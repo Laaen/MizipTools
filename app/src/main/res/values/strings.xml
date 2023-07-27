@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">MizipTools</string>
+    <string name="miziptools">MizipTools</string>
+    <string name="dumper_la_cle">Dump tag</string>
+    <string name="ecrire_une_nouvelle_cle">Write new tag</string>
+    <string name="recharger_la_cle">Recharge tag</string>
+    <string name="changer_l_uid">Change UID</string>
+    <string name="reinitialiser_la_cle">Reset tag</string>
+    <string name="activer">Activate</string>
+    <string name="solde_en_euros">Money ($)</string>
+    <string name="recharger">Recharge</string>
+    <string name="uid">UID</string>
+    <string name="changer">Change</string>
+    <string name="cle_unique">Unique key</string>
+    <string name="base_uid">XDXXXBXX</string>
+    <string name="base_money">26.92</string>
+    <string name="cles_a_et_b">A and B keys</string>
+    <string name="base_key">FFFFFFFFFFFF</string>
+    <string name="ecrire_la_cle">Write tag</string>
+    <string name="nom_fichier_dump">Dump file name</string>
+    <string name="parcourir">Search</string>
+    <string name="cle_ecrite_avec_succes">Tag written succesfully !</string>
+    <string name="dump_effectue_fichier">Dump done ! file :</string>
+    <string name="cle_rechargee_avec_succes">Tag recharged succesfully !</string>
+    <string name="uid_change_avec_succes">UID succesfully modified !</string>
+    <string name="cle_reinitialisee_avec_succes">Tag succesfully reset !</string>
+</resources>

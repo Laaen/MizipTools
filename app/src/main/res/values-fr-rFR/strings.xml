@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MizipTools</string>
+    <string name="miziptools">MizipTools</string>
+    <string name="dumper_la_cle">Dumper la clé</string>
+    <string name="ecrire_une_nouvelle_cle">Ecrire une nouvelle clé</string>
+    <string name="recharger_la_cle">Recharger la clé</string>
+    <string name="changer_l_uid">Changer l\'UID</string>
+    <string name="reinitialiser_la_cle">Réinitialiser la clé</string>
+    <string name="activer">Activer</string>
+    <string name="solde_en_euros">Solde (en €)</string>
+    <string name="recharger">Recharger</string>
+    <string name="uid">UID</string>
+    <string name="changer">Changer</string>
+    <string name="cle_unique">Clé unique</string>
+    <string name="base_uid">XDXXXBXX</string>
+    <string name="base_money">26.92</string>
+    <string name="cles_a_et_b">Clés A et B</string>
+    <string name="base_key">FFFFFFFFFFFF</string>
+    <string name="ecrire_la_cle">Ecrire la clé</string>
+    <string name="nom_fichier_dump">Nom fichier dump</string>
+    <string name="parcourir">Parcourir</string>
+    <string name="cle_ecrite_avec_succes">Clé écrite avec succès !</string>
+    <string name="dump_effectue_fichier">"Dump effectué !  fichier : "</string>
+    <string name="cle_rechargee_avec_succes">Clé rechargée avec succès !</string>
+    <string name="uid_change_avec_succes">UID changé avec succès !</string>
+    <string name="cle_reinitialisee_avec_succes">Clé réinitialisée avec succès !</string>
+</resources>
