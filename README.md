@@ -45,7 +45,9 @@ Pretty simple : It will write a predefined dump in your tag all data will be era
 
 ## Final words
 This app is stil quite unstable, if you remove/add a new tag while it is open, it il very likely to crash.
+
 Moreover, when asked informations (UID, money, Key), please follow the guide. 
+
 If for example you enter an UID which is too small, it could brick your tag (I'll very likely start to implement stuff to prevent that soon)
 
 Unfortunately most of the code's comments and var/fun names are in French D: 
