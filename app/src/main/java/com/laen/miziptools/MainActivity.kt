@@ -13,12 +13,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import com.example.miziptools.R
-import com.example.miziptools.databinding.ActivityMainScreenBinding
-import com.example.miziptools.databinding.ActivityWriteNewBinding
+import com.laen.miziptools.R
+import com.laen.miziptools.databinding.ActivityMainScreenBinding
+import com.laen.miziptools.databinding.ActivityWriteNewBinding
 import java.io.File
-import com.example.miziptools.databinding.ActivityChangeIdBinding
-import com.example.miziptools.databinding.ActivityRechargeKeyBinding
+import com.laen.miziptools.databinding.ActivityChangeIdBinding
+import com.laen.miziptools.databinding.ActivityRechargeKeyBinding
 
 class MainActivity : ComponentActivity() {
 

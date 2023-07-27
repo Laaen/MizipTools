@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.miziptools'
+    namespace 'com.laen.miziptools'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.miziptools"
+        applicationId "com.laen.miziptools"
         minSdk 24
         targetSdk 33
         versionCode 1

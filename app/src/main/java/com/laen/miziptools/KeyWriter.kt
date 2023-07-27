@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import com.example.miziptools.R
+import com.laen.miziptools.R
 import java.io.BufferedReader
 import java.io.FileNotFoundException
 import java.io.InputStream
