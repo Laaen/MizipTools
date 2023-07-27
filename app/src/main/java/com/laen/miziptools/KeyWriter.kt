@@ -103,7 +103,7 @@ class KeyWriter constructor(private val root : MainActivity){
             // On génère ce que l'on va écrire dans la clé
             val contenu = generateKeyContents(templateDump, listOf(uidBcc, ancienSolde, soldeActuel), listeKA, listeKB)
             // On écrit dans la clé
-            //ecritureCleUnique(contenu, root.writeNewBinding.bKey.text.toString())
+            ecritureCleUnique(contenu, root.writeNewBinding.bKey.text.toString())
         }catch(e : FileNotFoundException){
             Log.e("Fichier", "Erreur lors de la lecture du fichier : ${e.message}")
         }catch (e : java.lang.Exception) {

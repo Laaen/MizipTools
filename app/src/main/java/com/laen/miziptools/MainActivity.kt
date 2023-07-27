@@ -260,7 +260,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF"""
         try{
             nfcWrapper = connectToTag()
         }catch(e : Exception){
-            //finish()
+            finish()
         }
 
 
