@@ -40,6 +40,10 @@ class MainActivity : ComponentActivity() {
     // Var qui contient l'URI du fichier
     var uriFichier : Uri? = null
 
+    // Reges pour vérification des entrées
+    val regexUID = """^[a-fA-F0-9X]{8}$"""
+    val regexCle = """^[a-fA-F0-9]{12}$"""
+
     // Pour le layout
     lateinit var writeNewBinding: ActivityWriteNewBinding
     private lateinit var mainBinding : ActivityMainScreenBinding
@@ -80,6 +84,11 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF
 00000000000000000000000000000000
 00000000000000000000000000000000
 FFFFFFFFFFFFFF078069FFFFFFFFFFFF"""
+
+    // FOnction qui affcihe un message d'erraur de saisie incorrecte
+    fun displayErrorMessage(msg : String){
+        Toast.makeText(this, getString(R.string.erreur_dans_le_param) + msg, Toast.LENGTH_LONG).show()
+    }
 
     // Fonctions qui permettent de calculer les clés A et B
     private fun calcKeyA(uid : String) = (uid + uid.slice(0..3))
@@ -164,6 +173,10 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF"""
     // Fonction qui va servir à recharger la clé
     private fun rechargerCle(nouveauSolde : String){
 
+        // On vérifie si le solde est ok
+        val nouveauSolde = if (!nouveauSolde.isEmpty() && nouveauSolde.toFloat() < 655.34 ) {nouveauSolde} else { displayErrorMessage(getString(
+                    R.string.solde)); return }
+
         // On récupère l'UID
         val uid = nfcWrapper.getKeyUID()
 
@@ -193,6 +206,9 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF"""
 
     // Fonction qui change l'ID de la clé, et modifie ses clés
     private fun changerIdCle(uid : String){
+        // Verification si l'UID est ok
+        val uid = if (uid.matches(Regex(regexUID))) {uid} else { displayErrorMessage("UID"); return }
+
         // On a le nouvel UID, on calcule son BCC
         val newUid = keyWriter.generateUidBcc(uid)
         Log.d("UID", uid)

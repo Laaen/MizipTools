@@ -24,4 +24,7 @@
     <string name="cle_rechargee_avec_succes">Tag recharged succesfully !</string>
     <string name="uid_change_avec_succes">UID succesfully modified !</string>
     <string name="cle_reinitialisee_avec_succes">Tag succesfully reset !</string>
+    <string name="erreur_dans_le_param">"Erreur dans le paramètre : "</string>
+    <string name="solde">Solde</string>
+    <string name="cle">Clé</string>
 </resources>

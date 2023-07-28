@@ -86,6 +86,13 @@ class KeyWriter constructor(private val root : MainActivity){
     // S'occupe de la génération de l'UID, des clés, et du dump à écrire, puis l'écrit sur la clé
     fun ecrireNouvelleCle(uid : String, solde : String){
 
+        // Verification de tout ce qui est entré
+        val uid = if (uid.matches(Regex(root.regexUID))) {uid} else { root.displayErrorMessage("UID"); return }
+        val solde = if (!solde.isEmpty() && solde.toFloat() < 655.34 ) {solde} else { root.displayErrorMessage(root.getString(
+            R.string.solde)); return }
+        val cleUnique = if (root.writeNewBinding.bKey.text.toString().matches(Regex(root.regexCle))) { root.writeNewBinding.bKey.text.toString() } else {root.displayErrorMessage(root.context.getString(
+                    R.string.cle)); return}
+
         // On génère l'UID + BCC
         val uidBcc = generateUidBcc(uid)
         Log.d("Info", uidBcc)
@@ -103,7 +110,7 @@ class KeyWriter constructor(private val root : MainActivity){
             // On génère ce que l'on va écrire dans la clé
             val contenu = generateKeyContents(templateDump, listOf(uidBcc, ancienSolde, soldeActuel), listeKA, listeKB)
             // On écrit dans la clé
-            ecritureCleUnique(contenu, root.writeNewBinding.bKey.text.toString())
+            ecritureCleUnique(contenu, cleUnique)
         }catch(e : FileNotFoundException){
             Log.e("Fichier", "Erreur lors de la lecture du fichier : ${e.message}")
         }catch (e : java.lang.Exception) {
