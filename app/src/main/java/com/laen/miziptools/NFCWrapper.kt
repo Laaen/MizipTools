@@ -3,6 +3,7 @@ package com.laen.miziptools
 import android.nfc.tech.MifareClassic
 import android.util.Log
 import java.lang.Exception
+import java.util.Locale
 
 // Classe qui gère tout ce qui est interactions avec le tag NFC
 class NFCWrapper (private val nfc: MifareClassic) {
@@ -33,14 +34,14 @@ class NFCWrapper (private val nfc: MifareClassic) {
             } else {
                 return false
             }
-        }catch (e : Exception){
-            Log.e("Err Write", "Erreur lors de l'écriture sur la clé : $e")
-            return false
+        }catch (e : android.nfc.TagLostException){
+            throw android.nfc.TagLostException("Tag lost")
         }
 
     }
 
-    fun getKeyUID() : String = nfc.tag.id.joinToString(separator = "") { it.toUByte().toString(radix = 16).padStart(2, '0') }
+    fun getKeyUID() : String = nfc.tag.id.joinToString(separator = "") { it.toUByte().toString(radix = 16).padStart(2, '0') }.uppercase(
+        Locale("EN"))
 
     fun isConnected(): Boolean = nfc.isConnected
 

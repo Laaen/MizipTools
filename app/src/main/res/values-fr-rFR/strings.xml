@@ -25,4 +25,11 @@
     <string name="cle_rechargee_avec_succes">Clé rechargée avec succès !</string>
     <string name="uid_change_avec_succes">UID changé avec succès !</string>
     <string name="cle_reinitialisee_avec_succes">Clé réinitialisée avec succès !</string>
+    <string name="erreur_dans_le_param">"Erreur dans le paramètre : "</string>
+    <string name="solde">Solde</string>
+    <string name="cle">Clé</string>
+    <string name="nouveau_tag_trouv">Nouveau tag trouvé :</string>
+    <string name="erreur_lors_de_l_criture_sur_le_tag">Erreur lors de l\'écriture sur le Tag</string>
+    <string name="erreur_tag_enleve">Erreur lors de la lecture du tag : Le tag a été enlevé</string>
+    <string name="erreur_de_communication">Erreur de communication avec le tag (Clés non valides)</string>
 </resources>
