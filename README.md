@@ -15,15 +15,12 @@ Features :
 ## Quick guide
 
 ### Introduction
-Put your MiZip key on the back of your phone, the app should start.
-
-Don't start the app manually, it won't work (I'll maybe fiddle with it to allow manual starting)
-
+Start the app, put the tag on the back of your phone, and you're good to go
 
 ### Dump Tag
 It will read your Mizip tag's UID, generate all keys, and read all sectors, a dump should be saved in the Android/data/com.laen.miziptools/files/[UID].txt
 
-If the app crashes when dumping, it's either you don't have a MiZip tag, some issue occured when writing the file (unlikely), or there are some subtilities on how they generate key and this app is worthless D:
+If the app crashes when dumping, it's either you don't have a MiZip tag, some issue occured when writing the file (unlikely), or there are some subtilities on how they generate keys and this app is worthless D:
 
 If it doesn't work, and you are sure your tag is a MiZip tag, feel free to submit an issue :)
 
@@ -42,7 +39,7 @@ If it doesn't work, the most common issue is that your A and B keys are not the 
 
 
 ### Recharge Tag
-Easy put amount of money you want, tap recharge, and you're done ;)
+Easy, put amount of money you want, tap recharge, and you're done ;)
 
 If the app crashes when recharging, it' likely to be the same reasons as for the "Dump tag"
 
@@ -58,11 +55,7 @@ Pretty simple : It will write a predefined dump in your tag all data will be era
 
 
 ## Final words
-This app is stil quite unstable, if you remove/add a new tag while it is open, it il very likely to crash.
-
-Moreover, when asked informations (UID, money, Key), please follow the guide. 
-
-If for example you enter an UID which is too small, it could brick your tag (I'll very likely start to implement stuff to prevent that soon)
+This app is stil quite unstable, the "back" button doesn't work, so you have to close/restart the app everytime you want to go to the main screen
 
 Unfortunately for you most of the code's comments and var/fun names are in French. If you have any questions and/or suggestions feel free to message me :)
 

@@ -286,7 +286,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         // Context
         context = applicationContext
 
-         mainBinding = ActivityMainScreenBinding.inflate(layoutInflater)
+        mainBinding = ActivityMainScreenBinding.inflate(layoutInflater)
         writeNewBinding = ActivityWriteNewBinding.inflate(layoutInflater)
         rechargeBinding = ActivityRechargeKeyBinding.inflate(layoutInflater)
         changeIdBinding = ActivityChangeIdBinding.inflate(layoutInflater)

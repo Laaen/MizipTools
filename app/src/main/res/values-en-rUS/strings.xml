@@ -28,7 +28,7 @@
     <string name="erreur_dans_le_param">Error in the parameter :</string>
     <string name="solde">Money</string>
     <string name="cle">Key</string>
-    <string name="nouveau_tag_trouv">New Tag found :</string>
+    <string name="nouveau_tag_trouv">"New Tag found : "</string>
     <string name="erreur_lors_de_l_criture_sur_le_tag">Error while writing to the tag</string>
     <string name="erreur_tag_enleve">Error while reading the tag : the tag was removed</string>
     <string name="erreur_de_communication">Error while communiocating with the tag : Wrong keys</string>
