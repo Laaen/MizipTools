@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
     // Objet qui gère l'écriture
     private val keyWriter = KeyWriter(this)
     //objet qui gère le tag
-    lateinit var nfcWrapper : NFCWrapper
+    var nfcWrapper : NFCWrapper? = null
 
     // Données de base d'une clé, utilisé pour la remise à 0
     private val baseCle = """4c61656e26890400c834002000000016
@@ -142,17 +142,19 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
     // Fonction qui va faire le dump, elle renvoie un String
     private fun dumpCleMizip() : String?{
 
+        checkNfcWrapper() ?: return null
+
         // Vars qui contiennent ce qu'on va ecrire dans les fichiers
         var contenuDump = ""
         // On reconstitue l'UID
-        val targetUid = nfcWrapper.getKeyUID()
+        val targetUid = nfcWrapper!!.getKeyUID()
         // Calcul des clés
         val (listKeysA, listKeysB) = getAllKeys(targetUid).toList()
         // On est connecté, pour chaque block (20 au total) on lit les infos, tous les 4 blocks on
         // s'authentifie avec la bonne clé
         for (i in 0..19){
             try {
-                contenuDump += nfcWrapper.readBlock(i, listKeysA[i / 4], i / 4) + "\n"
+                contenuDump += nfcWrapper!!.readBlock(i, listKeysA[i / 4], i / 4) + "\n"
             }catch (e : android.nfc.TagLostException){
                 Toast.makeText(this, getString(R.string.erreur_tag_enleve), Toast.LENGTH_SHORT).show()
                 return null
@@ -171,22 +173,24 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         nfcWrapper = NFCWrapper(MifareClassic.get(tag))
 
         // On affiche à l'utilisateur qu'on a trouvé un tag
-        this.runOnUiThread { Toast.makeText(this, getString(R.string.nouveau_tag_trouv) + nfcWrapper.getKeyUID(), Toast.LENGTH_SHORT).show() }
+        this.runOnUiThread { Toast.makeText(this, getString(R.string.nouveau_tag_trouv) + nfcWrapper!!.getKeyUID(), Toast.LENGTH_SHORT).show() }
 
         // On le renvoie
-        return nfcWrapper
+        return nfcWrapper!!
 
     }
 
     // Fonction qui va servir à recharger la clé
     private fun rechargerCle(nouveauSolde : String){
 
+        checkNfcWrapper() ?: return
+
         // On vérifie si le solde est ok
         val nouveauSolde = if (nouveauSolde.isNotEmpty() && nouveauSolde.toFloat() < 655.34 ) {nouveauSolde} else { displayErrorMessage(getString(
                     R.string.solde)); return }
 
         // On récupère l'UID
-        val uid = nfcWrapper.getKeyUID()
+        val uid = nfcWrapper!!.getKeyUID()
 
         // On génère les clés A et B, et on récupère uniquemment celle qui nous intéresse : celle du secteur 2
         val cleA = calcKey(uid, baseKeyAList, ::calcKeyA)[1]
@@ -194,8 +198,8 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
 
         // On récupère seulement les deux lignes qui ont à voir avec le solde
         // Blocks 8 et 9 Secteur 2
-        val ancienSolde = nfcWrapper.readBlock(9, cleA, 2)
-        val soldeActuel = nfcWrapper.readBlock(8, cleA, 2)
+        val ancienSolde = nfcWrapper!!.readBlock(9, cleA, 2)
+        val soldeActuel = nfcWrapper!!.readBlock(8, cleA, 2)
 
         // On récupère le nouveau solde que l'on veut et son solde antérieur + leur checksum
         val nouveauSoldeAct = keyWriter.traiterSolde(nouveauSolde)
@@ -206,14 +210,17 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         val ligneNouveauAct = soldeActuel.replace(soldeActuel.slice(2..7), nouveauSoldeAct)
 
         // On écrit les deux lignes
-        nfcWrapper.writeBlock(ligneNouveauAnt, 2, 8, cleA, cleB)
-        nfcWrapper.writeBlock(ligneNouveauAct, 2, 9, cleA, cleB)
+        nfcWrapper!!.writeBlock(ligneNouveauAnt, 2, 8, cleA, cleB)
+        nfcWrapper!!.writeBlock(ligneNouveauAct, 2, 9, cleA, cleB)
 
         Toast.makeText(this, getString(R.string.cle_rechargee_avec_succes), Toast.LENGTH_SHORT).show()
     }
 
     // Fonction qui change l'ID de la clé, et modifie ses clés
     private fun changerIdCle(uid : String){
+
+        checkNfcWrapper() ?: return
+
         // Verification si l'UID est ok
         val uid = if (uid.matches(Regex(regexUID))) {uid} else { displayErrorMessage("UID"); return }
 
@@ -222,7 +229,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         Log.d("UID", uid)
         // On récupère la liste des clés
         val listeCles = getAllKeys(uid)
-        val oldKeys = getAllKeys(nfcWrapper.getKeyUID())
+        val oldKeys = getAllKeys(nfcWrapper!!.getKeyUID())
         // On génère le dump de la clé actuelle, si erreur lors du dump, on return
         var dump = dumpCleMizip() ?: return
         // On le modifie pour changer les clés
@@ -237,8 +244,11 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
 
     // Fonction qui reset la clé, On laisse son UID, mais on Passe toutes ses clés à FFFFFFFFFFFF
     private fun resetCle(){
+
+        checkNfcWrapper() ?: return
+
         // On prend l'UID de la clé actuelle
-        val uid = nfcWrapper.getKeyUID()
+        val uid = nfcWrapper!!.getKeyUID()
         // On récupère ses clés
         val (kA, kB) = getAllKeys(uid).toList()
         // On écrit la clé de base, on catch les erreurs possibles
@@ -255,6 +265,22 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
             return
         }
             Toast.makeText(this, getString(R.string.cle_reinitialisee_avec_succes), Toast.LENGTH_SHORT).show()
+    }
+
+    // Fonction qui est appellée pour chaque action, on vérifie juste si le nfcWrapper existe
+    fun checkNfcWrapper() : Boolean?{
+        if (nfcWrapper == null){
+            // C'est null, on affiche message d'erreur, et on retourn false
+            runOnUiThread {
+                Toast.makeText(
+                    context,
+                    getString(R.string.pas_de_tag_d_tect),
+                    Toast.LENGTH_SHORT
+                ).show()}
+            return null
+        }else{
+            return true
+        }
     }
 
     // Ecran du menu de changement d'UID
@@ -293,7 +319,8 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
 
         setContentView(mainBinding.root)
 
-        mainBinding.dumpKey.setOnClickListener { saveDump(dumpCleMizip(), nfcWrapper.getKeyUID()+ ".txt") }
+        // The NFC wrapper should be here if the DumpCleMizip func id successful
+        mainBinding.dumpKey.setOnClickListener { saveDump(dumpCleMizip(), nfcWrapper?.getKeyUID()+ ".txt") }
         mainBinding.writeNewKey.setOnClickListener { ecranEcrireNouvelleCle() }
         mainBinding.rechargeKey.setOnClickListener { ecranRechargerCle() }
         mainBinding.changeUid.setOnClickListener { ecranChangeId() }
@@ -307,6 +334,11 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         val nfcAdapter = getDefaultAdapter(context)
         nfcAdapter.enableReaderMode(this,
             { tag -> connectToTag(tag) }, NfcAdapter.FLAG_READER_NFC_A , null)
+    }
+
+    override fun onBackPressed() {
+        // A messay way of implementing the back button feature
+        setContentView(mainBinding.root)
     }
 
     override fun onStop() {

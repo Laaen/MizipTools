@@ -95,6 +95,8 @@ class KeyWriter constructor(private val root : MainActivity) {
     // S'occupe de la génération de l'UID, des clés, et du dump à écrire, puis l'écrit sur la clé
     fun ecrireNouvelleCle(uid: String, solde: String) {
 
+        root.checkNfcWrapper() ?: return
+
         // Verification de tout ce qui est entré
         val uid = if (uid.matches(Regex(root.regexUID))) {
             uid
@@ -189,20 +191,26 @@ class KeyWriter constructor(private val root : MainActivity) {
 
     // FOnction qui écrit le contenu dans la clé
     fun ecritureCle(contenu: String, l_k_a: List<String>, l_k_b: List<String>) {
+
+        root.checkNfcWrapper() ?: return
+
         // Pour les 20 secteurs
         for (i in 0..19) {
             // On Ecrit
-            root.nfcWrapper.writeBlock(contenu.lines()[i], i / 4, i, l_k_a[i / 4], l_k_b[i / 4])
+            root.nfcWrapper!!.writeBlock(contenu.lines()[i], i / 4, i, l_k_a[i / 4], l_k_b[i / 4])
         }
     }
 
 
     // Fonction qui écrit le contenu dans la clé, en se basant sur la clé donnée (Correspond aux clée A et B de tous les secteurs)
     private fun ecritureCleUnique(contenu: String, cle: String) {
+
+        root.checkNfcWrapper() ?: return
+
         // Pour les 20 secteurs
         for (i in 0..19) {
             // On Ecrit
-            root.nfcWrapper.writeBlock(contenu.lines()[i], i / 4, i, cle, cle).toString()
+            root.nfcWrapper!!.writeBlock(contenu.lines()[i], i / 4, i, cle, cle).toString()
         }
     }
 }

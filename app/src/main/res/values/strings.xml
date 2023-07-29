@@ -31,4 +31,7 @@
     <string name="erreur_lors_de_l_criture_sur_le_tag">Error while writing to the tag</string>
     <string name="erreur_tag_enleve">Error while reading the tag : the tag was removed</string>
     <string name="erreur_de_communication">Error while communiocating with the tag : Wrong keys</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="pas_de_tag_d_tect">Pas de tag détecté</string>
 </resources>
