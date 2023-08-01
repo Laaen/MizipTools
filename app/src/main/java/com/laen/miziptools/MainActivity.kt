@@ -6,31 +6,45 @@ import android.net.Uri
 import android.nfc.NfcAdapter
 import android.nfc.NfcAdapter.getDefaultAdapter
 import android.nfc.Tag
+import android.nfc.TagLostException
 import android.nfc.tech.MifareClassic
 import android.os.Bundle
+import android.service.media.MediaBrowserService.BrowserRoot
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.text.toUpperCase
 import com.laen.miziptools.databinding.ActivityMainScreenBinding
 import com.laen.miziptools.databinding.ActivityWriteNewBinding
 import java.io.File
 import com.laen.miziptools.databinding.ActivityChangeIdBinding
 import com.laen.miziptools.databinding.ActivityRechargeKeyBinding
+import com.laen.miziptools.databinding.ActivityViewDumpBinding
+import java.io.IOException
+import java.lang.Exception
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
     // Tout ce qui gère le choix du fichier
     // Activité qui va ouvrir le file picker
-    val dirRequest = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+    val dirRequestWriteKey = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
             // call this to persist permission across decice reboots
             contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             // do your stuff
             this.uriFichier = uri
             writeNewBinding.fichierDump.setText(uri.path.toString().split("/").last())
+        }
+    }
+
+    val dirRequestReadDump = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let {
+            // call this to persist permission across decice reboots
+            contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            // do your stuff
+            this.uriFichier = uri
+            viewDumpBinding.fichierDump.setText(uri.path.toString().split("/").last())
         }
     }
 
@@ -49,6 +63,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var mainBinding : ActivityMainScreenBinding
     private lateinit var rechargeBinding : ActivityRechargeKeyBinding
     private lateinit var changeIdBinding : ActivityChangeIdBinding
+    private lateinit var viewDumpBinding: ActivityViewDumpBinding
 
     // CLés et UID connus à partir desquels on va calculer les clés du MiZip
     private val baseKeyAList = listOf("6421E1E7E4D6", "C64672F5FF1C", "8F41FA6D413A", "5C490CED29A3")
@@ -59,9 +74,16 @@ class MainActivity : ComponentActivity() {
     private val deduction = 0.37
 
     // Objet qui gère l'écriture
-    private val keyWriter = KeyWriter(this)
+    val tagWriter = TagWriter(this)
+    // Objet qui gère la lecture
+    val tagReader = TagReader(this)
     //objet qui gère le tag
     var nfcWrapper : NFCWrapper? = null
+
+    // Le thread d'update
+    var threadUpdate : Thread? = null
+    var continuer : Boolean = true
+
 
     // Données de base d'une clé, utilisé pour la remise à 0
     private val baseCle = """4c61656e26890400c834002000000016
@@ -84,6 +106,18 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF
 00000000000000000000000000000000
 00000000000000000000000000000000
 FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
+
+    // Fonctions qui stoppent le thread de mise à jour et le redémarrent
+    fun stopThreadUpdate(){
+        continuer = false
+        Thread.sleep(1000)
+    }
+
+    fun startThreadUpdate(){
+        continuer = true
+        threadUpdate = Thread { updateTagInfo() }
+        threadUpdate!!.start()
+    }
 
     // FOnction qui affcihe un message d'erraur de saisie incorrecte
     fun displayErrorMessage(msg : String){
@@ -110,6 +144,15 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         val keysA = listOf("a0a1a2a3a4a5") + calcKey(uid, baseKeyAList, ::calcKeyA)
         val keysB = listOf("b4c123439eef") + calcKey(uid, baseKeyBList, ::calcKeyB)
         return Pair(keysA, keysB)
+    }
+
+    // Fonction qui récupère le solde
+    private fun getSolde() : String{
+        // On prend la clé A du secteur 2
+        val keyA = getAllKeys(nfcWrapper!!.getKeyUID()).first[2]
+        // On récupère les infos
+        val solde = nfcWrapper!!.readBlock(9, keyA, 2)
+        return solde.slice(2..5).chunked(2).reversed().joinToString(separator = "").toInt(16).div(100.0).toString()
     }
 
     // Sauvegarde la dump dans un fichier dont le nom est l'UID
@@ -139,8 +182,19 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         return resultat
     }
 
+    // Fonction qui lit le dump et l'affiche
+    private fun lireDump(uri : Uri){
+
+        val contenuDump = tagReader.lireFichier(uri)
+
+        this.runOnUiThread { viewDumpBinding.lireDumpTitre.text = contenuDump.slice(0..7).uppercase() + ". txt" }
+        this.runOnUiThread { viewDumpBinding.lireDumpContenu.text = contenuDump.uppercase() }
+    }
+
     // Fonction qui va faire le dump, elle renvoie un String
     private fun dumpCleMizip() : String?{
+
+        stopThreadUpdate()
 
         checkNfcWrapper() ?: return null
 
@@ -152,37 +206,109 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         val (listKeysA, listKeysB) = getAllKeys(targetUid).toList()
         // On est connecté, pour chaque block (20 au total) on lit les infos, tous les 4 blocks on
         // s'authentifie avec la bonne clé
-        for (i in 0..19){
-            try {
-                contenuDump += nfcWrapper!!.readBlock(i, listKeysA[i / 4], i / 4) + "\n"
-            }catch (e : android.nfc.TagLostException){
+        try {
+        for (i in 0..19) {
+            contenuDump += nfcWrapper!!.readBlock(i, listKeysA[i / 4], i / 4) + "\n"
+        }
+        }catch (e : android.nfc.TagLostException){
                 Toast.makeText(this, getString(R.string.erreur_tag_enleve), Toast.LENGTH_SHORT).show()
                 return null
-            }catch (e : java.io.IOException){
-                Toast.makeText(this, getString(R.string.erreur_de_communication), Toast.LENGTH_SHORT).show()
-                return null
-            }
+        }catch (e : java.io.IOException){
+            Log.d("", "$e")
+            Toast.makeText(this, getString(R.string.erreur_de_communication), Toast.LENGTH_SHORT).show()
+            return null
+        }finally {
+            startThreadUpdate()
         }
         // Formatage, et retour du dump
         return traiterDump(contenuDump, listKeysA, listKeysB)
     }
 
+    // Fonction qui va pool toutes les x secondes les infos du tag (utilisé pour savoir si le tag est toujours là
+    private fun updateTagInfo(){
+            // Met ensuite à jour l'UID et/ou le solde
+        while (continuer) {
+            var uid = "N/A"
+            var solde = "N/A"
+            try {
+                Thread.sleep(1000)
+                //On change le texte du tableau du menu principal
+                Log.d("", "Boucle")
+                uid = nfcWrapper!!.getKeyUID()
+                // On essaie d'avoir le solde, si on y arrive pas, on ne touche pas au texte
+                solde = getSolde() + getString(R.string.euros)
+            } catch (e: TagLostException) {
+                tagDisconnected()
+                return
+            }catch (e: IOException) {
+                this.runOnUiThread { mainBinding.infotagMoney.text = "N/A" }
+            } catch (e: InterruptedException) {
+                return
+            }catch(e: Exception){
+
+            }
+            this.runOnUiThread { mainBinding.infotagMoney.text = solde }
+            this.runOnUiThread { mainBinding.infoTagUID.text = uid}
+        }
+    }
+
     // Instancie un NFCWrapper
-    private fun connectToTag(tag : Tag) : NFCWrapper {
+    private fun connectToTag(tag : Tag){
+
         // On crée l'objet NFCWrapper
-        nfcWrapper = NFCWrapper(MifareClassic.get(tag))
+        this.nfcWrapper = NFCWrapper(MifareClassic.get(tag))
 
         // On affiche à l'utilisateur qu'on a trouvé un tag
         this.runOnUiThread { Toast.makeText(this, getString(R.string.nouveau_tag_trouv) + nfcWrapper!!.getKeyUID(), Toast.LENGTH_SHORT).show() }
 
-        // On le renvoie
-        return nfcWrapper!!
+        // On active tous les boutons possibles
+        this.runOnUiThread { mainBinding.dumpKey.isEnabled = true }
+        this.runOnUiThread { mainBinding.writeNewKey.isEnabled = true }
+        this.runOnUiThread { mainBinding.rechargeKey.isEnabled = true }
+        this.runOnUiThread { mainBinding.changeUid.isEnabled = true }
+        this.runOnUiThread { mainBinding.activateReset.isEnabled = true }
 
+        this.runOnUiThread { rechargeBinding.buttonRecharge.isEnabled = true }
+        this.runOnUiThread { changeIdBinding.buttonChId.isEnabled = true }
+        this.runOnUiThread {  writeNewBinding.writeNewKey.isEnabled = true }
+
+        // Thread pour l'actualisation des infos / detection du tag enlevé
+        startThreadUpdate()
+    }
+
+    // Appelé lorsque le tag est enlevé
+    private fun tagDisconnected(){
+
+        stopThreadUpdate()
+
+        // ON affiche un message à l'utilisateur
+        this.runOnUiThread { Toast.makeText(this, getString(R.string.connection_avec_le_tag_perdue), Toast.LENGTH_SHORT).show() }
+
+        // On désactive tous les boutons possibles
+        this.runOnUiThread {mainBinding.dumpKey.isEnabled = false }
+        this.runOnUiThread {mainBinding.writeNewKey.isEnabled = false }
+        this.runOnUiThread {mainBinding.rechargeKey.isEnabled = false }
+        this.runOnUiThread {mainBinding.changeUid.isEnabled = false }
+        this.runOnUiThread {mainBinding.activateReset.isEnabled = false }
+
+        this.runOnUiThread {rechargeBinding.buttonRecharge.isEnabled = false }
+        this.runOnUiThread {changeIdBinding.buttonChId.isEnabled = false }
+        this.runOnUiThread {writeNewBinding.writeNewKey.isEnabled = false }
+
+        // On change le texte du tableau du menu principal
+        this.runOnUiThread {mainBinding.infoTagUID.text = getString(R.string.pas_de_tag)}
+        this.runOnUiThread {mainBinding.infotagMoney.text = getString(R.string.pas_de_tag)}
+
+        // On supprime le wrapper
+        nfcWrapper = null
     }
 
     // Fonction qui va servir à recharger la clé
     private fun rechargerCle(nouveauSolde : String){
 
+        // On doit arrêter le Thread à chaque opération (éviter des transactions simultannées)
+        stopThreadUpdate()
+        Log.d("", "Stop")
         checkNfcWrapper() ?: return
 
         // On vérifie si le solde est ok
@@ -196,22 +322,29 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         val cleA = calcKey(uid, baseKeyAList, ::calcKeyA)[1]
         val cleB = calcKey(uid, baseKeyBList, ::calcKeyB)[1]
 
-        // On récupère seulement les deux lignes qui ont à voir avec le solde
-        // Blocks 8 et 9 Secteur 2
-        val ancienSolde = nfcWrapper!!.readBlock(9, cleA, 2)
-        val soldeActuel = nfcWrapper!!.readBlock(8, cleA, 2)
+        try{
+            // On récupère seulement les deux lignes qui ont à voir avec le solde
+            // Blocks 8 et 9 Secteur 2
+            val ancienSolde = nfcWrapper!!.readBlock(9, cleA, 2)
+            val soldeActuel = nfcWrapper!!.readBlock(8, cleA, 2)
 
-        // On récupère le nouveau solde que l'on veut et son solde antérieur + leur checksum
-        val nouveauSoldeAct = keyWriter.traiterSolde(nouveauSolde)
-        val nouveauSoldeAnt = keyWriter.traiterSolde((nouveauSolde.toFloat() + deduction).toString())
+            // On récupère le nouveau solde que l'on veut et son solde antérieur + leur checksum
+            val nouveauSoldeAct = tagWriter.traiterSolde(nouveauSolde)
+            val nouveauSoldeAnt = tagWriter.traiterSolde((nouveauSolde.toFloat() + deduction).toString())
 
-        // On remplace dans les deux lignes
-        val ligneNouveauAnt = ancienSolde.replace(ancienSolde.slice(2..7), nouveauSoldeAnt)
-        val ligneNouveauAct = soldeActuel.replace(soldeActuel.slice(2..7), nouveauSoldeAct)
+            // On remplace dans les deux lignes
+            val ligneNouveauAnt = ancienSolde.replace(ancienSolde.slice(2..7), nouveauSoldeAnt)
+            val ligneNouveauAct = soldeActuel.replace(soldeActuel.slice(2..7), nouveauSoldeAct)
 
-        // On écrit les deux lignes
-        nfcWrapper!!.writeBlock(ligneNouveauAnt, 2, 8, cleA, cleB)
-        nfcWrapper!!.writeBlock(ligneNouveauAct, 2, 9, cleA, cleB)
+            // On écrit les deux lignes
+            nfcWrapper!!.writeBlock(ligneNouveauAnt, 2, 8, cleA, cleB)
+            nfcWrapper!!.writeBlock(ligneNouveauAct, 2, 9, cleA, cleB)
+        }catch(e : java.io.IOException){
+            Toast.makeText(this, getString(R.string.erreur_lors_de_l_criture_sur_le_tag), Toast.LENGTH_SHORT).show()
+            return
+        }finally {
+            startThreadUpdate()
+        }
 
         Toast.makeText(this, getString(R.string.cle_rechargee_avec_succes), Toast.LENGTH_SHORT).show()
     }
@@ -219,13 +352,16 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
     // Fonction qui change l'ID de la clé, et modifie ses clés
     private fun changerIdCle(uid : String){
 
+        // On doit arrêter le Thread à chaque opération (éviter des transactions simultannées)
+        stopThreadUpdate()
         checkNfcWrapper() ?: return
+        // On pause le thread de mise à jour
 
         // Verification si l'UID est ok
         val uid = if (uid.matches(Regex(regexUID))) {uid} else { displayErrorMessage("UID"); return }
 
         // On a le nouvel UID, on calcule son BCC
-        val newUid = keyWriter.generateUidBcc(uid)
+        val newUid = tagWriter.generateUidBcc(uid)
         Log.d("UID", uid)
         // On récupère la liste des clés
         val listeCles = getAllKeys(uid)
@@ -236,8 +372,17 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         dump = traiterDump(dump, listeCles.first, listeCles.second)
         // On modifie la première ligne pour changer l'UID et le BCC
         dump = dump.replace(dump.slice(0..9), newUid)
-        // On peut écrire le dump sur la clé
-        keyWriter.ecritureCle(dump, oldKeys.first, oldKeys.second)
+
+        try{
+            // On peut écrire le dump sur la clé
+            tagWriter.ecritureCle(dump, oldKeys.first, oldKeys.second)
+        }catch(e : java.io.IOException){
+            Toast.makeText(this, getString(R.string.erreur_lors_de_l_criture_sur_le_tag), Toast.LENGTH_SHORT).show()
+            return
+        }finally {
+            startThreadUpdate()
+        }
+
 
         Toast.makeText(this, getString(R.string.uid_change_avec_succes), Toast.LENGTH_SHORT).show()
     }
@@ -245,16 +390,19 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
     // Fonction qui reset la clé, On laisse son UID, mais on Passe toutes ses clés à FFFFFFFFFFFF
     private fun resetCle(){
 
+        // On doit arrêter le Thread à chaque opération (éviter des transactions simultannées)
+        stopThreadUpdate()
+        Log.d("", "Stop")
         checkNfcWrapper() ?: return
 
         // On prend l'UID de la clé actuelle
         val uid = nfcWrapper!!.getKeyUID()
-        // On récupère ses clés
-        val (kA, kB) = getAllKeys(uid).toList()
-        // On écrit la clé de base, on catch les erreurs possibles
-        try {
-            keyWriter.ecritureCle(baseCle, kA, kB)
-        }catch(e : android.nfc.TagLostException){
+        try{
+            // On récupère ses clés
+            val (kA, kB) = getAllKeys(uid).toList()
+            // On écrit la clé de base, on catch les erreurs possibles
+            tagWriter.ecritureCle(baseCle, kA, kB)
+        }catch(e : java.io.IOException){
             runOnUiThread {
                 Toast.makeText(
                     context,
@@ -263,6 +411,9 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
                 ).show()
             }
             return
+        }
+        finally {
+            startThreadUpdate()
         }
             Toast.makeText(this, getString(R.string.cle_reinitialisee_avec_succes), Toast.LENGTH_SHORT).show()
     }
@@ -283,6 +434,25 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         }
     }
 
+    // Ecran du menu de lecture du dump
+    private fun ecranLireDump(){
+        setContentView(viewDumpBinding.root)
+        // Choix du fichier
+        viewDumpBinding.choisirFichier.setOnClickListener { tagReader.choisirFichier()
+            // On modifie le editText
+            viewDumpBinding.fichierDump.setText(tagReader.getUriFichier().path.toString().split("/").last())
+        }
+
+        // Lecture et affichage
+        viewDumpBinding.lireDump.setOnClickListener {
+            try {
+                lireDump(tagReader.getUriFichier())
+            }catch(e : Exception){
+                this.runOnUiThread { Toast.makeText(this, getString(R.string.erreur_lors_de_la_lecture_du_dump), Toast.LENGTH_SHORT).show() }
+            }
+        }
+    }
+
     // Ecran du menu de changement d'UID
     private fun ecranChangeId(){
         setContentView(changeIdBinding.root)
@@ -293,9 +463,9 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
     private fun ecranEcrireNouvelleCle(){
 
         setContentView(writeNewBinding.root)
-        writeNewBinding.choisirFichier.setOnClickListener { keyWriter.choisirFichier()}
+        writeNewBinding.choisirFichier.setOnClickListener { tagReader.choisirFichier()}
 
-        writeNewBinding.writeNewKey.setOnClickListener { keyWriter.ecrireNouvelleCle(writeNewBinding.uidBase.text.toString(),
+        writeNewBinding.writeNewKey.setOnClickListener { tagWriter.ecrireNouvelleCle(writeNewBinding.uidBase.text.toString(),
             writeNewBinding.nouveauSolde.text.toString()) }
 
     }
@@ -316,10 +486,12 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         writeNewBinding = ActivityWriteNewBinding.inflate(layoutInflater)
         rechargeBinding = ActivityRechargeKeyBinding.inflate(layoutInflater)
         changeIdBinding = ActivityChangeIdBinding.inflate(layoutInflater)
+        viewDumpBinding = ActivityViewDumpBinding.inflate(layoutInflater)
 
         setContentView(mainBinding.root)
 
         // The NFC wrapper should be here if the DumpCleMizip func id successful
+        mainBinding.boutonLireDump.setOnClickListener { ecranLireDump() }
         mainBinding.dumpKey.setOnClickListener { saveDump(dumpCleMizip(), nfcWrapper?.getKeyUID()+ ".txt") }
         mainBinding.writeNewKey.setOnClickListener { ecranEcrireNouvelleCle() }
         mainBinding.rechargeKey.setOnClickListener { ecranRechargerCle() }
@@ -345,4 +517,5 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         super.onStop()
         getDefaultAdapter(context).disableReaderMode(this)
     }
+
 }

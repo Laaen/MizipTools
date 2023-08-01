@@ -32,4 +32,9 @@
     <string name="erreur_lors_de_l_criture_sur_le_tag">Erreur lors de l\'écriture sur le Tag</string>
     <string name="erreur_tag_enleve">Erreur lors de la lecture du tag : Le tag a été enlevé</string>
     <string name="erreur_de_communication">Erreur de communication avec le tag (Clés non valides)</string>
+    <string name="pas_de_tag_d_tect">Pas de tag détecté</string>
+    <string name="connection_avec_le_tag_perdue">Connection avec le tag perdue</string>
+    <string name="pas_de_tag">Pas de tag</string>
+    <string name="euros">" €"</string>
+    <string name="infos_tag">Infos Tag</string>
 </resources>

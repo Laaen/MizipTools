@@ -14,30 +14,33 @@
         android:text="@string/miziptools"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:flow_horizontalAlign="center"
-        app:layout_constraintBottom_toTopOf="@+id/dump_key"
+        app:layout_constraintBottom_toTopOf="@+id/tagInfotable"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
 
     <Button
         android:id="@+id/dump_key"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="24dp"
         android:backgroundTint="#AAFFB300"
+        android:enabled="false"
         android:text="@string/dumper_la_cle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titre" />
+        app:layout_constraintTop_toBottomOf="@+id/boutonLireDump" />
 
     <Button
         android:id="@+id/write_new_key"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="24dp"
         android:backgroundTint="#AAFFB300"
+        android:enabled="false"
         android:text="@string/ecrire_une_nouvelle_cle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -48,8 +51,9 @@
         android:id="@+id/recharge_key"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="24dp"
         android:backgroundTint="#AAFFB300"
+        android:enabled="false"
         android:text="@string/recharger_la_cle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -60,39 +64,122 @@
         android:id="@+id/change_uid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="24dp"
         android:backgroundTint="#AAFFB300"
+        android:enabled="false"
         android:text="@string/changer_l_uid"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recharge_key" />
 
-    <Button
-        android:id="@+id/reset_key"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="#AAFFB300"
-        android:enabled="false"
-        android:text="@string/reinitialiser_la_cle"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.355"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/change_uid" />
+        app:layout_constraintTop_toBottomOf="@+id/change_uid">
 
-    <Switch
-        android:id="@+id/activate_reset"
+        <Button
+            android:id="@+id/reset_key"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#AAFFB300"
+            android:enabled="false"
+            android:text="@string/reinitialiser_la_cle" />
+
+        <Switch
+            android:id="@+id/activate_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#AAFFB300"
+            android:enabled="false"
+            android:text="@string/activer" />
+    </LinearLayout>
+
+    <TableLayout
+        android:id="@+id/tagInfotable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#AAFFB300"
-        android:text="@string/activer"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="50dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.25"
-        app:layout_constraintStart_toEndOf="@+id/reset_key"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.65" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titre">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/tagInfoTableTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/infos_tag"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/InfoTagUIDTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/uid"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/infoTagUID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pas_de_tag"
+                android:textSize="16sp" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/infoTagMoneyTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/solde"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/infotagMoney"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pas_de_tag"
+                android:textSize="16sp" />
+        </TableRow>
+
+    </TableLayout>
+
+    <Button
+        android:id="@+id/boutonLireDump"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#AAFFB300"
+        android:text="Lire Dump"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tagInfotable" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

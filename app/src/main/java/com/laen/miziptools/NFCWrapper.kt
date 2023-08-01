@@ -2,7 +2,6 @@ package com.laen.miziptools
 
 import android.nfc.tech.MifareClassic
 import android.util.Log
-import java.lang.Exception
 import java.util.Locale
 
 // Classe qui gère tout ce qui est interactions avec le tag NFC
@@ -51,4 +50,12 @@ class NFCWrapper (private val nfc: MifareClassic) {
         return key.chunked(2).map { it.toUByte(radix = 16).toByte() }.toByteArray()
     }
 
+    // Thread qui pingue le tag
+    fun pingTag(){
+        while(!Thread.interrupted()){
+            Thread.sleep(500)
+            nfc.transceive(convertToByteArr("FFCA000000"))
+        }
+    }
 }
+
