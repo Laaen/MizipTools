@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Lire dump"
+        android:text="@string/lire_dump"
         android:textAllCaps="false"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textStyle="bold"
@@ -110,7 +110,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="#AAFFB300"
-            android:text="Lire" />
+            android:text="@string/lire" />
 
         <Button
             android:id="@+id/makeTemplate"
@@ -118,7 +118,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="#AAFFB300"
-            android:text="Créer template" />
+            android:text="@string/cr_er_template" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline

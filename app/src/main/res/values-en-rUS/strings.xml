@@ -37,4 +37,18 @@
     <string name="pas_de_tag">No tag</string>
     <string name="euros">$</string>
     <string name="infos_tag">Tag info</string>
+    <string name="erreur_lors_de_la_lecture_du_dump">Error while reading the dump</string>
+    <string name="erreur_lors_de_la_lecture_du_template">Error while reading the template</string>
+    <string name="erreur_lors_de_la_cr_ation_du_template">Error while creating the template</string>
+    <string name="template_sauvegard">Template saved !</string>
+    <string name="pas_de_template_s_lectionn">No template selected</string>
+    <string name="erreur_lors_de_la_g_n_ration_des_cl_s_mauvais_uid">Error while generating keys : bad UID</string>
+    <string name="erreur_lors_de_l_criture_du_fichier">Error while writing the file</string>
+    <string name="param_tre_solde_invalide">\"Money\" parameter invalid</string>
+    <string name="erreur_lors_de_la_lecture_du_solde_du_tag">Error while reading money on tag</string>
+    <string name="param_tre_uid_invalide">\"UID\" parameter invalid</string>
+    <string name="param_tre_cl_invalide">\"Key\" parameter invalid</string>
+    <string name="lire_dump">Read dump</string>
+    <string name="lire">Read</string>
+    <string name="cr_er_template">Create template</string>
 </resources>
