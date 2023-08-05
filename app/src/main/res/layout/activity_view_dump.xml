@@ -23,76 +23,32 @@
         android:id="@+id/sous_titre4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:text="Lire dump"
         android:textAllCaps="false"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textStyle="bold"
         app:flow_horizontalAlign="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titre4"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginTop="24dp"
-        android:gravity="center"
-        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sous_titre4">
-
-        <EditText
-            android:id="@+id/fichier_dump"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableTint="#9AFFFFFF"
-            android:enabled="false"
-            android:hint="@string/nom_fichier_dump"
-            android:inputType="text|textNoSuggestions"
-            tools:ignore="MissingConstraints" />
-
-        <Button
-            android:id="@+id/choisir_fichier"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:backgroundTint="#AAFFB300"
-            android:text="@string/parcourir" />
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/lire_dump"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:backgroundTint="#AAFFB300"
-        android:text="Lire"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/titre4" />
 
     <View
         android:id="@+id/divider"
         android:layout_width="wrap_content"
         android:layout_height="5dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="75dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lire_dump" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
     <TableLayout
         android:id="@+id/tableauLireDump"
         android:layout_width="409dp"
-        android:layout_height="418dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -108,7 +64,6 @@
                 android:id="@+id/lireDumpTitre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Test"
                 android:textAlignment="center"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -124,10 +79,53 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
-                android:text="bd741b74a6890400c808002000000017 6200488849884a884b88000000000000 00000000000000000000000000000000 a0a1a2a3a4a5787788c1b4c123439eef ef42004e61bc8001000100000000be02 01000001000080010001000000008001 aa020000000000000000000000000000 b4664151349178778803ea583927c355 00c506c30000000000000000000000da 00a006a60000000000000000000000db 55db0000000000000000000000000000 1601d2432f5b787788126893248a2935 00000000000000000000000000000000 00000000000000000000000000000001 55010000000000000000000000000000 5f065adb917d78778800b139ae024dda 00000000000000000000000000000000 00000000000000000000000000000001 55010000000000000000000000000000 8c0eac5bf9e478778800ab679a533689"
                 android:textAlignment="center" />
         </TableRow>
 
     </TableLayout>
+
+    <Spinner
+        android:id="@+id/choixFichier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sous_titre4" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/choixFichier">
+
+        <Button
+            android:id="@+id/lire_dump"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#AAFFB300"
+            android:text="Lire" />
+
+        <Button
+            android:id="@+id/makeTemplate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#AAFFB300"
+            android:text="Créer template" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="20dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

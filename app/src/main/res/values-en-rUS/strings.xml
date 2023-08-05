@@ -36,5 +36,5 @@
     <string name="connection_avec_le_tag_perdue">Connection lost with the tag</string>
     <string name="pas_de_tag">No tag</string>
     <string name="euros">$</string>
-    <string name="infos_tag">" Tag info"</string>
+    <string name="infos_tag">Tag info</string>
 </resources>

@@ -39,10 +39,38 @@ class NFCWrapper (private val nfc: MifareClassic) {
 
     }
 
+    // Dumpe le contenu de la clé, renvoir un string
+    fun dumpTag(keysA : List<String>) : String{
+        var contenuDump = ""
+        try {
+            for (i in 0..19) {
+                contenuDump += readBlock(i,keysA[i / 4], i / 4) + "\n"
+            }
+        }catch (e : android.nfc.TagLostException){
+            throw e
+        }catch (e : java.io.IOException){
+            throw e
+        }
+
+        return contenuDump
+    }
+
+    // Prend un dump de tout le tag, et l'écrit
+    fun writeWholeTag(contenu : String, keysA : List<String>, keysB : List<String>){ // Pour les 20 secteurs
+        try{
+            for (i in 0..19) {
+                // On Ecrit
+                this.writeBlock(contenu.lines()[i], i / 4, i, keysA[i / 4], keysB[i / 4])
+            }
+        }catch (e : android.nfc.TagLostException){
+            throw e
+        }catch (e : java.io.IOException){
+            throw e
+        }
+    }
+
     fun getKeyUID() : String = nfc.tag.id.joinToString(separator = "") { it.toUByte().toString(radix = 16).padStart(2, '0') }.uppercase(
         Locale("EN"))
-
-    fun isConnected(): Boolean = nfc.isConnected
 
     // Convertit un String en ByteArray
     private fun convertToByteArr(key : String): ByteArray{
@@ -50,12 +78,5 @@ class NFCWrapper (private val nfc: MifareClassic) {
         return key.chunked(2).map { it.toUByte(radix = 16).toByte() }.toByteArray()
     }
 
-    // Thread qui pingue le tag
-    fun pingTag(){
-        while(!Thread.interrupted()){
-            Thread.sleep(500)
-            nfc.transceive(convertToByteArr("FFCA000000"))
-        }
-    }
 }
 

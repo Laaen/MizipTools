@@ -35,7 +35,19 @@
     <string name="connection_avec_le_tag_perdue">Connection lost with the tag</string>
     <string name="pas_de_tag">No tag</string>
     <string name="euros">$</string>
-    <string name="infos_tag">" Tag info"</string>
+    <string name="infos_tag">Tag info</string>
     <string name="erreur_lors_de_la_lecture_du_dump">Erreur lors de la lecture du dump</string>
     <string name="erreur_lors_de_la_lecture_du_template">Erreur lors de la lecture du template</string>
+    <string name="erreur_lors_de_la_cr_ation_du_template">Erreur lors de la création du template</string>
+    <string name="template_sauvegard">Template sauvegardé !</string>
+    <string name="pas_de_template_s_lectionn">Pas de template sélectionné</string>
+    <string name="erreur_lors_de_la_g_n_ration_des_cl_s_mauvais_uid">Erreur lors de la génération des clés : mauvais UID</string>
+    <string name="erreur_lors_de_l_criture_du_fichier">Erreur lors de l\'écriture du fichier</string>
+    <string name="param_tre_solde_invalide">Paramètre \'solde\' invalide</string>
+    <string name="erreur_lors_de_la_lecture_du_solde_du_tag">Erreur lors de la lecture du solde du tag</string>
+    <string name="param_tre_uid_invalide">Paramètre \'uid\' invalide</string>
+    <string name="param_tre_cl_invalide">Paramètre \'clé\' invalide</string>
+    <string-array name="placeholderSpinner">
+    </string-array>
+
 </resources>

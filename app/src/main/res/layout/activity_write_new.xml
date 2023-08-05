@@ -9,12 +9,22 @@
 
 
     <TextView
+        android:id="@+id/legendeChoixFichier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fichier dump"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.318"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/choixFichierNew" />
+
+    <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/cle_unique"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.307"
+        app:layout_constraintHorizontal_bias="0.309"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/b_key" />
 
@@ -24,7 +34,7 @@
         android:layout_height="wrap_content"
         android:text="@string/solde_en_euros"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.315"
+        app:layout_constraintHorizontal_bias="0.302"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nouveau_solde" />
 
@@ -38,11 +48,10 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textStyle="bold"
         app:flow_horizontalAlign="center"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titre"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/titre" />
 
     <TextView
         android:id="@+id/titre"
@@ -78,7 +87,7 @@
         android:id="@+id/nouveau_solde"
         android:layout_width="200dp"
         android:layout_height="50dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:drawableTint="#9AFFFFFF"
         android:ems="10"
         android:hint="@string/solde_en_euros"
@@ -88,13 +97,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uid_base" />
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <EditText
         android:id="@+id/b_key"
         android:layout_width="200dp"
         android:layout_height="50dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:drawableTint="#9AFFFFFF"
         android:ems="10"
         android:hint="@string/cles_a_et_b"
@@ -104,50 +113,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nouveau_solde" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <Button
         android:id="@+id/write_new_key"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="75dp"
         android:backgroundTint="#AAFFB300"
         android:enabled="false"
         android:text="@string/ecrire_la_cle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/b_key" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginTop="24dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/b_key">
-
-        <EditText
-            android:id="@+id/fichier_dump"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableTint="#9AFFFFFF"
-            android:enabled="false"
-            android:hint="@string/nom_fichier_dump"
-            android:inputType="text|textNoSuggestions"
-            tools:ignore="MissingConstraints" />
-
-        <Button
-            android:id="@+id/choisir_fichier"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:backgroundTint="#AAFFB300"
-            android:text="@string/parcourir" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/legendeChoixFichier" />
 
     <TextView
         android:id="@+id/textView"
@@ -155,9 +134,19 @@
         android:layout_height="wrap_content"
         android:text="@string/uid"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.272"
+        app:layout_constraintHorizontal_bias="0.269"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/uid_base" />
+
+    <Spinner
+        android:id="@+id/choixFichierNew"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
