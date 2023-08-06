@@ -10,7 +10,7 @@ class Utils {
     // CLés et UID connus à partir desquels on va calculer les clés du MiZip
     val baseKeyAList = listOf("6421E1E7E4D6", "C64672F5FF1C", "8F41FA6D413A", "5C490CED29A3")
     val baseKeyBList = listOf("4AEEE96063E3", "C825F4CD8983", "118F7E45ED6C", "0BD14A14963F")
-    val baseUid = "6D33BBC2"
+    private val baseUid = "6D33BBC2"
 
     //Caractères possibles pour du hexa
     private val charsPossibles = "ABCDEF0123456789"
@@ -40,12 +40,19 @@ class Utils {
                     continue
                 }
                 for (char in ligne) {
-                    if (char == 'X') {
-                        resultat += listeRempl[indexListeRempl][indexSubListe]
-                        indexSubListe += 1
-                        ligneModifiee = true
-                    } else {
-                        resultat += char
+                    when (char) {
+                        'X' -> {
+                            resultat += listeRempl[indexListeRempl][indexSubListe]
+                            indexSubListe += 1
+                            ligneModifiee = true
+                        }
+                        'Y' -> {
+                            // Remplacement d'un "Y" par un caractère aléatoire
+                            resultat += charsPossibles.random()
+                        }
+                        else -> {
+                            resultat += char
+                        }
                     }
                 }
                 if (ligneModifiee) {
@@ -68,13 +75,13 @@ class Utils {
     fun generateUidBcc(uid: String): String {
         // uid => Base que l'on veut XXXXXXXX => Que des bytes aléatoires | BXAXXXXX => UID qui contiendra les bits donnés (ex BDAF78F1)
         // On va map pour chaque char du str un nouveau char si c'est X
-        val uid = uid.map { if (it != 'X') it else charsPossibles.random() }.joinToString(separator = "")
+        val uidRand = uid.map { if (it != 'X') it else charsPossibles.random() }.joinToString(separator = "")
         // Avec l'UID, on va générer le BCC (le checksum)
         // C'est juste un XOR sur chaque Byte consécutif
         val bcc =
-            uid.chunked(2).map { it.toLong(radix = 16) }.reduce { curr, next -> curr xor next }
+            uidRand.chunked(2).map { it.toLong(radix = 16) }.reduce { curr, next -> curr xor next }
                 .toString(radix = 16).padStart(2, '0')
-        return (uid + bcc)
+        return (uidRand + bcc)
     }
 
 

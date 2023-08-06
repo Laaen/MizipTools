@@ -1,7 +1,6 @@
 package com.laen.miziptools
 
 import android.nfc.tech.MifareClassic
-import android.util.Log
 import java.util.Locale
 
 // Classe qui gère tout ce qui est interactions avec le tag NFC

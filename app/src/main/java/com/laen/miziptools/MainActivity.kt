@@ -1,6 +1,5 @@
 package com.laen.miziptools
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.nfc.NfcAdapter
@@ -9,17 +8,18 @@ import android.nfc.Tag
 import android.nfc.TagLostException
 import android.nfc.tech.MifareClassic
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.core.net.toUri
+import com.laen.miziptools.databinding.ActivityAboutBinding
 import com.laen.miziptools.databinding.ActivityMainScreenBinding
 import com.laen.miziptools.databinding.ActivityWriteNewBinding
 import com.laen.miziptools.databinding.ActivityChangeIdBinding
 import com.laen.miziptools.databinding.ActivityRechargeKeyBinding
 import com.laen.miziptools.databinding.ActivityViewDumpBinding
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.lang.Exception
 import java.util.Locale
@@ -38,29 +38,29 @@ class MainActivity : ComponentActivity() {
     // ================================ Attributes ======================================
 
     //Contexte pour la localisation
-    lateinit var context: Context
+    private lateinit var context: Context
 
     // Reges pour vérification des entrées
-    val regexUIDRand = """^[a-fA-F0-9X]{8}$"""
-    val regexUid = """^[a-fA-F0-9]{8}$"""
-    val regexCle = """^[a-fA-F0-9]{12}$"""
+    private val regexUIDRand = """^[a-fA-F0-9X]{8}$"""
+    private val regexCle = """^[a-fA-F0-9]{12}$"""
 
     // Pour le layout
-    lateinit var writeNewBinding: ActivityWriteNewBinding
+    private lateinit var writeNewBinding: ActivityWriteNewBinding
     private lateinit var mainBinding : ActivityMainScreenBinding
     private lateinit var rechargeBinding : ActivityRechargeKeyBinding
     private lateinit var changeIdBinding : ActivityChangeIdBinding
     private lateinit var viewDumpBinding: ActivityViewDumpBinding
+    private lateinit var aboutBinding: ActivityAboutBinding
 
     // Objet qui gère la lecture / écriture des fichiers
     private lateinit var fileWrapper : FileWrapper
     // Objet qui regroupe des fonctions
-    val utils = Utils()
-    var nfcWrapper : NFCWrapper? = null
+    private val utils = Utils()
+    private var nfcWrapper : NFCWrapper? = null
 
     // Le thread d'update
-    var threadUpdate : Thread? = null
-    var continuer : Boolean = true
+    private var threadUpdate : Thread? = null
+    private var continuer : Boolean = true
 
     // Données de base d'une clé, utilisé pour la remise à 0
     private val baseCle = """4c61656e26890400c834002000000016
@@ -87,12 +87,12 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
     // ================================ Fonctions du Thread Update ==============================
 
     // Fonctions qui stoppent le thread de mise à jour et le redémarrent
-    fun stopThreadUpdate(){
+    private fun stopThreadUpdate(){
         continuer = false
         Thread.sleep(1000)
     }
 
-    fun startThreadUpdate(){
+    private fun startThreadUpdate(){
         continuer = true
         threadUpdate = Thread { updateTagInfo() }
         threadUpdate!!.start()
@@ -119,7 +119,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
             } catch (e: InterruptedException) {
                 return
             }catch(e: Exception){
-
+                Log.d("ThreadError", "Error during thread life: " + e.message)
             }
             this.runOnUiThread { mainBinding.infotagMoney.text = solde }
             this.runOnUiThread { mainBinding.infoTagUID.text = uid}
@@ -129,7 +129,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
     // ================================ Connexion et déconnexion du tag ==============================
 
     // Switche les boutons on ou off
-    fun switchButtons(bool : Boolean){
+    private fun switchButtons(bool : Boolean){
         this.runOnUiThread { mainBinding.dumpKey.isEnabled = bool }
         this.runOnUiThread { mainBinding.writeNewKey.isEnabled = bool }
         this.runOnUiThread { mainBinding.rechargeKey.isEnabled = bool }
@@ -199,9 +199,16 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
     }
 
     // Fonction qui lit un fichier de dump, et le transforme en template
-    fun transformerTemplate(uri : Uri){
+    private fun transformerTemplate(uri : Uri){
+
+        // On ne crée un template que sur un dump qui n'en est pas un !
+        if (uri.path.toString().contains("template")){
+            this.runOnUiThread { this.runOnUiThread { Toast.makeText(this, getString(R.string.erreur_on_ne_peut_pas_cr_er_un_template_partir_d_un_autre), Toast.LENGTH_SHORT).show() } }
+            return
+        }
+
         // On ne va modifier que les lignes d'intérêt
-        var contenu : MutableList<String>
+        val contenu : MutableList<String>
         try {
             contenu = fileWrapper.lireFichier(uri).lines().toMutableList()
         }catch(e: IOException){
@@ -233,10 +240,9 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
     // Fonction qui appelle le dump de la clé, se charge des erreurs
     private fun dumpMizipTag(){
 
-        var content = ""
-        var cles : Pair<List<String>, List<String>>
+        var content: String
 
-        cles = utils.getAllKeys(nfcWrapper!!.getKeyUID())
+        val cles : Pair<List<String>, List<String>> = utils.getAllKeys(nfcWrapper!!.getKeyUID())
 
         // On vérifie que le dump est ok, si non, on return
         try {
@@ -265,7 +271,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
     // ====================================== Ecriture nouveau tag ================================
 
     // S'occupe de la génération de l'UID, des clés, et du dump à écrire, puis l'écrit sur la clé
-    fun ecrireNouveauTag(uid: String, solde: String, key : String, file : Uri) {
+    private fun ecrireNouveauTag(uid: String, solde: String, key : String, file : Uri) {
 
         // Verification de tout ce qui est entré
         if (! uid.matches(Regex(regexUIDRand))) {
@@ -280,6 +286,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         // On vérifie que la clé est Ok
         if (!key.matches(Regex(regexCle))){
             this.runOnUiThread { Toast.makeText(this, getString(R.string.param_tre_cl_invalide), Toast.LENGTH_SHORT).show() }
+            return
         }
 
         // On génère l'UID + BCC
@@ -287,7 +294,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         // On sépare l'UID pour le donner aux fonctions qui génèrent les clés
         val (listeKA, listeKB) = utils.getAllKeys(uidBcc.slice(0..7)).toList()
 
-        var templateDump = ""
+        val templateDump : String
         try {
             // On récupère les infos du template
             templateDump = fileWrapper.lireFichier(file)
@@ -368,7 +375,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
             // On écrit les deux lignes
             nfcWrapper!!.writeBlock(ligneNouveauAnt, 2, 8, cleA, cleB)
             nfcWrapper!!.writeBlock(ligneNouveauAct, 2, 9, cleA, cleB)
-        }catch(e : java.io.IOException){
+        }catch(e : IOException){
             this.runOnUiThread { Toast.makeText(this, getString(R.string.erreur_lors_de_l_criture_sur_le_tag), Toast.LENGTH_SHORT).show()}
             return
         }catch(e : TagLostException){
@@ -440,7 +447,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
             val (kA, kB) = utils.getAllKeys(uid).toList()
             // On écrit la clé de base, on catch les erreurs possibles
             nfcWrapper!!.writeWholeTag(baseCle, kA, kB)
-        }catch(e : java.io.IOException){
+        }catch(e : IOException){
             this.runOnUiThread {Toast.makeText(context, context.getString(R.string.erreur_lors_de_l_criture_sur_le_tag), Toast.LENGTH_LONG).show() }
             return
         }catch (e: TagLostException){
@@ -487,46 +494,68 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         setContentView(viewDumpBinding.root)
 
         // On récupère la liste des Uri des fichiers
-        var listeUri = fileWrapper.listFiles().filter{!(it.toString().split("/").last() =="files")}
+        var listeUri = fileWrapper.listFiles().filter{ it.toString().split("/").last() != "files" }
 
         // On setup le spin pour qu'il les affiche
-        val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, listeUri.map { it.toString().split("/").last() })
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listeUri.map { it.toString().split("/").last() })
         viewDumpBinding.choixFichier.adapter = adapter
 
         // Lecture et affichage
-        viewDumpBinding.lireDump.setOnClickListener { readDump(listeUri[viewDumpBinding.choixFichier.selectedItemPosition]) }
+        viewDumpBinding.lireDump.setOnClickListener {
+            try{
+                readDump(listeUri[viewDumpBinding.choixFichier.selectedItemPosition])
+            }catch(e : ArrayIndexOutOfBoundsException){
+                this.runOnUiThread { Toast.makeText(this, getString(R.string.pas_de_fichier_s_lectionn), Toast.LENGTH_SHORT).show() }
+            } }
 
         // Transformation en Template
         viewDumpBinding.makeTemplate.setOnClickListener {
+            try{
             transformerTemplate(listeUri[viewDumpBinding.choixFichier.selectedItemPosition])
+            }catch(e : ArrayIndexOutOfBoundsException){
+                this.runOnUiThread { Toast.makeText(this, getString(R.string.pas_de_fichier_s_lectionn), Toast.LENGTH_SHORT).show() }
+            }
             // On recharge la liste des fichiers
             listeUri = fileWrapper.listFiles()
             adapter.clear()
             adapter.addAll(listeUri.map { it.toString().split("/").last() }.filter{it != "files"})
         }
 
-
+        // Suppression du fichier
+        viewDumpBinding.deleteFile.setOnClickListener {
+            try {
+                fileWrapper.deleteFile(listeUri[viewDumpBinding.choixFichier.selectedItemPosition])
+            }catch(e : ArrayIndexOutOfBoundsException){
+                this.runOnUiThread { Toast.makeText(this, getString(R.string.pas_de_fichier_s_lectionn), Toast.LENGTH_SHORT).show() }
+            }
+            // On recharge la liste des fichiers
+            listeUri = fileWrapper.listFiles()
+            adapter.clear()
+            adapter.addAll(listeUri.map { it.toString().split("/").last() }.filter{it != "files"})
+        }
     }
 
     // Ecran du menu écrire une nouvelle clé
     private fun ecranEcrireNouvelleCle(){
 
         // On récupère la liste des Uri des fichiers
-        var listeUri = fileWrapper.listFiles().filter { it.path.toString().contains("template") }
+        val listeUri = fileWrapper.listFiles().filter { it.path.toString().contains("template") }
 
         // On setup le spin pour qu'il les affiche
-        val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, listeUri.map { it.toString().split("/").last() })
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listeUri.map { it.toString().split("/").last() })
         writeNewBinding.choixFichierNew.adapter = adapter
 
         setContentView(writeNewBinding.root)
 
-        try {
-            writeNewBinding.writeNewKey.setOnClickListener {launchAction(3, writeNewBinding.uidBase.text.toString(),
+        writeNewBinding.writeNewKey.setOnClickListener {
+            try {
+                launchAction(3, writeNewBinding.uidBase.text.toString(),
                 writeNewBinding.nouveauSolde.text.toString(),
                 writeNewBinding.bKey.text.toString(),
-                listeUri[writeNewBinding.choixFichierNew.selectedItemPosition].toString()) }
-        }catch(e : ArrayIndexOutOfBoundsException){
-            this.runOnUiThread { Toast.makeText(this, getString(R.string.pas_de_template_s_lectionn), Toast.LENGTH_SHORT).show() }
+                listeUri[writeNewBinding.choixFichierNew.selectedItemPosition].toString())
+            }catch(e : ArrayIndexOutOfBoundsException){
+                this.runOnUiThread { Toast.makeText(this, getString(R.string.pas_de_template_s_lectionn), Toast.LENGTH_SHORT).show() }
+            }
         }
 
     }
@@ -541,6 +570,12 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
     private fun ecranChangeId(){
         setContentView(changeIdBinding.root)
         changeIdBinding.buttonChId.setOnClickListener { launchAction(5, changeIdBinding.nouveauUid.text.toString()) }
+    }
+
+    // Ecran du à propos
+    private fun ecranAbout(){
+        setContentView(aboutBinding.root)
+        aboutBinding.textView6.movementMethod = LinkMovementMethod.getInstance()
     }
 
 
@@ -559,6 +594,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         rechargeBinding = ActivityRechargeKeyBinding.inflate(layoutInflater)
         changeIdBinding = ActivityChangeIdBinding.inflate(layoutInflater)
         viewDumpBinding = ActivityViewDumpBinding.inflate(layoutInflater)
+        aboutBinding = ActivityAboutBinding.inflate(layoutInflater)
 
         setContentView(mainBinding.root)
 
@@ -569,16 +605,17 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         mainBinding.changeUid.setOnClickListener { ecranChangeId() }
         mainBinding.activateReset.setOnClickListener {mainBinding.resetKey.isEnabled = mainBinding.activateReset.isChecked }
         mainBinding.resetKey.setOnClickListener { launchAction(6) }
+        mainBinding.aboutButton.setOnClickListener { ecranAbout() }
     }
 
     override fun onStart() {
         super.onStart()
         // Some setup for NFC stuff
         val nfcAdapter = getDefaultAdapter(context)
-        nfcAdapter.enableReaderMode(this,
-            { tag -> connectToTag(tag) }, NfcAdapter.FLAG_READER_NFC_A , null)
+        nfcAdapter.enableReaderMode(this, { tag -> connectToTag(tag) }, NfcAdapter.FLAG_READER_NFC_A , null)
     }
 
+    @Deprecated("onBackPressed deprecated")
     override fun onBackPressed() {
         // A messay way of implementing the back button feature
         setContentView(mainBinding.root)

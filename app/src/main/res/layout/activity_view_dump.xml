@@ -119,6 +119,14 @@
             android:layout_weight="1"
             android:backgroundTint="#AAFFB300"
             android:text="@string/cr_er_template" />
+
+        <Button
+            android:id="@+id/deleteFile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#AAFFB300"
+            android:text="@string/delete" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline

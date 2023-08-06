@@ -50,7 +50,15 @@
     <string name="lire_dump">Read dump</string>
     <string name="lire">Read</string>
     <string name="cr_er_template">Create template</string>
+    <string name="erreur_on_ne_peut_pas_cr_er_un_template_partir_d_un_autre">Error : Can\'t create a template from another one</string>
+    <string name="delete">Delete</string>
     <string-array name="placeholderSpinner">
     </string-array>
+    <string name="lien_github"><a href='https://github.com/Laaen/MizipTools'>Project\'s github</a></string>
+    <string name="by_laen">By Laen</string>
+    <string name="enjoy_your_coffee">Enjoy your coffee ;)</string>
+    <string name="about">About</string>
+    <string name="fichier_dump">Dump file</string>
+    <string name="pas_de_fichier_s_lectionn">No file selected</string>
 
 </resources>

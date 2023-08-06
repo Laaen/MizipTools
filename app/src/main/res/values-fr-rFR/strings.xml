@@ -51,4 +51,12 @@
     <string name="lire_dump">Lire dump</string>
     <string name="lire">Lire</string>
     <string name="cr_er_template">Créer template</string>
+    <string name="erreur_on_ne_peut_pas_cr_er_un_template_partir_d_un_autre">Erreur : on ne peut pas créer un template à partir d\'un autre</string>
+    <string name="delete">Supprimer</string>
+    <string name="lien_github"><a href="https://github.com/Laaen/MizipTools">Github du projet</a></string>
+    <string name="by_laen">Par Laen</string>
+    <string name="enjoy_your_coffee">Enjoy your coffee ;)</string>
+    <string name="about">A propos</string>
+    <string name="fichier_dump">Fichier dump</string>
+    <string name="pas_de_fichier_s_lectionn">Pas de fichier sélectionné</string>
 </resources>

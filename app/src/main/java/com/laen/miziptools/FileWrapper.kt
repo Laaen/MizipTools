@@ -44,4 +44,9 @@ class FileWrapper(private val context: Context) {
         file.appendText(infos.uppercase(Locale("EN")))
     }
 
+    // Fonction qui supprime le fichier
+    fun deleteFile(uri : Uri){
+        File(uri.path!!).delete()
+    }
+
 }
