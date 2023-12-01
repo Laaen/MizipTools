@@ -60,4 +60,5 @@
     <string name="fichier_dump">Dump file</string>
     <string name="pas_de_fichier_s_lectionn">No file selected</string>
     <string name="add_10_bucks">Add 10$</string>
+    <string name="version">Version 1.0.1</string>
 </resources>

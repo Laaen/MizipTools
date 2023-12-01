@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#2B2D30">
 
     <TextView
         android:id="@+id/titre4"
@@ -12,6 +13,7 @@
         android:layout_marginTop="24dp"
         android:text="@string/miziptools"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#DCDCDC"
         app:flow_horizontalAlign="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -27,6 +29,7 @@
         android:text="@string/lire_dump"
         android:textAllCaps="false"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#DCDCDC"
         android:textStyle="bold"
         app:flow_horizontalAlign="center"
         app:layout_constraintEnd_toEndOf="parent"
@@ -65,6 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
+                android:textColor="#DCDCDC"
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </TableRow>
@@ -79,7 +83,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="#DCDCDC" />
         </TableRow>
 
     </TableLayout>
@@ -89,6 +94,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:backgroundTint="#DCDCDC"
+        android:foregroundTint="#DCDCDC"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

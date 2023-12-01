@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#2B2D30"
     tools:context="com.laen.miziptools.MainActivity">
 
     <TextView
@@ -13,6 +14,7 @@
         android:layout_marginTop="24dp"
         android:text="@string/miziptools"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#DCDCDC"
         app:flow_horizontalAlign="center"
         app:layout_constraintBottom_toTopOf="@+id/tagInfotable"
         app:layout_constraintEnd_toEndOf="parent"
@@ -99,7 +101,8 @@
             android:layout_height="wrap_content"
             android:backgroundTint="#AAFFB300"
             android:enabled="false"
-            android:text="@string/activer" />
+            android:text="@string/activer"
+            android:textColor="#DCDCDC" />
     </LinearLayout>
 
     <TableLayout
@@ -122,6 +125,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/infos_tag"
+                android:textColor="#DCDCDC"
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </TableRow>
@@ -135,6 +139,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/uid"
+                android:textColor="#DCDCDC"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -143,6 +148,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/pas_de_tag"
+                android:textColor="#DCDCDC"
                 android:textSize="16sp" />
 
         </TableRow>
@@ -156,6 +162,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/solde"
+                android:textColor="#DCDCDC"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -164,6 +171,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/pas_de_tag"
+                android:textColor="#DCDCDC"
                 android:textSize="16sp" />
         </TableRow>
 
@@ -189,6 +197,7 @@
         android:layout_marginBottom="16dp"
         android:background="#00FFFFFF"
         android:text="@string/about"
+        android:textColor="#DCDCDC"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"

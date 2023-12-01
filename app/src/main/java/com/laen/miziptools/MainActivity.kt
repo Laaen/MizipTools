@@ -1,6 +1,7 @@
 package com.laen.miziptools
 
 import android.content.Context
+import android.graphics.Color
 import android.net.Uri
 import android.nfc.NfcAdapter
 import android.nfc.NfcAdapter.getDefaultAdapter
@@ -10,19 +11,23 @@ import android.nfc.tech.MifareClassic
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.util.Log
+import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.core.net.toUri
 import com.laen.miziptools.databinding.ActivityAboutBinding
-import com.laen.miziptools.databinding.ActivityMainScreenBinding
-import com.laen.miziptools.databinding.ActivityWriteNewBinding
 import com.laen.miziptools.databinding.ActivityChangeIdBinding
+import com.laen.miziptools.databinding.ActivityMainScreenBinding
 import com.laen.miziptools.databinding.ActivityRechargeKeyBinding
 import com.laen.miziptools.databinding.ActivityViewDumpBinding
+import com.laen.miziptools.databinding.ActivityWriteNewBinding
 import java.io.IOException
-import java.lang.Exception
 import java.util.Locale
+
 
 /*
     MizipTools : Android app to fiddle with MiZip tags
@@ -509,7 +514,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         var listeUri = fileWrapper.listFiles().filter{ it.toString().split("/").last() != "files" }
 
         // On setup le spin pour qu'il les affiche
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listeUri.map { it.toString().split("/").last() })
+        val adapter = ArrayAdapter(this, R.layout.dark_mode_spinner, listeUri.map { it.toString().split("/").last() })
         viewDumpBinding.choixFichier.adapter = adapter
 
         // Lecture et affichage
@@ -554,7 +559,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         val listeUri = fileWrapper.listFiles().filter { it.path.toString().contains("template") }
 
         // On setup le spin pour qu'il les affiche
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listeUri.map { it.toString().split("/").last() })
+        val adapter = ArrayAdapter(this, R.layout.dark_mode_spinner, listeUri.map { it.toString().split("/").last() })
         writeNewBinding.choixFichierNew.adapter = adapter
 
         setContentView(writeNewBinding.root)
@@ -638,5 +643,4 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         super.onStop()
         getDefaultAdapter(context).disableReaderMode(this)
     }
-
 }
