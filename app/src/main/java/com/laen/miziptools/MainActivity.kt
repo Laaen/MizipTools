@@ -107,7 +107,6 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
             try {
                 Thread.sleep(1000)
                 //On change le texte du tableau du menu principal
-                Log.d("", "Boucle")
                 uid = nfcWrapper!!.getKeyUID()
                 // On essaie d'avoir le solde, si on y arrive pas, on ne touche pas au texte
                 solde = getSolde() + getString(R.string.euros)
@@ -116,6 +115,8 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
                 return
             }catch (e: IOException) {
                 this.runOnUiThread { mainBinding.infotagMoney.text = "N/A" }
+                this.runOnUiThread { mainBinding.infoTagUID.text = "N/A" }
+                tagDisconnected()
             } catch (e: InterruptedException) {
                 return
             }catch(e: Exception){
@@ -137,6 +138,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         this.runOnUiThread { mainBinding.activateReset.isEnabled = bool }
 
         this.runOnUiThread { rechargeBinding.buttonRecharge.isEnabled = bool }
+        this.runOnUiThread { rechargeBinding.buttonAdd10.isEnabled = bool }
         this.runOnUiThread { changeIdBinding.buttonChId.isEnabled = bool }
         this.runOnUiThread {  writeNewBinding.writeNewKey.isEnabled = bool }
     }
@@ -457,6 +459,15 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         this.runOnUiThread { Toast.makeText(this, getString(R.string.cle_reinitialisee_avec_succes), Toast.LENGTH_SHORT).show() }
     }
 
+    // ====================================== Add Money =======================================
+
+    // Ajoute X d'argent à la somme déjà présente
+    private fun addMoney(montant : String){
+        val solde = getSolde()
+        val nouveau_solde = (solde.toFloat() + montant.toFloat()).toString()
+        rechargeTag(nouveau_solde)
+    }
+
     // ====================================== Quelques fonctions ===================================
 
     // Fonction qui récupère le solde
@@ -482,6 +493,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
             4 -> rechargeTag(args[0])
             5 -> changeUid(args[0])
             6 -> resetTag()
+            7 -> addMoney(args[0])
         }
         // Redémerre le thread
         startThreadUpdate()
@@ -504,7 +516,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         viewDumpBinding.lireDump.setOnClickListener {
             try{
                 readDump(listeUri[viewDumpBinding.choixFichier.selectedItemPosition])
-            }catch(e : ArrayIndexOutOfBoundsException){
+            }catch(e : Exception){
                 this.runOnUiThread { Toast.makeText(this, getString(R.string.pas_de_fichier_s_lectionn), Toast.LENGTH_SHORT).show() }
             } }
 
@@ -512,7 +524,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         viewDumpBinding.makeTemplate.setOnClickListener {
             try{
             transformerTemplate(listeUri[viewDumpBinding.choixFichier.selectedItemPosition])
-            }catch(e : ArrayIndexOutOfBoundsException){
+            }catch(e : Exception){
                 this.runOnUiThread { Toast.makeText(this, getString(R.string.pas_de_fichier_s_lectionn), Toast.LENGTH_SHORT).show() }
             }
             // On recharge la liste des fichiers
@@ -525,7 +537,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
         viewDumpBinding.deleteFile.setOnClickListener {
             try {
                 fileWrapper.deleteFile(listeUri[viewDumpBinding.choixFichier.selectedItemPosition])
-            }catch(e : ArrayIndexOutOfBoundsException){
+            }catch(e : Exception){
                 this.runOnUiThread { Toast.makeText(this, getString(R.string.pas_de_fichier_s_lectionn), Toast.LENGTH_SHORT).show() }
             }
             // On recharge la liste des fichiers
@@ -564,6 +576,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
     private fun ecranRechargerCle(){
         setContentView(rechargeBinding.root)
         rechargeBinding.buttonRecharge.setOnClickListener { launchAction(4, rechargeBinding.nouveauSoldeRecharge.text.toString()) }
+        rechargeBinding.buttonAdd10.setOnClickListener { launchAction(7, "10") }
     }
 
     // Ecran du menu de changement d'UID
@@ -617,7 +630,7 @@ FFFFFFFFFFFFFF078069FFFFFFFFFFFF""".uppercase(Locale("EN"))
 
     @Deprecated("onBackPressed deprecated")
     override fun onBackPressed() {
-        // A messay way of implementing the back button feature
+        // A messay way of implementing the back button_add_10 feature
         setContentView(mainBinding.root)
     }
 

@@ -59,4 +59,5 @@
     <string name="about">A propos</string>
     <string name="fichier_dump">Fichier dump</string>
     <string name="pas_de_fichier_s_lectionn">Pas de fichier sélectionné</string>
+    <string name="add_10_bucks">Ajouter 10€</string>
 </resources>

@@ -60,5 +60,6 @@
     <string name="about">About</string>
     <string name="fichier_dump">Dump file</string>
     <string name="pas_de_fichier_s_lectionn">No file selected</string>
+    <string name="add_10_bucks">Add 10$</string>
 
 </resources>
