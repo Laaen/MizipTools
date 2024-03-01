@@ -32,10 +32,13 @@ class NFCWrapper (private val nfc: MifareClassic) {
             } else {
                 return false
             }
-        }catch (e : android.nfc.TagLostException){
-            throw android.nfc.TagLostException("Tag lost")
+        }catch (e : android.nfc.TagLostException) {
+            throw e
+        }catch (e : SecurityException){
+            throw android.nfc.TagLostException()
+        }catch (e : java.io.IOException){
+            throw e
         }
-
     }
 
     // Dumpe le contenu de la clé, renvoir un string
@@ -45,8 +48,10 @@ class NFCWrapper (private val nfc: MifareClassic) {
             for (i in 0..19) {
                 contenuDump += readBlock(i,keysA[i / 4], i / 4) + "\n"
             }
-        }catch (e : android.nfc.TagLostException){
+        }catch (e : android.nfc.TagLostException) {
             throw e
+        }catch (e : SecurityException){
+            throw android.nfc.TagLostException()
         }catch (e : java.io.IOException){
             throw e
         }
@@ -63,6 +68,8 @@ class NFCWrapper (private val nfc: MifareClassic) {
             }
         }catch (e : android.nfc.TagLostException){
             throw e
+        }catch (e : SecurityException){
+            throw android.nfc.TagLostException()
         }catch (e : java.io.IOException){
             throw e
         }
