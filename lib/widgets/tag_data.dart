@@ -38,20 +38,22 @@ class _TagDataPresent extends StatelessWidget{
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.all(Radius.circular(20))),
       child: Column(
-        spacing: 10,
+        spacing: 15,
         children: [
           Text("Tag info", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),),
-          Row(spacing: 10,
-            children: [
-              Text("UID: ", style: TextStyle(fontSize: 16),),
-              Text(uid, style: TextStyle(fontSize: 16),),
-            ],
-          ),
-          Row(spacing: 10,
-            children: [
-              Text("Balance:", style: TextStyle(fontSize: 16),),
-              Text("$balance\$", style: TextStyle(fontSize: 16),),
-            ],
+          Column( children: [
+            Row(spacing: 10,
+              children: [
+                Text("UID: ", style: TextStyle(fontSize: 16),),
+                Text(uid, style: TextStyle(fontSize: 16),),
+              ],
+            ),
+            Row(spacing: 10,
+              children: [
+                Text("Balance:", style: TextStyle(fontSize: 16),),
+                Text("$balance\$", style: TextStyle(fontSize: 16),),
+              ],
+            )]
           )
         ],
       ), 
@@ -73,7 +75,7 @@ class _TagDataAbsent extends StatelessWidget{
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSecondary, 
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.all(Radius.circular(20))),
-      child: Text("No tag detected, please put a Mizip tag on the reader",
+      child: Text("No tag detected",
         style: TextStyle(fontSize: 16),)
     );
   }
