@@ -1,12 +1,15 @@
+import "dart:io";
+
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
+import 'package:synchronized/synchronized.dart';
 
 import "../misc/mizip_tag.dart";
 
 import "../widgets/appbar.dart";
 import "../widgets/tag_data.dart";
 import "../widgets/tag_balance.dart";
-
+import "../widgets/tag_add_x.dart";
 
 class MainPage extends StatefulWidget{
 
@@ -18,13 +21,19 @@ class MainPage extends StatefulWidget{
 
 class MainPage_State extends State<MainPage>{
 
-  /// The tag's handle, MUST be set to null in case of error to initiate a new poll 
-  MizipTag? _tag;
+  /// The tag's handle, MUST be set to null in case of error / disconnection to initiate a new poll 
+  MizipTag? currentTag;
+  /// The balance, we need to put it here because async/await
+  String tagBalance = "";
+  /// GLobal lock, to prevent concurrent transmissions
+  Lock globalLock = Lock(reentrant: true);
 
   /// Tries to send a message to the tag to check if it is still present
   Future<bool> checkTagPresent() async{
     try{
-      await FlutterNfcKit.transceive("FFCA000000");
+      await globalLock.synchronized(()async {
+        await FlutterNfcKit.transceive("FFCA000000");
+      });
       return true;
     } catch(error){
       return false;
@@ -34,17 +43,17 @@ class MainPage_State extends State<MainPage>{
   /// Background loop to detect when a tag is put on the phone
   Future<void> watchForTag(Function(NFCTag) callback) async{
     while (true){
-      // Check if the tag is still here, if the handle is null, then no, and we set _tag to null
-      if (_tag != null){
+      // Check if the tag is still here, if the handle is null, then no, and we set currentTag to null
+      if (currentTag != null){
         var present = await checkTagPresent();
         if (!present) {
           setState(() {
-            _tag = null;
+            currentTag = null;
           });
         }
       }
 
-      if (_tag == null){
+      if (currentTag == null){
         try{
           final tag = await FlutterNfcKit.poll(timeout: const Duration(seconds: 2),androidCheckNDEF: false);
           await callback(tag);
@@ -62,11 +71,14 @@ class MainPage_State extends State<MainPage>{
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Not a Mifare Classic Tag"), duration: Duration(seconds: 2),));
       return;
     }
+    // Extract data we want to display
+    final cTag = MizipTag(uid: tag.id, lock: globalLock);
+    String? balance = await cTag.getBalance();
+    balance ??= "N/A";
     setState(() {
-      // Extract data we want to display
-      _tag = MizipTag(balance: "20.92", uid: tag.id);
+      this.tagBalance = balance!;
+      this.currentTag = cTag;
     });
-    
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("New tag detected : ${tag.id}"), duration: Duration(seconds: 2),));
   }
 
@@ -78,14 +90,15 @@ class MainPage_State extends State<MainPage>{
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return Scaffold(
       appBar: MizipToolsAppBar(),
       body: Container(
         child: Column(
           children: [
-            TagData(uid: _tag?.uid, balance: _tag?.balance,),
-            if (_tag != null) TagBalance()
+            TagData(uid: currentTag?.uid, balance: tagBalance,),
+            if (currentTag != null) TagBalance(currentTag: currentTag!,),
+            if (currentTag != null) TagAdd10(currentTag: currentTag!,),
           ],
         ),
       ),
