@@ -85,7 +85,7 @@ class MizipTag {
     // Sector 2 block 9
     try{
       final data = await readBlock(9, retries: 5);
-      final balance = data.sublist(1, 3).map((x) {return x.toRadixString(16);}).toList().reversed;
+      final balance = data.sublist(1, 3).map((x) => x.toRadixString(16).padLeft(2, "0")).toList().reversed;
       return (int.parse(balance.join(""), radix: 16) / 100.0).toString();
     } catch(error){
       return null;
@@ -110,6 +110,7 @@ class MizipTag {
       // update the block with the new values
       var newBalanceBlock = current_balance_block.toList();
       newBalanceBlock.replaceRange(1, 4, [newValue[0], newValue[1], checksum]);
+      Logger.root.info("New block : $newBalanceBlock");
       await lock.synchronized(() async {
         await writeBlock(9, Uint8List.fromList(newBalanceBlock), retries: 5);
       });
