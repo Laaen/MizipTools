@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 import 'package:synchronized/synchronized.dart';
 
 /// Interface to the Mizip Tag
@@ -36,7 +37,7 @@ class MizipTag {
   }
 
   /// Reads a block and returns it, retries a certain amount of times
-  Future<Uint8List> readBlock(int number, {int retries = 0}) async{
+  Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
       return await lock.synchronized(() async{
         await FlutterNfcKit.authenticateSector(number ~/ 4, keyA: getKeys().a[number ~/ 4]);
@@ -44,25 +45,36 @@ class MizipTag {
       });
     } catch(error) {
       if(retries > 0){
+        Logger.root.warning("Read failed, retrying");
+        // Wait some time before retrying
+        await Future.delayed(delay);
         return await readBlock(number, retries: retries - 1);
       } else {
+        Logger.root.severe("Failed to read block $number");
         rethrow;
       }
     }
   }
 
   /// Writes the given block, retries a certain amount of times
-  Future<void> writeBlock(int number, Uint8List data, {int retries = 0}) async{
+  Future<void> writeBlock(int number, Uint8List data, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
-      await lock.synchronized(() async{
-        await FlutterNfcKit.authenticateSector(number ~/ 4, keyA: getKeys().a[number ~/ 4]);
-        await FlutterNfcKit.authenticateSector(number ~/ 4, keyB: getKeys().b[number ~/ 4]);
+      // Auth with key A seemes to be not mandatory for writing
+      //await FlutterNfcKit.authenticateSector(number ~/ 4, keyA: getKeys().a[number ~/ 4]);
+      // Retry if auth not good
+      if (await FlutterNfcKit.authenticateSector(number ~/ 4, keyB: getKeys().b[number ~/ 4]) != true){
+        return await writeBlock(number, data, retries: retries - 1);
+      } else {
         await FlutterNfcKit.writeBlock(number, data);
-      });
+      }      
     } catch(error) {
       if(retries > 0){
+        Logger.root.warning("Write failed, retrying");
+        // Wait some time before retrying
+        await Future.delayed(delay);
         await writeBlock(number, data, retries: retries - 1);
       } else {
+        Logger.root.severe("Failed to write block $number");
         rethrow;
       }
     }
@@ -81,21 +93,32 @@ class MizipTag {
   }
 
   /// Writes the new balance to the tag
-  Future<void> setBalance(String value) async{
-    // Get the current block's value
-    Uint8List current_balance_block;
-    current_balance_block = await readBlock(9, retries: 5);
-    // Convert given value to a list of 2 hex + get the checksum
-    final new_value = (double.parse(value) * 100).toInt().toRadixString(16).split("").slices(2).map((x) => x.join()).toList().reversed.map((x) => int.parse(x, radix: 16)).toList();
-    final checksum = new_value.reduce((acc, curr) => acc ^ curr);
+  Future<bool> setBalance(String value) async{
+
+    await lock.synchronized(() async {
+      // Get the current block's value
+      Uint8List current_balance_block;
+      try{
+        current_balance_block = await readBlock(9, retries: 5);
+      } catch(err){
+        return false;
+      }
+      // Convert given value to a list of 2 hex + get the checksum
+      final newValue = (double.parse(value) * 100).toInt().toRadixString(16).padLeft(4, '0').split("").slices(2).map((x) => x.join()).toList().reversed.map((x) => int.parse(x, radix: 16)).toList();
+      final checksum = newValue.reduce((acc, curr) => acc ^ curr);
+      
+      // update the block with the new values
+      var newBalanceBlock = current_balance_block.toList();
+      newBalanceBlock.replaceRange(1, 4, [newValue[0], newValue[1], checksum]);
+      await lock.synchronized(() async {
+        await writeBlock(9, Uint8List.fromList(newBalanceBlock), retries: 5);
+      });
+      Logger.root.info("Tag balance written succesfully");
+      
+      // Close the session to trigger a new discovery => new balance
+      await FlutterNfcKit.finish();
+    });
     
-    // update the block with the new values
-    var newBalanceBlock = current_balance_block.toList();
-    newBalanceBlock.replaceRange(1, 4, [new_value[0], new_value[1], checksum]);
-    await writeBlock(9, Uint8List.fromList(newBalanceBlock), retries: 5);
-
-    // Close the session to trigger a new discovery => new balance
-    await FlutterNfcKit.finish();
-
+    return true;
   }
 }

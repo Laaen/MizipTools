@@ -2,6 +2,7 @@ import "dart:io";
 
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
+import "package:logging/logging.dart";
 import 'package:synchronized/synchronized.dart';
 
 import "../misc/mizip_tag.dart";
@@ -25,52 +26,62 @@ class MainPage_State extends State<MainPage>{
   MizipTag? currentTag;
   /// The balance, we need to put it here because async/await
   String tagBalance = "";
-  /// GLobal lock, to prevent concurrent transmissions
+  /// Global lock, to prevent concurrent transmissions
   Lock globalLock = Lock(reentrant: true);
 
   /// Tries to send a message to the tag to check if it is still present
-  Future<bool> checkTagPresent() async{
+  Future<bool> checkTagPresent({int retries = 2, Duration delay = const Duration(milliseconds: 50)}) async{
     try{
       await globalLock.synchronized(()async {
-        await FlutterNfcKit.transceive("FFCA000000");
+        Logger.root.info("Tag Ping");
+        await FlutterNfcKit.transceive("FFCA000000", timeout: Duration(milliseconds: 200));
       });
       return true;
     } catch(error){
-      return false;
+      if(retries > 0){
+        Logger.root.warning("Ping failed, retrying");
+        await Future.delayed(delay);
+        return await checkTagPresent(retries: retries - 1);
+      }
+      else{
+        Logger.root.warning("Tag Lost");
+        return false;
+      }
     }
   }
 
   /// Background loop to detect when a tag is put on the phone
   Future<void> watchForTag(Function(NFCTag) callback) async{
     while (true){
-      // Check if the tag is still here, if the handle is null, then no, and we set currentTag to null
-      if (currentTag != null){
-        var present = await checkTagPresent();
-        if (!present) {
-          setState(() {
-            currentTag = null;
-          });
-        }
+      // Check if the tag is still here, go outside the loop when absent
+      while (currentTag != null && await checkTagPresent()){    
+        await Future.delayed(const Duration(milliseconds: 500));    
       }
-
-      if (currentTag == null){
-        try{
-          final tag = await FlutterNfcKit.poll(timeout: const Duration(seconds: 2),androidCheckNDEF: false);
-          await callback(tag);
-        } catch(error) {
-          //print(error);
-        }
+      // Update layout
+      setState(() {
+        currentTag = null;
+      });
+      // Poll a new tag
+      try{
+        final tag = await FlutterNfcKit.poll(timeout: const Duration(milliseconds: 100),androidCheckNDEF: false);
+        await callback(tag);
+      } catch(error) {
+        Logger.root.fine("No tag found");
       }
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(milliseconds: 10));
     }
   }
 
   /// Callback executed when a new tag is detected, gets the tag's handle + its keys
   Future<void> handleTag(NFCTag tag) async{
+    Logger.root.info("Tag detected");
     if(tag.type != NFCTagType.mifare_classic){
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Not a Mifare Classic Tag"), duration: Duration(seconds: 2),));
+      Logger.root.warning("Not a Mifare classic tag");
       return;
     }
+    // TODO : Check if tag is a Mizip one, if not, we abort
     // Extract data we want to display
     final cTag = MizipTag(uid: tag.id, lock: globalLock);
     String? balance = await cTag.getBalance();
@@ -79,7 +90,12 @@ class MainPage_State extends State<MainPage>{
       this.tagBalance = balance!;
       this.currentTag = cTag;
     });
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("New tag detected : ${tag.id}"), duration: Duration(seconds: 2),));
+
+    if (mounted){
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("New tag detected : ${tag.id}"), duration: Duration(seconds: 2),));
+    }
+    Logger.root.info("Tag OK, balance: ${this.tagBalance}");
   }
 
   @override
@@ -104,5 +120,4 @@ class MainPage_State extends State<MainPage>{
       ),
     );
   }
-
 }

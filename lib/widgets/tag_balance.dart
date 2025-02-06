@@ -3,7 +3,7 @@ import "../misc/mizip_tag.dart";
 
 class TagBalance extends StatefulWidget{
 
-  TagBalance({super.key, required this.currentTag});
+  const TagBalance({super.key, required this.currentTag});
 
   final MizipTag currentTag;
 
@@ -19,11 +19,17 @@ class TagBalanceState extends State<TagBalance>{
 
   final balanceController = TextEditingController();
 
-  // TODO: Sometimes the button tap does not seem to register ...
   void changeBalance() async {
     if( _tagBalanceForm.currentState!.validate()){
+      if(mounted){
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Setting balance to : ${balanceController.text}\$"), duration: Duration(seconds: 2),));
+      }
       await widget.currentTag.setBalance(balanceController.text);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Balance changed"), duration: Duration(seconds: 2),));
+      if(mounted){
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error while setting new balance"), duration: Duration(seconds: 2),));
+      }
     }
   }
 
@@ -70,7 +76,6 @@ class TagBalanceState extends State<TagBalance>{
                       return "Not a valid number";
                     }
                     // Check if between two given values
-                    // TODO: Determine max possible value
                     if(value < 0.0){
                       return "Can't be negative";
                     }
