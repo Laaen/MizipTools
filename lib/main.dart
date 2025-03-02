@@ -24,11 +24,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      showPerformanceOverlay: true,
       title: 'MizipTools',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 236, 214, 134), brightness: Brightness.dark),
-        snackBarTheme: const SnackBarThemeData(backgroundColor: Color.fromARGB(255, 202, 138, 0)),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 255, 255, 255), brightness: Brightness.dark),
+        snackBarTheme: const SnackBarThemeData(backgroundColor: Color.fromARGB(255, 0, 155, 202)),
         useMaterial3: true,
       ),
       home: MainPage(),

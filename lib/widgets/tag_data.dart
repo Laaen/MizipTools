@@ -33,14 +33,13 @@ class _TagDataPresent extends StatelessWidget{
     return Container(
       alignment: Alignment.center,
       padding: EdgeInsets.all(20),
-      margin: EdgeInsets.fromLTRB(40, 70, 40, 20),
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSecondary, 
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.all(Radius.circular(20))),
       child: Column(
         spacing: 15,
         children: [
-          Text("Tag info", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),),
+          Text("Tag data", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),),
           Column( children: [
             Row(spacing: 10,
               children: [
@@ -71,7 +70,6 @@ class _TagDataAbsent extends StatelessWidget{
     return Container(
       alignment: Alignment.center,
       padding: EdgeInsets.all(20),
-      margin: EdgeInsets.fromLTRB(40, 70, 40, 20),
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSecondary, 
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.all(Radius.circular(20))),

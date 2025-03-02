@@ -56,6 +56,26 @@ class MizipTag {
     }
   }
 
+    /// Reads a block and returns it, retries a certain amount of times
+  Future<Uint8List> readSector(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
+    try{
+      return await lock.synchronized(() async{
+        await FlutterNfcKit.authenticateSector(number, keyA: getKeys().a[number]);
+        return await FlutterNfcKit.readSector(number);
+      });
+    } catch(error) {
+      if(retries > 0){
+        Logger.root.warning("Read failed, retrying");
+        // Wait some time before retrying
+        await Future.delayed(delay);
+        return await readSector(number, retries: retries - 1);
+      } else {
+        Logger.root.severe("Failed to read sector $number");
+        rethrow;
+      }
+    }
+  }
+
   /// Writes the given block, retries a certain amount of times
   Future<void> writeBlock(int number, Uint8List data, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{

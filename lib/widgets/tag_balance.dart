@@ -26,10 +26,6 @@ class TagBalanceState extends State<TagBalance>{
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Setting balance to : ${balanceController.text}\$"), duration: Duration(seconds: 2),));
       }
       await widget.currentTag.setBalance(balanceController.text);
-      if(mounted){
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error while setting new balance"), duration: Duration(seconds: 2),));
-      }
     }
   }
 
@@ -50,7 +46,6 @@ class TagBalanceState extends State<TagBalance>{
       child:  
       Container(
         padding: EdgeInsets.all(20),
-        margin: EdgeInsets.fromLTRB(40, 15, 40, 20),
         decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSecondary, borderRadius: BorderRadius.all(Radius.circular(20)), shape: BoxShape.rectangle),
         child: Row(
           spacing: 20,
@@ -87,7 +82,7 @@ class TagBalanceState extends State<TagBalance>{
                 )
               )
             )
-          , ElevatedButton(onPressed: changeBalance, child: Text("Ok"))],
+          , OutlinedButton(onPressed: changeBalance, child: Text("Ok"))],
         ),
       )
     );

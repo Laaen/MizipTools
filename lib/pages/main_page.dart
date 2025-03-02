@@ -3,6 +3,7 @@ import "dart:io";
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import "package:logging/logging.dart";
+import "package:miziptools/widgets/dump_tag.dart";
 import 'package:synchronized/synchronized.dart';
 
 import "../misc/mizip_tag.dart";
@@ -93,7 +94,6 @@ class MainPage_State extends State<MainPage>{
 
     if (mounted){
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("New tag detected : ${tag.id}"), duration: Duration(seconds: 2),));
     }
     Logger.root.info("Tag OK, balance: ${this.tagBalance}");
   }
@@ -110,11 +110,14 @@ class MainPage_State extends State<MainPage>{
     return Scaffold(
       appBar: MizipToolsAppBar(),
       body: Container(
+        padding: EdgeInsets.fromLTRB(40, 30, 40, 30),
         child: Column(
+          spacing: 20,
           children: [
             TagData(uid: currentTag?.uid, balance: tagBalance,),
             if (currentTag != null) TagBalance(currentTag: currentTag!,),
             if (currentTag != null) TagAdd10(currentTag: currentTag!,),
+            if (currentTag != null) DumpTagWidget(currentTag: currentTag!),
           ],
         ),
       ),

@@ -12,7 +12,6 @@ class TagAdd10 extends StatefulWidget{
   State<StatefulWidget> createState() => _TagAdd10State();
 }
 
-
 /// Widget holding the "Add 10$" functionnality
 class _TagAdd10State extends State<TagAdd10>{
   
@@ -40,12 +39,7 @@ class _TagAdd10State extends State<TagAdd10>{
     }
 
     // Show a message
-    if (writeStatus == true){
-      if (mounted){
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Added 10\$"), duration: Duration(seconds: 2),));
-      }
-    } else {
+    if (! writeStatus == true){
       if(mounted){
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error while adding 10\$"), duration: Duration(seconds: 2),));
@@ -58,11 +52,10 @@ class _TagAdd10State extends State<TagAdd10>{
     return Container(
       alignment: Alignment.center,
       padding: EdgeInsets.all(20),
-      margin: EdgeInsets.fromLTRB(40, 15, 40, 20),
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSecondary, 
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.all(Radius.circular(20))),
-      child: ElevatedButton(onPressed: () => add10(widget.currentTag), child: Text("Add 10\$"),),
+      child: OutlinedButton(onPressed: () => add10(widget.currentTag), child: Text("Add 10\$"),),
     );
   }
 
