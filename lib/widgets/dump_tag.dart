@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:miziptools/misc/mizip_tag.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DumpTagWidget extends StatelessWidget{
 
@@ -9,18 +12,27 @@ class DumpTagWidget extends StatelessWidget{
   final MizipTag currentTag;
 
   Future<void> dumpTag(MizipTag tag) async{
-    String dump = "";
+    List<String> dump = [];
     for (int i = 1 ; i < 5; i++){
       final sectorData = await tag.readSector(i, retries: 5);
       for (final elt in sectorData.slices(16)){
-        dump += "${elt.map((x) => x.toRadixString(16).padLeft(2, '0')).join(" ")}\n";
+        dump.add(elt.map((x) => x.toRadixString(16).padLeft(2, '0')).join(" "));
       }
     }
 
     // Add keys to the dump
-    
+    final keys = tag.getKeys();
+    for (final (idx, elt) in [3, 7, 11, 15].indexed){
+      dump[elt] = keys.a[idx].characters.slices(2).map((x) => x.join("")).join(" ") + dump[elt].substring(17, 30) + keys.b[idx].characters.slices(2).map((x) => x.join("")).join(" ");
+    }
 
-    print(dump);
+    // Write dump to a file
+    final dir = await getExternalStorageDirectory();
+    final fileName = "${dir!.path}/${tag.uid}.dump";
+
+    final file = File(fileName).openWrite();
+    file.writeAll(dump, "\n");
+    file.close();
   }
 
   @override
