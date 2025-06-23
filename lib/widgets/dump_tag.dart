@@ -2,18 +2,36 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:miziptools/misc/mifare_classic_tag.dart';
 import 'package:miziptools/misc/mizip_tag.dart';
 import 'package:path_provider/path_provider.dart';
+import "package:logging/logging.dart";
 
-class DumpTagWidget extends StatelessWidget{
+class DumpTagWidget extends StatefulWidget{
+  final MifareClassicTag currentTag;
 
   const DumpTagWidget({super.key, required this.currentTag});
 
-  final MizipTag currentTag;
+  @override
+  State<StatefulWidget> createState(){
+    return DumpTagWidgetState();
+  }
+}
 
-  Future<void> dumpTag(MizipTag tag) async{
+
+class DumpTagWidgetState extends State<DumpTagWidget>{
+
+  Future<void> dumpTag(MifareClassicTag tag) async{
+
+    if(mounted){
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Dumping tag's data"), duration: Duration(seconds: 10),));
+    }
+
+    Logger.root.info(tag.getKeys());
+
     List<String> dump = [];
-    for (int i = 1 ; i < 5; i++){
+    for (int i = 0 ; i < 5; i++){
       final sectorData = await tag.readSector(i, retries: 5);
       for (final elt in sectorData.slices(16)){
         dump.add(elt.map((x) => x.toRadixString(16).padLeft(2, '0')).join(" "));
@@ -22,7 +40,7 @@ class DumpTagWidget extends StatelessWidget{
 
     // Add keys to the dump
     final keys = tag.getKeys();
-    for (final (idx, elt) in [3, 7, 11, 15].indexed){
+    for (final (idx, elt) in [3, 7, 11, 15, 19].indexed){
       dump[elt] = keys.a[idx].characters.slices(2).map((x) => x.join("")).join(" ") + dump[elt].substring(17, 30) + keys.b[idx].characters.slices(2).map((x) => x.join("")).join(" ");
     }
 
@@ -33,6 +51,12 @@ class DumpTagWidget extends StatelessWidget{
     final file = File(fileName).openWrite();
     file.writeAll(dump, "\n");
     file.close();
+
+    if(mounted){
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Dump done file : $fileName"), duration: Duration(seconds: 10),));
+    }
+
   }
 
   @override
@@ -43,7 +67,7 @@ class DumpTagWidget extends StatelessWidget{
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSecondary, 
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.all(Radius.circular(20))),
-      child: OutlinedButton(onPressed: () async => await dumpTag(currentTag), child: Text("Dump Tag"),),
+      child: OutlinedButton(onPressed: () async => await dumpTag(widget.currentTag), child: Text("Dump Tag"),),
     );
   }
 }

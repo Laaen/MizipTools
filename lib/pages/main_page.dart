@@ -3,6 +3,7 @@ import "dart:io";
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import "package:logging/logging.dart";
+import "package:miziptools/misc/mifare_classic_tag.dart";
 import "package:miziptools/widgets/dump_tag.dart";
 import 'package:synchronized/synchronized.dart';
 
@@ -24,7 +25,7 @@ class MainPage extends StatefulWidget{
 class MainPage_State extends State<MainPage>{
 
   /// The tag's handle, MUST be set to null in case of error / disconnection to initiate a new poll 
-  MizipTag? currentTag;
+  MifareClassicTag? currentTag;
   /// The balance, we need to put it here because async/await
   String tagBalance = "";
   /// Global lock, to prevent concurrent transmissions
@@ -83,15 +84,21 @@ class MainPage_State extends State<MainPage>{
       return;
     }
     // TODO : Check if tag is a Mizip one, if not, we abort
-    // Extract data we want to display
+    // Try to use the tag as a Mizip one
     final cTag = MizipTag(uid: tag.id, lock: globalLock);
     String? balance = await cTag.getBalance();
-    balance ??= "N/A";
-    setState(() {
-      this.tagBalance = balance!;
-      this.currentTag = cTag;
-    });
-
+    // If we can't read balance, it's a MifareClassic but not Mizip
+    if (balance == null) {
+      setState(() {
+        this.tagBalance = "Not a Mizip tag";
+        this.currentTag = MifareClassicTag(uid: tag.id, lock: globalLock);
+      });
+    } else {
+      setState(() {
+        this.tagBalance = "$balance\$";
+        this.currentTag = cTag;
+      });
+    }
     if (mounted){
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
     }
@@ -115,8 +122,9 @@ class MainPage_State extends State<MainPage>{
           spacing: 20,
           children: [
             TagData(uid: currentTag?.uid, balance: tagBalance,),
-            if (currentTag != null) TagBalance(currentTag: currentTag!,),
-            if (currentTag != null) TagAdd10(currentTag: currentTag!,),
+            // Some buttons don't appear if not a mizip tag
+            if (currentTag != null && currentTag is MizipTag) TagBalance(currentTag: currentTag! as MizipTag,),
+            if (currentTag != null && currentTag is MizipTag) TagAdd10(currentTag: currentTag! as MizipTag,),
             if (currentTag != null) DumpTagWidget(currentTag: currentTag!),
           ],
         ),

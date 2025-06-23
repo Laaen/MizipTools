@@ -50,7 +50,7 @@ class _TagDataPresent extends StatelessWidget{
             Row(spacing: 10,
               children: [
                 Text("Balance:", style: TextStyle(fontSize: 16),),
-                Text("$balance\$", style: TextStyle(fontSize: 16),),
+                Text(balance, style: TextStyle(fontSize: 16),),
               ],
             )]
           )
