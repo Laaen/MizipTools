@@ -92,7 +92,7 @@ class MainPage_State extends State<MainPage>{
       });
     } else {
       setState(() {
-        tagBalance = "$balance\$";
+        cTag.balance = balance;
         App.tag = cTag;
       });
     }
@@ -117,7 +117,7 @@ class MainPage_State extends State<MainPage>{
         child: Column(
           spacing: 20,
           children: [
-            TagData(uid:App.tag?.uid, balance: tagBalance,),
+            TagData(),
             // Some buttons don't appear if not a mizip tag
             if (App.tag != null && App.tag is MizipTag) TagBalance(currentTag: App.tag! as MizipTag,),
             if (App.tag != null && App.tag is MizipTag) TagAdd10(currentTag: App.tag! as MizipTag,),

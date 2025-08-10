@@ -1,81 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:miziptools/main.dart';
+import 'package:miziptools/misc/mizip_tag.dart';
+import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 
-/// Display the tag's data (UID and balance)
-/// If not present, displays a message asking the user for scanning the tag
 class TagData extends StatelessWidget{
 
-  const TagData({super.key, this.uid, this.balance});
-
-  final String? uid;
-  final String? balance;
+  const TagData({super.key});
 
   @override
   Widget build(BuildContext context) {
-    if (uid == null || balance == null){
-      return _TagDataAbsent();
+    if (App.tag is! MizipTag){
+      return ContainerWithBorder(child: Text("No tag detected", style: TextStyle(fontSize: 16)));
     } else {
-      return _TagDataPresent(uid: uid!, balance: balance!);
+      return ContainerWithBorder(child: getTagDataDisplay(App.tag as MizipTag));
     }
-    
   }
 
-}
-
-class _TagDataPresent extends StatelessWidget{
-
-  const _TagDataPresent({super.key, required this.uid, required this.balance});
-
-  final String uid;
-  final String balance;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSecondary, 
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.all(Radius.circular(20))),
-      child: Column(
-        spacing: 15,
-        children: [
-          Text("Tag data", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),),
-          Column( children: [
-            Row(spacing: 10,
-              children: [
-                Text("UID: ", style: TextStyle(fontSize: 16),),
-                Text(uid, style: TextStyle(fontSize: 16),),
-              ],
-            ),
-            Row(spacing: 10,
-              children: [
-                Text("Balance:", style: TextStyle(fontSize: 16),),
-                Text(balance, style: TextStyle(fontSize: 16),),
-              ],
-            )]
-          )
-        ],
-      ), 
+  Widget getTagDataDisplay(MizipTag tag){
+    return Column(
+      children : [
+        Text("Tag data", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),),
+        Container(height: 10,),
+        Row(children: [Text("UID: ${tag.uid}", style: TextStyle(fontSize: 16))]),
+        Row(children: [Text("Balance: ${tag.balance}\$", style: TextStyle(fontSize: 16))])
+      ]
     );
   }
-
-}
-
-class _TagDataAbsent extends StatelessWidget{
-
-  const _TagDataAbsent({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSecondary, 
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.all(Radius.circular(20))),
-      child: Text("No tag detected",
-        style: TextStyle(fontSize: 16),)
-    );
-  }
-
 }

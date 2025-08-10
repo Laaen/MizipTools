@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ContainerWithBorder extends StatelessWidget{
 
-  final StatelessWidget child;
+  final Widget child;
 
   const ContainerWithBorder({super.key, required this.child});
 

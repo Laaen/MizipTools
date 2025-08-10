@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
@@ -10,9 +9,10 @@ import 'package:synchronized/synchronized.dart';
 /// Interface to the Mizip Tag
 class MizipTag extends MifareClassicTag{
 
+  String balance = "N/A";
+
   MizipTag({required super.uid, required super.lock});
 
-  /// Returns keys A and B for the given uid
   @override
   ({List<String> a,List<String> b}) getKeys(){
     const baseKeysA = ["6421E1E7E4D6", "C64672F5FF1C", "8F41FA6D413A", "5C490CED29A3"];
