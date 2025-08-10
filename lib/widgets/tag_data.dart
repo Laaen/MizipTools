@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miziptools/main.dart';
+import 'package:miziptools/misc/mifare_classic_tag.dart';
 import 'package:miziptools/misc/mizip_tag.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 
@@ -9,10 +10,15 @@ class TagData extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    if (App.tag is! MizipTag){
-      return ContainerWithBorder(child: Text("No tag detected", style: TextStyle(fontSize: 16)));
-    } else {
+    
+    // Order of evaluation is important as MizipTag inherits MifareClassicTag
+    if (App.tag is MizipTag){
       return ContainerWithBorder(child: getTagDataDisplay(App.tag as MizipTag));
+    }
+    else if (App.tag is MifareClassicTag){
+      return ContainerWithBorder(child: Text("Not a mizip tag (Mifare Classic Tag)"));
+    } else {
+      return ContainerWithBorder(child: Text("No tag detected", style: TextStyle(fontSize: 16)));
     }
   }
 
