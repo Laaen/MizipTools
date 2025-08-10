@@ -3,6 +3,7 @@ import "dart:io";
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import "package:logging/logging.dart";
+import "package:miziptools/main.dart";
 import "package:miziptools/misc/mifare_classic_tag.dart";
 import "package:miziptools/widgets/dump_tag.dart";
 import 'package:synchronized/synchronized.dart';
@@ -24,11 +25,7 @@ class MainPage extends StatefulWidget{
 
 class MainPage_State extends State<MainPage>{
 
-  /// The tag's handle, MUST be set to null in case of error / disconnection to initiate a new poll 
-  MifareClassicTag? currentTag;
-  /// The balance, we need to put it here because async/await
   String tagBalance = "";
-  /// Global lock, to prevent concurrent transmissions
   Lock globalLock = Lock(reentrant: true);
 
   /// Tries to send a message to the tag to check if it is still present
@@ -56,12 +53,12 @@ class MainPage_State extends State<MainPage>{
   Future<void> watchForTag(Function(NFCTag) callback) async{
     while (true){
       // Check if the tag is still here, go outside the loop when absent
-      while (currentTag != null && await checkTagPresent()){    
+      while (App.tag != null && await checkTagPresent()){    
         await Future.delayed(const Duration(milliseconds: 500));    
       }
       // Update layout
       setState(() {
-        currentTag = null;
+        App.tag = null;
       });
       // Poll a new tag
       try{
@@ -90,25 +87,24 @@ class MainPage_State extends State<MainPage>{
     // If we can't read balance, it's a MifareClassic but not Mizip
     if (balance == null) {
       setState(() {
-        this.tagBalance = "Not a Mizip tag";
-        this.currentTag = MifareClassicTag(uid: tag.id, lock: globalLock);
+        tagBalance = "Not a Mizip tag";
+        App.tag = MifareClassicTag(uid: tag.id, lock: globalLock);
       });
     } else {
       setState(() {
-        this.tagBalance = "$balance\$";
-        this.currentTag = cTag;
+        tagBalance = "$balance\$";
+        App.tag = cTag;
       });
     }
     if (mounted){
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
     }
-    Logger.root.info("Tag OK, balance: ${this.tagBalance}");
+    Logger.root.info("Tag OK, balance: ${tagBalance}");
   }
 
   @override
   void initState(){
     super.initState();
-    // Launch background loop
     watchForTag(handleTag).then((val){});
   }
 
@@ -121,11 +117,11 @@ class MainPage_State extends State<MainPage>{
         child: Column(
           spacing: 20,
           children: [
-            TagData(uid: currentTag?.uid, balance: tagBalance,),
+            TagData(uid:App.tag?.uid, balance: tagBalance,),
             // Some buttons don't appear if not a mizip tag
-            if (currentTag != null && currentTag is MizipTag) TagBalance(currentTag: currentTag! as MizipTag,),
-            if (currentTag != null && currentTag is MizipTag) TagAdd10(currentTag: currentTag! as MizipTag,),
-            if (currentTag != null) DumpTagWidget(currentTag: currentTag!),
+            if (App.tag != null && App.tag is MizipTag) TagBalance(currentTag: App.tag! as MizipTag,),
+            if (App.tag != null && App.tag is MizipTag) TagAdd10(currentTag: App.tag! as MizipTag,),
+            if (App.tag != null) DumpTagWidget(currentTag: App.tag!),
           ],
         ),
       ),
