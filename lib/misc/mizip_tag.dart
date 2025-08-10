@@ -52,9 +52,9 @@ class MizipTag extends MifareClassicTag{
 
     await lock.synchronized(() async {
       // Get the current block's value
-      Uint8List current_balance_block;
+      Uint8List currentBalanceBlock;
       try{
-        current_balance_block = await readBlock(9, retries: 5);
+        currentBalanceBlock = await readBlock(9, retries: 5);
       } catch(err){
         return false;
       }
@@ -63,7 +63,7 @@ class MizipTag extends MifareClassicTag{
       final checksum = newValue.reduce((acc, curr) => acc ^ curr);
       
       // update the block with the new values
-      var newBalanceBlock = current_balance_block.toList();
+      var newBalanceBlock = currentBalanceBlock.toList();
       newBalanceBlock.replaceRange(1, 4, [newValue[0], newValue[1], checksum]);
       Logger.root.info("New block : $newBalanceBlock");
       await lock.synchronized(() async {

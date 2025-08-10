@@ -1,26 +1,22 @@
 import 'dart:typed_data';
 
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
-import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:synchronized/synchronized.dart';
 
 /// Basic interface for any Mifare Classic tag
 class MifareClassicTag {
   
-  /// Tag's UID
   String uid;
   /// Lock used to prevent concurrent access to the NFC reader
   Lock lock;
 
   MifareClassicTag({required this.uid, required this.lock});
 
-  /// Returns keys A and B, we assume they're FFFFFFFFFFFF for all sectors
   ({List<String> a,List<String> b}) getKeys(){
     return (a: List.filled(5, "FFFFFFFFFFFF"), b:List.filled(5, "FFFFFFFFFFFF"));
   }
 
-  /// Reads a block and returns it, retries a certain amount of times
   Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
       return await lock.synchronized(() async{
