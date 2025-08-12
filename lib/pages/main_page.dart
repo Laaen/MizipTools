@@ -1,5 +1,3 @@
-import "dart:io";
-
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import "package:logging/logging.dart";
@@ -12,7 +10,7 @@ import "../misc/mizip_tag.dart";
 
 import "../widgets/appbar.dart";
 import "../widgets/tag_data.dart";
-import "../widgets/tag_balance.dart";
+import "../widgets/change_tag_balance.dart";
 import "../widgets/tag_add_x.dart";
 
 class MainPage extends StatefulWidget{
@@ -119,7 +117,7 @@ class MainPage_State extends State<MainPage>{
           children: [
             TagData(),
             // Some buttons don't appear if not a mizip tag
-            if (App.tag != null && App.tag is MizipTag) TagBalance(currentTag: App.tag! as MizipTag,),
+            if (App.tag != null && App.tag is MizipTag) TagBalance(),
             if (App.tag != null && App.tag is MizipTag) TagAdd10(currentTag: App.tag! as MizipTag,),
             if (App.tag != null) DumpTagWidget(currentTag: App.tag!),
           ],
