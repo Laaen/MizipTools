@@ -11,7 +11,7 @@ import "../misc/mizip_tag.dart";
 import "../widgets/appbar.dart";
 import "../widgets/tag_data.dart";
 import "../widgets/change_tag_balance.dart";
-import "../widgets/tag_add_x.dart";
+import "../widgets/tag_add_10.dart";
 
 class MainPage extends StatefulWidget{
 
@@ -118,7 +118,7 @@ class MainPage_State extends State<MainPage>{
             TagData(),
             // Some buttons don't appear if not a mizip tag
             if (App.tag != null && App.tag is MizipTag) TagBalance(),
-            if (App.tag != null && App.tag is MizipTag) TagAdd10(currentTag: App.tag! as MizipTag,),
+            if (App.tag != null && App.tag is MizipTag) TagAdd10(),
             if (App.tag != null) DumpTagWidget(currentTag: App.tag!),
           ],
         ),
