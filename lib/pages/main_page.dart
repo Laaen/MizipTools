@@ -119,7 +119,7 @@ class MainPage_State extends State<MainPage>{
             // Some buttons don't appear if not a mizip tag
             if (App.tag != null && App.tag is MizipTag) TagBalance(),
             if (App.tag != null && App.tag is MizipTag) TagAdd10(),
-            if (App.tag != null) DumpTagWidget(currentTag: App.tag!),
+            if (App.tag != null) DumpTag(),
           ],
         ),
       ),

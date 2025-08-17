@@ -1,0 +1,1 @@
+typedef MifareKeys = ({List<String> a, List<String> b});

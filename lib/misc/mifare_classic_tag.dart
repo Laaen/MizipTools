@@ -2,9 +2,9 @@ import 'dart:typed_data';
 
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
+import 'package:miziptools/misc/mifare_keys.dart';
 import 'package:synchronized/synchronized.dart';
 
-/// Basic interface for any Mifare Classic tag
 class MifareClassicTag {
   
   String uid;
@@ -13,7 +13,7 @@ class MifareClassicTag {
 
   MifareClassicTag({required this.uid, required this.lock});
 
-  ({List<String> a,List<String> b}) getKeys(){
+  MifareKeys getKeys(){
     return (a: List.filled(5, "FFFFFFFFFFFF"), b:List.filled(5, "FFFFFFFFFFFF"));
   }
 

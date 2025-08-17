@@ -2,72 +2,79 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:miziptools/functions/snackbar.dart';
+import 'package:miziptools/main.dart';
 import 'package:miziptools/misc/mifare_classic_tag.dart';
+import 'package:miziptools/misc/mifare_keys.dart';
 import 'package:miziptools/misc/mizip_tag.dart';
+import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 import 'package:path_provider/path_provider.dart';
 import "package:logging/logging.dart";
 
-class DumpTagWidget extends StatefulWidget{
-  final MifareClassicTag currentTag;
+class DumpTag extends StatelessWidget{
 
-  const DumpTagWidget({super.key, required this.currentTag});
-
-  @override
-  State<StatefulWidget> createState(){
-    return DumpTagWidgetState();
-  }
-}
-
-
-class DumpTagWidgetState extends State<DumpTagWidget>{
-
-  Future<void> dumpTag(MifareClassicTag tag) async{
-
-    if(mounted){
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Dumping tag's data"), duration: Duration(seconds: 10),));
-    }
-
-    Logger.root.info(tag.getKeys());
-
-    List<String> dump = [];
-    for (int i = 0 ; i < 5; i++){
-      final sectorData = await tag.readSector(i, retries: 5);
-      for (final elt in sectorData.slices(16)){
-        dump.add(elt.map((x) => x.toRadixString(16).padLeft(2, '0')).join(" "));
-      }
-    }
-
-    // Add keys to the dump
-    final keys = tag.getKeys();
-    for (final (idx, elt) in [3, 7, 11, 15, 19].indexed){
-      dump[elt] = keys.a[idx].characters.slices(2).map((x) => x.join("")).join(" ") + dump[elt].substring(17, 30) + keys.b[idx].characters.slices(2).map((x) => x.join("")).join(" ");
-    }
-
-    // Write dump to a file
-    final dir = await getExternalStorageDirectory();
-    final fileName = "${dir!.path}/${tag.uid}.dump";
-
-    final file = File(fileName).openWrite();
-    file.writeAll(dump, "\n");
-    file.close();
-
-    if(mounted){
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Dump done file : $fileName"), duration: Duration(seconds: 10),));
-    }
-
-  }
+  const DumpTag({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSecondary, 
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.all(Radius.circular(20))),
-      child: OutlinedButton(onPressed: () async => await dumpTag(widget.currentTag), child: Text("Dump Tag"),),
+    return ContainerWithBorder(
+      child: OutlinedButton(onPressed: () async => await dumpTag(context), child: Text("Dump Tag"),),
     );
   }
+
+  Future<void> dumpTag(BuildContext context) async{
+
+    final tag = App.tag!;
+    final keys = tag.getKeys();
+    final fileName = tag.uid;
+
+    showSnackBar(context, "Dumping tag's data");
+    final rawDump = await getTagContent(tag);
+    final dumpWithKeys = addKeysToDump(rawDump, keys);
+    writeDumpToFile(fileName, dumpWithKeys);
+    showSnackBar(context, "Dump done file : $fileName");
+  }
+
+  Future<List<String>> getTagContent(MifareClassicTag tag) async {
+    List<String> dump = [];
+    for (int sectorNb = 0 ; sectorNb < 5; sectorNb++){
+      final sectorData = await tag.readSector(sectorNb, retries: 5);
+      for (final line in sectorData.slices(16)){
+        dump.add(formatLineData(line));
+      }
+    }
+    return dump;
+  }
+
+  String formatLineData(List<int> lineData){
+    return lineData.map((byte) => byte.toRadixString(16).padLeft(2, '0').toUpperCase())
+    .join("");
+  }
+
+  List<String> addKeysToDump(List<String> dump, MifareKeys keys){
+    var modifiedDump = dump.toList();
+    for (final (sectorNb, blockNb) in [3, 7, 11, 15, 19].indexed){
+      final keyA = formatKey(keys.a[sectorNb]);
+      final keyB = formatKey(keys.b[sectorNb]);
+      final permissions = modifiedDump[blockNb].substring(12, 20);
+      modifiedDump[blockNb] = keyA + permissions + keyB;
+    }
+    return modifiedDump;
+  }
+
+  String formatKey(String key) {
+    return key.characters.slices(2)
+    .map((x) => x.join("").toUpperCase())
+    .join("");
+  }
+
+  void writeDumpToFile(String fileName, List<String> content) async {
+    final dir = await getExternalStorageDirectory();
+    final fileFullPath = "${dir!.path}/$fileName.dump";
+
+    final file = File(fileFullPath).openWrite();
+    file.writeAll(content, "\n");
+    file.close();
+  }
+
 }
