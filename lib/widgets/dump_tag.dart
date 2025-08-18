@@ -2,14 +2,12 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:miziptools/functions/snackbar.dart';
+import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/main.dart';
 import 'package:miziptools/misc/mifare_classic_tag.dart';
 import 'package:miziptools/misc/mifare_keys.dart';
-import 'package:miziptools/misc/mizip_tag.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 import 'package:path_provider/path_provider.dart';
-import "package:logging/logging.dart";
 
 class DumpTag extends StatelessWidget{
 

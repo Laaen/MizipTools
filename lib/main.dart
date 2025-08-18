@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miziptools/misc/mifare_classic_tag.dart';
+import 'package:miziptools/misc/mizip_tag.dart';
 
 import "pages/main_page.dart";
 import 'package:logging/logging.dart';

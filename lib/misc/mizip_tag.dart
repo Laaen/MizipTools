@@ -1,11 +1,9 @@
 import 'dart:typed_data';
-
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:miziptools/misc/mifare_classic_tag.dart';
 import 'package:miziptools/misc/mifare_keys.dart';
-import 'package:synchronized/synchronized.dart';
 
 /// Interface to the Mizip Tag
 class MizipTag extends MifareClassicTag{

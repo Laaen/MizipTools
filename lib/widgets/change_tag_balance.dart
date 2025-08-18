@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:miziptools/functions/snackbar.dart';
+import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/main.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 import "../misc/mizip_tag.dart";
