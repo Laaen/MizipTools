@@ -4,6 +4,7 @@ import "package:logging/logging.dart";
 import "package:miziptools/main.dart";
 import "package:miziptools/misc/mifare_classic_tag.dart";
 import "package:miziptools/misc/nfc.dart";
+import "package:miziptools/misc/snackbar.dart";
 import "package:miziptools/widgets/dump_tag.dart";
 import 'package:synchronized/synchronized.dart';
 
@@ -61,34 +62,35 @@ class MainPage_State extends State<MainPage>{
 
   /// Callback executed when a new tag is detected, gets the tag's handle + its keys
   Future<void> onTagDetected (Lock globalLock, NFCTag tag) async{
-    Logger.root.info("Tag detected");
+
     if(tag.type != NFCTagType.mifare_classic){
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Not a Mifare Classic Tag"), duration: Duration(seconds: 2),));
-      Logger.root.warning("Not a Mifare classic tag");
+      await handleNotMifareClassicTag();
       return;
     }
-    // TODO : Check if tag is a Mizip one, if not, we abort
-    // Try to use the tag as a Mizip one
-    final cTag = MizipTag(uid: tag.id, lock: globalLock);
-    String? balance = await cTag.getBalance();
-    // If we can't read balance, it's a MifareClassic but not Mizip
-    if (balance == null) {
-      setState(() {
-        cTag.balance = "Not a Mizip tag";
-        App.tag = MifareClassicTag(uid: tag.id, lock: globalLock);
-      });
+
+    MifareClassicTag currentTag;
+    if (await isMizipTag(tag)){
+      currentTag = MizipTag(uid: tag.id, lock: globalLock);
     } else {
-      setState(() {
-        cTag.balance = balance;
-        App.tag = cTag;
-      });
+      currentTag = MifareClassicTag(uid: tag.id, lock: globalLock);
     }
-    if (mounted){
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    }
-    Logger.root.info("Tag OK, balance: ${tagBalance}");
+
+    await currentTag.updateInnerBalance();
+
+    setState(() {
+      App.tag = currentTag;
+    });
   }
 
+  Future<void> handleNotMifareClassicTag() async {
+    showSnackBar(context, "Not a Mifare Classic tag");
+    Logger.root.warning("Not a Mifare classic tag");
+    await Future.delayed(Duration(seconds: 2));
+  }
 
+  Future<bool> isMizipTag(NFCTag tag) async{
+    final cTag = MizipTag(uid: tag.id, lock: globalLock);
+    String? balance = await cTag.getBalance();
+    return balance != "N/A";
+  }
 }

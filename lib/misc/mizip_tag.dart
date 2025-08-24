@@ -8,8 +8,6 @@ import 'package:miziptools/misc/mifare_keys.dart';
 /// Interface to the Mizip Tag
 class MizipTag extends MifareClassicTag{
 
-  String balance = "N/A";
-
   MizipTag({required super.uid, required super.lock});
 
   @override
@@ -34,15 +32,18 @@ class MizipTag extends MifareClassicTag{
     return (a: keysA, b: keysB);
   }
 
-  /// Returns the balance of the tag, returns null in case of error
-  Future<String?> getBalance() async{
-    // Sector 2 block 9
+  Future<String> getBalance() async{
+    await updateInnerBalance();
+    return this.balance;
+  }
+
+  Future<void> updateInnerBalance() async {
     try{
       final data = await readBlock(9, retries: 5);
       final balance = data.sublist(1, 3).map((x) => x.toRadixString(16).padLeft(2, "0")).toList().reversed;
-      return (int.parse(balance.join(""), radix: 16) / 100.0).toString();
+      this.balance = (int.parse(balance.join(""), radix: 16) / 100.0).toString();
     } catch(error){
-      return null;
+      this.balance = "N/A";
     }
   }
 
@@ -71,6 +72,7 @@ class MizipTag extends MifareClassicTag{
       Logger.root.info("Tag balance written succesfully");
       
       // Close the session to trigger a new discovery => new balance
+      // TODO: Retirer et juste update le balance
       await FlutterNfcKit.finish();
     });
     

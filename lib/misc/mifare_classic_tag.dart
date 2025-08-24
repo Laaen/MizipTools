@@ -7,15 +7,26 @@ import 'package:synchronized/synchronized.dart';
 
 class MifareClassicTag {
   
-  String uid;
   /// Lock used to prevent concurrent access to the NFC reader
   Lock lock;
+
+  String uid;
+  String balance = "N/A";
 
   MifareClassicTag({required this.uid, required this.lock});
 
   MifareKeys getKeys(){
     return (a: List.filled(5, "FFFFFFFFFFFF"), b:List.filled(5, "FFFFFFFFFFFF"));
   }
+
+  Future<String> getBalance() async{
+    return this.balance;
+  }
+
+  Future<void> updateInnerBalance() async {
+    return;
+  }
+
 
   Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
