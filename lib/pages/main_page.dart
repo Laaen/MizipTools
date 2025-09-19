@@ -4,8 +4,10 @@ import "package:logging/logging.dart";
 import "package:miziptools/main.dart";
 import "package:miziptools/misc/mifare_classic_tag.dart";
 import "package:miziptools/misc/nfc.dart";
+import "package:miziptools/misc/nfctag.dart";
 import "package:miziptools/misc/snackbar.dart";
 import "package:miziptools/widgets/dump_tag.dart";
+import "package:provider/provider.dart";
 import 'package:synchronized/synchronized.dart';
 
 import "../misc/mizip_tag.dart";
@@ -34,16 +36,19 @@ class MainPage_State extends State<MainPage>{
       appBar: MizipToolsAppBar(),
       body: Container(
         padding: EdgeInsets.fromLTRB(40, 30, 40, 30),
-        child: Column(
-          spacing: 20,
-          children: [
-            TagData(),
-            // Some buttons don't appear if not a mizip tag
-            if (App.tag != null && App.tag is MizipTag) TagBalance(),
-            if (App.tag != null && App.tag is MizipTag) TagAdd10(),
-            if (App.tag != null) DumpTag(),
-          ],
-        ),
+        child: Consumer<CurrentNFCTag>(builder: (context, tag, child) {
+          return Column(
+            spacing: 20,
+            children: 
+            [
+              TagData(),
+              // Some buttons don't appear if not a mizip tag
+              if (tag.isPresent() && tag.isMizipTag()) TagBalance(),
+              if (tag.isPresent() && tag.isMizipTag()) TagAdd10(),
+              if (tag.isPresent()) DumpTag(),
+            ],
+          );
+        },) 
       ),
     );
   }
@@ -51,13 +56,12 @@ class MainPage_State extends State<MainPage>{
   @override
   void initState(){
     super.initState();
-    watchForTag(globalLock, context, onTagLost, onTagDetected).then((val){});
+    final currentTag = context.read<CurrentNFCTag>();
+    watchForTag(currentTag, globalLock, context, onTagLost, onTagDetected);
   }
 
   void onTagLost() async {
-    setState(() {
-      App.tag = null;
-    });
+    context.read<CurrentNFCTag>().setTagAbsent();
   }
 
   /// Callback executed when a new tag is detected, gets the tag's handle + its keys
@@ -76,10 +80,11 @@ class MainPage_State extends State<MainPage>{
     }
 
     await currentTag.updateInnerBalance();
-
-    setState(() {
-      App.tag = currentTag;
-    });
+    
+    if (mounted){
+      var t = context.read<CurrentNFCTag>();
+      t.updateInnerTag(currentTag);  
+    }
   }
 
   Future<void> handleNotMifareClassicTag() async {

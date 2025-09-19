@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import "package:miziptools/misc/nfctag.dart";
 import "package:miziptools/misc/snackbar.dart";
 import "package:miziptools/main.dart";
 import "package:miziptools/widgets/basic/containerWithBorder.dart";
+import "package:provider/provider.dart";
 import "../misc/mizip_tag.dart";
 
 class TagAdd10 extends StatelessWidget{
@@ -18,7 +20,7 @@ class TagAdd10 extends StatelessWidget{
   void add10(BuildContext context) async {
     
     showSnackBar(context, "Adding 10\$");
-    final tag = App.tag as MizipTag;
+    final tag = context.read<CurrentNFCTag>();
 
     try {
       final currentBalance = await tag.getBalance();
@@ -30,6 +32,9 @@ class TagAdd10 extends StatelessWidget{
       }
     } catch (e) {
       showSnackBar(context, "Error while adding 10\$");
+    }
+    if(context.mounted){
+      showSnackBar(context, "Balance changed successfully");  
     }
   }
 

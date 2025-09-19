@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:miziptools/main.dart';
 import 'package:miziptools/misc/mifare_classic_tag.dart';
 import 'package:miziptools/misc/mizip_tag.dart';
+import 'package:miziptools/misc/nfctag.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
+import 'package:provider/provider.dart';
 
 class TagData extends StatelessWidget{
 
@@ -10,26 +12,27 @@ class TagData extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    
+
+    final tag = Provider.of<CurrentNFCTag>(context);
     // Order of evaluation is important as MizipTag inherits MifareClassicTag
-    if (App.tag is MizipTag){
-      return ContainerWithBorder(child: getTagDataDisplay(App.tag as MizipTag));
-    }
-    else if (App.tag is MifareClassicTag){
+    if (tag.isMizipTag()){
+      return ContainerWithBorder(child: getTagDataDisplay(tag));
+    } else if (tag.isMifareClassic()){
       return ContainerWithBorder(child: Text("Not a mizip tag (Mifare Classic Tag)"));
     } else {
       return ContainerWithBorder(child: Text("No tag detected", style: TextStyle(fontSize: 16)));
     }
   }
 
-  Widget getTagDataDisplay(MizipTag tag){
+  Widget getTagDataDisplay(CurrentNFCTag tag){
     return Column(
       children : [
         Text("Tag data", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),),
         Container(height: 10,),
-        Row(children: [Text("UID: ${tag.uid}", style: TextStyle(fontSize: 16))]),
-        Row(children: [Text("Balance: ${tag.balance}\$", style: TextStyle(fontSize: 16))])
+        Row(children: [Text("UID: ${tag.getUid()}", style: TextStyle(fontSize: 16))]),
+        Row(children: [Text("Balance: ${tag.innerTag!.balance}\$", style: TextStyle(fontSize: 16))])
       ]
     );
   }
+
 }

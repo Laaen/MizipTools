@@ -1,11 +1,13 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
 import 'package:miziptools/misc/mifare_keys.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:provider/provider.dart';
 
-class MifareClassicTag {
+class MifareClassicTag with ChangeNotifier {
   
   /// Lock used to prevent concurrent access to the NFC reader
   Lock lock;
@@ -14,6 +16,7 @@ class MifareClassicTag {
   String balance = "N/A";
 
   MifareClassicTag({required this.uid, required this.lock});
+  MifareClassicTag.empty() : uid = "INVALID_UID", lock = Lock();
 
   MifareKeys getKeys(){
     return (a: List.filled(5, "FFFFFFFFFFFF"), b:List.filled(5, "FFFFFFFFFFFF"));
@@ -26,7 +29,6 @@ class MifareClassicTag {
   Future<void> updateInnerBalance() async {
     return;
   }
-
 
   Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{

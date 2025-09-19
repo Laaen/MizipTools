@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:miziptools/misc/nfctag.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/main.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
+import 'package:provider/provider.dart';
 import "../misc/mizip_tag.dart";
 
 class TagBalance extends StatelessWidget{
@@ -61,9 +63,12 @@ class TagBalance extends StatelessWidget{
 
   void changeBalance(BuildContext context) async {
     if( _tagBalanceForm.currentState!.validate()){
-      final tag = App.tag as MizipTag;
+      final tag = context.read<CurrentNFCTag>();
       showSnackBar(context, "Changing balance");
       await tag.setBalance(balanceController.text);
+      if(context.mounted){
+        showSnackBar(context, "Balance changed successfully");  
+      }
     }
   }
 

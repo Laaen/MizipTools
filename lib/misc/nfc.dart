@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:miziptools/misc/nfctag.dart';
+import 'package:provider/provider.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import "package:miziptools/main.dart";
 import "../misc/mizip_tag.dart";
 
-Future<void> watchForTag(Lock globalLock, BuildContext context, Function() onTagLost, Function(Lock, NFCTag) onTagDetected) async{
+Future<void> watchForTag(CurrentNFCTag currentTag, Lock globalLock, BuildContext context, Function() onTagLost, Function(Lock, NFCTag) onTagDetected) async{
 
   while (true){
-    await waitForTagLost(globalLock);
+    await waitForTagLost(currentTag, globalLock);
     await onTagLost();
     final tag = await waitForNewTag();
     await onTagDetected(globalLock, tag);
@@ -16,8 +18,8 @@ Future<void> watchForTag(Lock globalLock, BuildContext context, Function() onTag
   }
 }
 
-Future<void> waitForTagLost(Lock globalLock) async {
-  while (App.tag != null && await checkTagPresent(globalLock)){
+Future<void> waitForTagLost(CurrentNFCTag tag, Lock globalLock) async {
+  while (tag.isPresent() && await checkTagPresent(globalLock)){
     await Future.delayed(const Duration(milliseconds: 500));
   }
 }

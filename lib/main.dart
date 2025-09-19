@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:miziptools/misc/nfctag.dart';
 import 'package:miziptools/misc/mifare_classic_tag.dart';
-import 'package:miziptools/misc/mizip_tag.dart';
+import 'package:provider/provider.dart';
 
 import "pages/main_page.dart";
 import 'package:logging/logging.dart';
 
-// TODO: Writing new balance to tag 76.92
-// TODO: Tag OK, balance: 4.92
 
 void main() {
   setupLogging();
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const App());
+  runApp(App());
 }
 
 void setupLogging(){
@@ -31,11 +30,12 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MizipTools',
-      theme: ThemeData(colorScheme: colorScheme, snackBarTheme: snackBarTheme, useMaterial3: true),
-      home: MainPage(),
-    );
+    return MultiProvider(providers: [ChangeNotifierProvider.value(value: CurrentNFCTag.init())],
+        child: MaterialApp(
+          title: 'MizipTools',
+          theme: ThemeData(colorScheme: colorScheme, snackBarTheme: snackBarTheme, useMaterial3: true),
+          home: MainPage(),
+      )
+    ); 
   }
 }
-

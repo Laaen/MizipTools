@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:miziptools/misc/nfctag.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/main.dart';
 import 'package:miziptools/misc/mifare_classic_tag.dart';
 import 'package:miziptools/misc/mifare_keys.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 class DumpTag extends StatelessWidget{
 
@@ -22,9 +24,9 @@ class DumpTag extends StatelessWidget{
 
   Future<void> dumpTag(BuildContext context) async{
 
-    final tag = App.tag!;
+    final tag = context.read<CurrentNFCTag>();
     final keys = tag.getKeys();
-    final fileName = tag.uid;
+    final fileName = tag.getUid();
 
     showSnackBar(context, "Dumping tag's data");
     final rawDump = await getTagContent(tag);
@@ -33,7 +35,7 @@ class DumpTag extends StatelessWidget{
     showSnackBar(context, "Dump done file : $fileName");
   }
 
-  Future<List<String>> getTagContent(MifareClassicTag tag) async {
+  Future<List<String>> getTagContent(CurrentNFCTag tag) async {
     List<String> dump = [];
     for (int sectorNb = 0 ; sectorNb < 5; sectorNb++){
       final sectorData = await tag.readSector(sectorNb, retries: 5);

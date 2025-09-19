@@ -1,9 +1,11 @@
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:miziptools/misc/mifare_classic_tag.dart';
 import 'package:miziptools/misc/mifare_keys.dart';
+import 'package:miziptools/misc/snackbar.dart';
 
 /// Interface to the Mizip Tag
 class MizipTag extends MifareClassicTag{
@@ -16,27 +18,29 @@ class MizipTag extends MifareClassicTag{
     const baseKeysB = ["4AEEE96063E3", "C825F4CD8983", "118F7E45ED6C", "0BD14A14963F"];
     const baseUID = "6D33BBC2";
 
-    final transformedUID = (int.parse(uid, radix: 16) ^ int.parse(baseUID, radix: 16)).toRadixString(16).padLeft(8, '0');
+    final transformedUID = xor(super.uid, baseUID, 8);
 
     final intermediateKeyA = "$transformedUID${transformedUID.substring(0,4)}";
     final intermediateKeyB = "${transformedUID.substring(4,8)}$transformedUID";
 
-    final keysA = ["a0a1a2a3a4a5"] + baseKeysA.map((x){
-      return (int.parse(x, radix: 16) ^ int.parse(intermediateKeyA, radix: 16)).toRadixString(16).padLeft(12, '0');
-    }).toList();
+    final keysA = ["a0a1a2a3a4a5"] + baseKeysA.map((key) => xor(key, intermediateKeyA, 12)).toList(); 
 
-    final keysB = ["b4c123439eef"] + baseKeysB.map((x){
-      return (int.parse(x, radix: 16) ^ int.parse(intermediateKeyB, radix: 16)).toRadixString(16).padLeft(12, '0');
-    }).toList();
+    final keysB = ["b4c123439eef"] + baseKeysB.map((key) => xor(key, intermediateKeyB, 12)).toList();
 
     return (a: keysA, b: keysB);
   }
 
+  String xor(String x, String y, int leftPad){
+    return (int.parse(x, radix: 16) ^ int.parse(y, radix: 16)).toRadixString(16).padLeft(leftPad, '0');
+  }
+
+  @override
   Future<String> getBalance() async{
     await updateInnerBalance();
     return this.balance;
   }
 
+  @override
   Future<void> updateInnerBalance() async {
     try{
       final data = await readBlock(9, retries: 5);
@@ -47,14 +51,13 @@ class MizipTag extends MifareClassicTag{
     }
   }
 
-  /// Writes the new balance to the tag
   Future<bool> setBalance(String value) async{
 
     await lock.synchronized(() async {
-      // Get the current block's value
-      Uint8List currentBalanceBlock;
+
+      Uint8List balanceBlock;
       try{
-        currentBalanceBlock = await readBlock(9, retries: 5);
+        balanceBlock = await readBlock(9, retries: 5);
       } catch(err){
         return false;
       }
@@ -63,17 +66,15 @@ class MizipTag extends MifareClassicTag{
       final checksum = newValue.reduce((acc, curr) => acc ^ curr);
       
       // update the block with the new values
-      var newBalanceBlock = currentBalanceBlock.toList();
+      var newBalanceBlock = balanceBlock.toList();
       newBalanceBlock.replaceRange(1, 4, [newValue[0], newValue[1], checksum]);
       Logger.root.info("New block : $newBalanceBlock");
       await lock.synchronized(() async {
         await writeBlock(9, Uint8List.fromList(newBalanceBlock), retries: 5);
       });
       Logger.root.info("Tag balance written succesfully");
-      
-      // Close the session to trigger a new discovery => new balance
-      // TODO: Retirer et juste update le balance
-      await FlutterNfcKit.finish();
+
+      await updateInnerBalance();      
     });
     
     return true;
