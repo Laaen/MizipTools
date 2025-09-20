@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:miziptools/misc/nfctag.dart';
 import 'package:miziptools/misc/snackbar.dart';
-import 'package:miziptools/main.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 import 'package:provider/provider.dart';
-import "../misc/mizip_tag.dart";
 
 class TagBalance extends StatelessWidget{
 

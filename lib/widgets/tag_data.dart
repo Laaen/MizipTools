@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:miziptools/main.dart';
-import 'package:miziptools/misc/mifare_classic_tag.dart';
-import 'package:miziptools/misc/mizip_tag.dart';
 import 'package:miziptools/misc/nfctag.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 import 'package:provider/provider.dart';

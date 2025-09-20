@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import "package:miziptools/misc/nfctag.dart";
 import "package:miziptools/misc/snackbar.dart";
-import "package:miziptools/main.dart";
 import "package:miziptools/widgets/basic/containerWithBorder.dart";
 import "package:provider/provider.dart";
-import "../misc/mizip_tag.dart";
+
 
 class TagAdd10 extends StatelessWidget{
 
@@ -24,7 +23,7 @@ class TagAdd10 extends StatelessWidget{
 
     try {
       final currentBalance = await tag.getBalance();
-      final newBalance = double.parse(currentBalance!) + 10;
+      final newBalance = double.parse(currentBalance) + 10;
       if (newBalance > 100){
         await tag.setBalance(100.toString());
       } else {

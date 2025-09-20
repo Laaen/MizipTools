@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import "package:logging/logging.dart";
-import "package:miziptools/main.dart";
 import "package:miziptools/misc/mifare_classic_tag.dart";
 import "package:miziptools/misc/nfc.dart";
 import "package:miziptools/misc/nfctag.dart";
@@ -9,9 +8,7 @@ import "package:miziptools/misc/snackbar.dart";
 import "package:miziptools/widgets/dump_tag.dart";
 import "package:provider/provider.dart";
 import 'package:synchronized/synchronized.dart';
-
 import "../misc/mizip_tag.dart";
-
 import "../widgets/appbar.dart";
 import "../widgets/tag_data.dart";
 import "../widgets/change_tag_balance.dart";

@@ -1,10 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
-import 'package:logging/logging.dart';
 import 'package:miziptools/misc/mifare_classic_tag.dart';
 import 'package:miziptools/misc/mifare_keys.dart';
 import 'package:miziptools/misc/mizip_tag.dart';
-import 'package:synchronized/synchronized.dart';
 
 class CurrentNFCTag with ChangeNotifier {
   

@@ -1,11 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
 import 'package:miziptools/misc/mifare_keys.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:provider/provider.dart';
 
 class MifareClassicTag with ChangeNotifier {
   
