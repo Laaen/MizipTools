@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:miziptools/misc/nfctag.dart';
-import 'package:miziptools/misc/mifare_classic_tag.dart';
+import 'package:miziptools/nfc/currentnfctag.dart';
+import 'package:miziptools/tags/mifare_classic_tag.dart';
 import 'package:provider/provider.dart';
 
 import "pages/main_page.dart";

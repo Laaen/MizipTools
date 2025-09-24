@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:miziptools/misc/nfctag.dart';
+import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 import 'package:provider/provider.dart';

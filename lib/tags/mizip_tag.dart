@@ -2,8 +2,8 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
-import 'package:miziptools/misc/mifare_classic_tag.dart';
-import 'package:miziptools/misc/mifare_keys.dart';
+import 'package:miziptools/tags/mifare_classic_tag.dart';
+import 'package:miziptools/tags/mifare_keys.dart';
 
 /// Interface to the Mizip Tag
 class MizipTag extends MifareClassicTag{
@@ -41,18 +41,29 @@ class MizipTag extends MifareClassicTag{
   @override
   Future<void> updateInnerBalance() async {
     try{
-      final data = await readBlock(9, retries: 5);
-      final balance = data.sublist(1, 3).map((x) => x.toRadixString(16).padLeft(2, "0")).toList().reversed;
-      this.balance = (int.parse(balance.join(""), radix: 16) / 100.0).toString();
+      final rawBalance = await getRawBalance(); 
+      final balanceStringArr = bytesArrToHexaStringArr(rawBalance);
+      balance = hexaStringArrToBalance(balanceStringArr);
     } catch(error){
-      this.balance = "N/A";
+      balance = "N/A";
     }
   }
 
+  Future<Uint8List> getRawBalance() async{
+      final data = await readBlock(9, retries: 5);
+      return data.sublist(1, 3);
+  }
+
+  List<String> bytesArrToHexaStringArr(Uint8List bytesArr) {
+    return bytesArr.map((x) => x.toRadixString(16).padLeft(2, "0")).toList().reversed.toList();
+  }
+
+  String hexaStringArrToBalance(List<String> str){
+    return (int.parse(str.join(""), radix: 16) / 100.0).toString();
+  }
+
   Future<bool> setBalance(String value) async{
-
     await lock.synchronized(() async {
-
       Uint8List balanceBlock;
       try{
         balanceBlock = await readBlock(9, retries: 5);

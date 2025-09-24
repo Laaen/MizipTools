@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:miziptools/misc/nfctag.dart';
+import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';

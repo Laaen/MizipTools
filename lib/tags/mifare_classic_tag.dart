@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
-import 'package:miziptools/misc/mifare_keys.dart';
+import 'package:miziptools/tags/mifare_keys.dart';
 import 'package:synchronized/synchronized.dart';
 
 class MifareClassicTag with ChangeNotifier {
@@ -20,7 +20,7 @@ class MifareClassicTag with ChangeNotifier {
   }
 
   Future<String> getBalance() async{
-    return this.balance;
+    return balance;
   }
 
   Future<void> updateInnerBalance() async {
@@ -36,7 +36,6 @@ class MifareClassicTag with ChangeNotifier {
     } catch(error) {
       if(retries > 0){
         Logger.root.warning("Read failed, retrying");
-        // Wait some time before retrying
         await Future.delayed(delay);
         return await readBlock(number, retries: retries - 1);
       } else {
@@ -56,7 +55,6 @@ class MifareClassicTag with ChangeNotifier {
     } catch(error) {
       if(retries > 0){
         Logger.root.warning("Read failed, retrying");
-        // Wait some time before retrying
         await Future.delayed(delay);
         return await readSector(number, retries: retries - 1);
       } else {
@@ -69,9 +67,6 @@ class MifareClassicTag with ChangeNotifier {
   /// Writes the given block, retries a certain amount of times
   Future<void> writeBlock(int number, Uint8List data, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
-      // Auth with key A seemes to be not mandatory for writing
-      //await FlutterNfcKit.authenticateSector(number ~/ 4, keyA: getKeys().a[number ~/ 4]);
-      // Retry if auth not good
       if (await FlutterNfcKit.authenticateSector(number ~/ 4, keyB: getKeys().b[number ~/ 4]) != true){
         return await writeBlock(number, data, retries: retries - 1);
       } else {
@@ -80,7 +75,6 @@ class MifareClassicTag with ChangeNotifier {
     } catch(error) {
       if(retries > 0){
         Logger.root.warning("Write failed, retrying");
-        // Wait some time before retrying
         await Future.delayed(delay);
         await writeBlock(number, data, retries: retries - 1);
       } else {
