@@ -12,7 +12,7 @@ class CurrentNFCTag with ChangeNotifier {
 
   Future<void> updateInnerTag(MifareClassicTag? newTag) async{
     innerTag = newTag;
-    innerTag?.updateInnerBalance();
+    await innerTag?.updateInnerBalance();
     notifyListeners();
   }
 

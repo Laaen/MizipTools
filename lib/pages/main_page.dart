@@ -89,7 +89,6 @@ class MainPage_State extends State<MainPage>{
 
   Future<bool> isMizipTag(NFCTag tag) async{
     final cTag = MizipTag(uid: tag.id, lock: globalLock);
-    print("Getting balance");
     Balance balance = await cTag.getBalance();
     return balance.valid;
   }
