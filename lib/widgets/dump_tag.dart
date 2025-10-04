@@ -34,13 +34,15 @@ class DumpTag extends StatelessWidget{
 
   Future<List<String>> getTagContent(CurrentNFCTag tag) async {
     List<String> dump = [];
-    for (int sectorNb = 0 ; sectorNb < 5; sectorNb++){
-      final sectorData = await tag.readSector(sectorNb, retries: 5);
-      for (final line in sectorData.slices(16)){
-        dump.add(formatLineData(line));
+    return await tag.innerTag!.lock.synchronized(() async{
+      for (int sectorNb = 0 ; sectorNb < 5; sectorNb++){
+        final sectorData = await tag.readSector(sectorNb, retries: 5);
+        for (final line in sectorData.slices(16)){
+          dump.add(formatLineData(line));
+        }
       }
-    }
     return dump;
+    });
   }
 
   String formatLineData(List<int> lineData){

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
+import 'package:miziptools/tags/balance.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -10,7 +11,7 @@ class MifareClassicTag with ChangeNotifier {
   Lock lock;
 
   String uid;
-  String balance = "N/A";
+  Balance balance = Balance.empty();
 
   MifareClassicTag({required this.uid, required this.lock});
   MifareClassicTag.empty() : uid = "INVALID_UID", lock = Lock();
@@ -19,7 +20,7 @@ class MifareClassicTag with ChangeNotifier {
     return (a: List.filled(5, "FFFFFFFFFFFF"), b:List.filled(5, "FFFFFFFFFFFF"));
   }
 
-  Future<String> getBalance() async{
+  Future<Balance> getBalance() async{
     return balance;
   }
 

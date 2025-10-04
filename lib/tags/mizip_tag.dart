@@ -2,6 +2,8 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
+import 'package:miziptools/tags/balance.dart';
+import 'package:miziptools/tags/errors.dart';
 import 'package:miziptools/tags/mifare_classic_tag.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
 
@@ -16,76 +18,64 @@ class MizipTag extends MifareClassicTag{
     const baseKeysB = ["4AEEE96063E3", "C825F4CD8983", "118F7E45ED6C", "0BD14A14963F"];
     const baseUID = "6D33BBC2";
 
-    final transformedUID = xor(super.uid, baseUID, 8);
+    final transformedUID = _xor(super.uid, baseUID, 8);
 
     final intermediateKeyA = "$transformedUID${transformedUID.substring(0,4)}";
     final intermediateKeyB = "${transformedUID.substring(4,8)}$transformedUID";
 
-    final keysA = ["a0a1a2a3a4a5"] + baseKeysA.map((key) => xor(key, intermediateKeyA, 12)).toList(); 
+    final keysA = ["a0a1a2a3a4a5"] + baseKeysA.map((key) => _xor(key, intermediateKeyA, 12)).toList(); 
 
-    final keysB = ["b4c123439eef"] + baseKeysB.map((key) => xor(key, intermediateKeyB, 12)).toList();
+    final keysB = ["b4c123439eef"] + baseKeysB.map((key) => _xor(key, intermediateKeyB, 12)).toList();
 
     return (a: keysA, b: keysB);
   }
 
-  String xor(String x, String y, int leftPad){
+  String _xor(String x, String y, int leftPad){
     return (int.parse(x, radix: 16) ^ int.parse(y, radix: 16)).toRadixString(16).padLeft(leftPad, '0');
   }
 
   @override
-  Future<String> getBalance() async{
+  Future<Balance> getBalance() async{
     await updateInnerBalance();
-    return this.balance;
+    return balance;
   }
 
   @override
   Future<void> updateInnerBalance() async {
     try{
-      final rawBalance = await getRawBalance(); 
-      final balanceStringArr = bytesArrToHexaStringArr(rawBalance);
-      balance = hexaStringArrToBalance(balanceStringArr);
+      final data = await getRawBalanceAndChecksum(); 
+      balance = Balance(rawBalance: data.rawBalance, rawChecksum: data.rawChecksum);
+      balance.setValid(true);
     } catch(error){
-      balance = "N/A";
+      balance = Balance.empty();
     }
   }
 
-  Future<Uint8List> getRawBalance() async{
+  Future<({Uint8List rawBalance, Uint8List rawChecksum})> getRawBalanceAndChecksum() async{
+    return await lock.synchronized(() async {
       final data = await readBlock(9, retries: 5);
-      return data.sublist(1, 3);
-  }
-
-  List<String> bytesArrToHexaStringArr(Uint8List bytesArr) {
-    return bytesArr.map((x) => x.toRadixString(16).padLeft(2, "0")).toList().reversed.toList();
-  }
-
-  String hexaStringArrToBalance(List<String> str){
-    return (int.parse(str.join(""), radix: 16) / 100.0).toString();
-  }
-
-  Future<bool> setBalance(String value) async{
-    await lock.synchronized(() async {
-      Uint8List balanceBlock;
-      try{
-        balanceBlock = await readBlock(9, retries: 5);
-      } catch(err){
-        return false;
-      }
-      // Convert given value to a list of 2 hex + get the checksum
-      final newValue = (double.parse(value) * 100).toInt().toRadixString(16).padLeft(4, '0').split("").slices(2).map((x) => x.join()).toList().reversed.map((x) => int.parse(x, radix: 16)).toList();
-      final checksum = newValue.reduce((acc, curr) => acc ^ curr);
-      
-      // update the block with the new values
-      var newBalanceBlock = balanceBlock.toList();
-      newBalanceBlock.replaceRange(1, 4, [newValue[0], newValue[1], checksum]);
-      Logger.root.info("New block : $newBalanceBlock");
-      await lock.synchronized(() async {
-        await writeBlock(9, Uint8List.fromList(newBalanceBlock), retries: 5);
-      });
-      Logger.root.info("Tag balance written succesfully");
-
-      await updateInnerBalance();      
+      return (rawBalance: data.sublist(1, 3), rawChecksum: data.sublist(3, 4));
     });
-    
-    return true;
   }
+
+  Future<void> setBalance(String value) async{
+
+    // Convert given value to a list of 2 hex + get the checksum
+    final newValue = (double.parse(value) * 100).toInt().toRadixString(16).padLeft(4, '0').split("").slices(2).map((x) => x.join()).toList().reversed.map((x) => int.parse(x, radix: 16)).toList();
+    final checksum = newValue.reduce((acc, curr) => acc ^ curr);
+      
+    var newBalance = Balance(rawBalance: Uint8List.fromList(newValue), rawChecksum: Uint8List.fromList([checksum]));
+    Logger.root.info("New balance : $newBalance");
+    await writeBalance(newBalance);
+    Logger.root.info("Tag balance written succesfully");
+    await updateInnerBalance();      
+}
+
+Future<void> writeBalance(Balance balance) async{
+  await lock.synchronized(() async {
+    await writeBlock(9, Uint8List.fromList(balance.getRawBlockValue()), retries: 5);
+  });
+}
+
+
 }

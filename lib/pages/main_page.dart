@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import "package:logging/logging.dart";
+import "package:miziptools/tags/balance.dart";
 import "package:miziptools/tags/mifare_classic_tag.dart";
 import "package:miziptools/nfc/nfc.dart";
 import "package:miziptools/nfc/currentnfctag.dart";
@@ -39,7 +40,6 @@ class MainPage_State extends State<MainPage>{
             children: 
             [
               TagData(),
-              // Some buttons don't appear if not a mizip tag
               if (tag.isPresent() && tag.isMizipTag()) TagBalance(),
               if (tag.isPresent() && tag.isMizipTag()) TagAdd10(),
               if (tag.isPresent()) DumpTag(),
@@ -63,7 +63,6 @@ class MainPage_State extends State<MainPage>{
 
   /// Callback executed when a new tag is detected, gets the tag's handle + its keys
   Future<void> onTagDetected (Lock globalLock, NFCTag tag) async{
-
     if(tag.type != NFCTagType.mifare_classic){
       await handleNotMifareClassicTag();
       return;
@@ -75,12 +74,10 @@ class MainPage_State extends State<MainPage>{
     } else {
       currentTag = MifareClassicTag(uid: tag.id, lock: globalLock);
     }
-
-    await currentTag.updateInnerBalance();
     
     if (mounted){
       var t = context.read<CurrentNFCTag>();
-      t.updateInnerTag(currentTag);  
+      await t.updateInnerTag(currentTag);  
     }
   }
 
@@ -92,7 +89,8 @@ class MainPage_State extends State<MainPage>{
 
   Future<bool> isMizipTag(NFCTag tag) async{
     final cTag = MizipTag(uid: tag.id, lock: globalLock);
-    String? balance = await cTag.getBalance();
-    return balance != "N/A";
+    print("Getting balance");
+    Balance balance = await cTag.getBalance();
+    return balance.valid;
   }
 }

@@ -23,7 +23,7 @@ class TagAdd10 extends StatelessWidget{
 
     try {
       final currentBalance = await tag.getBalance();
-      final newBalance = double.parse(currentBalance) + 10;
+      final newBalance = currentBalance.getDoubleBalance() + 10;
       if (newBalance > 100){
         await tag.setBalance(100.toString());
       } else {

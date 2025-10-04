@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:miziptools/tags/balance.dart';
 import 'package:miziptools/tags/mifare_classic_tag.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
 import 'package:miziptools/tags/mizip_tag.dart';
@@ -9,8 +10,9 @@ class CurrentNFCTag with ChangeNotifier {
 
   CurrentNFCTag.init();
 
-  void updateInnerTag(MifareClassicTag? newTag){
+  Future<void> updateInnerTag(MifareClassicTag? newTag) async{
     innerTag = newTag;
+    innerTag?.updateInnerBalance();
     notifyListeners();
   }
 
@@ -31,7 +33,7 @@ class CurrentNFCTag with ChangeNotifier {
     return innerTag!.uid;
   }
   
-  Future<String> getBalance() async{
+  Future<Balance> getBalance() async{
     return await innerTag!.getBalance();
   }
 
