@@ -31,8 +31,7 @@ class Balance {
 
   String getStringBalance(){
     final hexaStringArrBalance = _getHexaStringArrBalance();
-    // TODO : Vérifier le 0 à droite
-    return (int.parse(hexaStringArrBalance.join(""), radix: 16) / 100.0).toString();
+    return (int.parse(hexaStringArrBalance.join(""), radix: 16) / 100.0).toStringAsFixed(2);
   }
 
   double getDoubleBalance(){
