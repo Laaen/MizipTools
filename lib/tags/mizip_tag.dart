@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:miziptools/tags/balance.dart';
-import 'package:miziptools/tags/errors.dart';
 import 'package:miziptools/tags/mifare_classic_tag.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
 
@@ -71,11 +70,10 @@ class MizipTag extends MifareClassicTag{
     await updateInnerBalance();      
 }
 
-Future<void> writeBalance(Balance balance) async{
-  await lock.synchronized(() async {
-    await writeBlock(9, Uint8List.fromList(balance.getRawBlockValue()), retries: 5);
-  });
-}
-
+  Future<void> writeBalance(Balance balance) async{
+    await lock.synchronized(() async {
+      await writeBlock(9, Uint8List.fromList(balance.getRawBlockValue()), retries: 5);
+    });
+  }
 
 }
