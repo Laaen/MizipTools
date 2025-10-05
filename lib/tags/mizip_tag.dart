@@ -46,6 +46,7 @@ class MizipTag extends MifareClassicTag{
       balance = Balance(rawBalance: data.rawBalance, rawChecksum: data.rawChecksum);
       balance.setValid(true);
     } catch(error){
+      Logger.root.warning("Error while getting balance : ${error.toString()}");
       balance = Balance.empty();
     }
   }
