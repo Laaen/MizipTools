@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
@@ -26,26 +27,26 @@ class DumpTag extends StatelessWidget{
     final fileName = tag.getUid();
 
     showSnackBar(context, "Dumping tag's data");
-    final rawDump = await getTagContent(tag);
-    final dumpWithKeys = addKeysToDump(rawDump, keys);
-    writeDumpToFile(fileName, dumpWithKeys);
-    showSnackBar(context, "Dump done file : $fileName");
+    try{
+      final rawDump = await tag.dumpTagData();
+      final stringDump = toStringDump(rawDump);
+      final dumpWithKeys = addKeysToDump(stringDump, keys);
+      writeDumpToFile(fileName, dumpWithKeys);
+      showSnackBar(context, "Dump done file : $fileName");
+    } catch (err){
+      showSnackBar(context, "Error while dumping tag : ${err.toString()}");
+    }
   }
 
-  Future<List<String>> getTagContent(CurrentNFCTag tag) async {
-    List<String> dump = [];
-    return await tag.innerTag!.lock.synchronized(() async{
-      for (int sectorNb = 0 ; sectorNb < 5; sectorNb++){
-        final sectorData = await tag.readSector(sectorNb, retries: 5);
-        for (final line in sectorData.slices(16)){
-          dump.add(formatLineData(line));
-        }
-      }
-    return dump;
-    });
+  List<String> toStringDump(List<Uint8List> rawDump){
+    List<String> result = [];
+    for(final block in rawDump){
+      result.add(formatLineData(block));
+    }
+    return result;
   }
 
-  String formatLineData(List<int> lineData){
+  String formatLineData(Uint8List lineData){
     return lineData.map((byte) => byte.toRadixString(16).padLeft(2, '0').toUpperCase())
     .join("");
   }

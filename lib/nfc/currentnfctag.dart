@@ -41,6 +41,10 @@ class CurrentNFCTag with ChangeNotifier {
     return await innerTag!.readSector(number);
   }
 
+  Future<List<Uint8List>> dumpTagData() async{
+    return await innerTag!.dumpTagData();
+  }
+
   Future<void> setBalance(String value) async{
     final tag = innerTag! as MizipTag;
     await tag.setBalance(value);

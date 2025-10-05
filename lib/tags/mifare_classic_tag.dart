@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
@@ -26,6 +27,19 @@ class MifareClassicTag with ChangeNotifier {
 
   Future<void> updateInnerBalance() async {
     return;
+  }
+
+  Future<List<Uint8List>> dumpTagData() async{
+    List<Uint8List> dump = [];
+    await lock.synchronized(() async{
+      for (int sectorNb = 0 ; sectorNb < 5; sectorNb++){
+        final sectorData = await readSector(sectorNb, retries: 5);
+        for (final line in sectorData.slices(16)){
+          dump.add(Uint8List.fromList(line));
+        }
+      }
+    });
+    return dump;
   }
 
   Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
