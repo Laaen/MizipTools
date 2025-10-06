@@ -42,8 +42,10 @@ class MizipTag extends MifareClassicTag{
   @override
   Future<void> updateInnerBalance() async {
     try{
-      final data = await getRawBalanceAndChecksum(); 
-      balance = Balance(rawBalance: data.rawBalance, rawChecksum: data.rawChecksum);
+      final data = await getRawBalanceData(); 
+      balance = Balance(rawBalance: data.rawBalance, rawChecksum: data.rawChecksum, counterByte: data.counterByte);
+      print("Counter byte : ");
+      print(balance.counterByte);
       balance.setValid(true);
     } catch(error){
       Logger.root.warning("Error while getting balance : ${error.toString()}");
@@ -51,10 +53,10 @@ class MizipTag extends MifareClassicTag{
     }
   }
 
-  Future<({Uint8List rawBalance, Uint8List rawChecksum})> getRawBalanceAndChecksum() async{
+  Future<({Uint8List rawBalance, Uint8List rawChecksum, Uint8List counterByte})> getRawBalanceData() async{
     return await lock.synchronized(() async {
       final data = await readBlock(9, retries: 5);
-      return (rawBalance: data.sublist(1, 3), rawChecksum: data.sublist(3, 4));
+      return (rawBalance: data.sublist(1, 3), rawChecksum: data.sublist(3, 4), counterByte: data.sublist(15, 16));
     });
   }
 
@@ -64,11 +66,11 @@ class MizipTag extends MifareClassicTag{
     final newValue = (double.parse(value) * 100).toInt().toRadixString(16).padLeft(4, '0').split("").slices(2).map((x) => x.join()).toList().reversed.map((x) => int.parse(x, radix: 16)).toList();
     final checksum = newValue.reduce((acc, curr) => acc ^ curr);
       
-    var newBalance = Balance(rawBalance: Uint8List.fromList(newValue), rawChecksum: Uint8List.fromList([checksum]));
+    var newBalance = Balance(rawBalance: Uint8List.fromList(newValue), rawChecksum: Uint8List.fromList([checksum]), counterByte: Uint8List.fromList(balance.counterByte));
     Logger.root.info("New balance : $newBalance");
     await writeBalance(newBalance);
-    Logger.root.info("Tag balance written succesfully");
     await updateInnerBalance();      
+    Logger.root.info("Tag balance written succesfully");
 }
 
   Future<void> writeBalance(Balance balance) async{

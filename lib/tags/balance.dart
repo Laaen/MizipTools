@@ -9,12 +9,13 @@ class Balance {
   late Uint8List rawBalance;
   /// One byte for balance checksum
   late Uint8List rawChecksum;
+  late Uint8List counterByte;
   /// On balance reading fail, it is marked as not valid
   bool valid = false;
 
-  Balance({required this.rawBalance, required this.rawChecksum});
+  Balance({required this.rawBalance, required this.rawChecksum, required this.counterByte});
   
-  Balance.empty(): rawBalance = Uint8List(0), rawChecksum = Uint8List(0);
+  Balance.empty(): rawBalance = Uint8List(0), rawChecksum = Uint8List(0), counterByte = Uint8List(0);
   
   Balance.fromDouble(double value){
     rawBalance = _rawBalanceFromDouble(value);
@@ -40,7 +41,7 @@ class Balance {
   }
 
   Uint8List getRawBlockValue(){
-    return Uint8List.fromList([0] + rawBalance + rawChecksum + List.filled(12, 0));
+    return Uint8List.fromList([0] + rawBalance + rawChecksum + List.filled(11, 0) + counterByte);
   }
 
   List<String> _getHexaStringArrBalance(){
