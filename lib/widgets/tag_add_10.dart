@@ -32,9 +32,7 @@ class TagAdd10 extends StatelessWidget{
     } catch (e) {
       showSnackBar(context, "Error while adding 10\$");
     }
-    if(context.mounted){
-      showSnackBar(context, "Balance changed successfully");  
-    }
+    showSnackBar(context, "Balance changed successfully");  
   }
 
 }

@@ -64,9 +64,7 @@ class TagBalance extends StatelessWidget{
       final tag = context.read<CurrentNFCTag>();
       showSnackBar(context, "Changing balance");
       await tag.setBalance(balanceController.text);
-      if(context.mounted){
-        showSnackBar(context, "Balance changed successfully");  
-      }
+      showSnackBar(context, "Balance changed successfully");  
     }
   }
 
