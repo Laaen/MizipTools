@@ -42,6 +42,10 @@ class MifareClassicTag with ChangeNotifier {
     return dump;
   }
 
+  Future<void> writeDumpToTag(List<Uint8List> data) async{
+    print(data);
+  }
+
   Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
       return await lock.synchronized(() async{

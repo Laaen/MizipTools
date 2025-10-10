@@ -7,6 +7,7 @@ import "package:miziptools/nfc/nfc.dart";
 import "package:miziptools/nfc/currentnfctag.dart";
 import "package:miziptools/misc/snackbar.dart";
 import "package:miziptools/widgets/dump_tag.dart";
+import "package:miziptools/widgets/write_from_dump.dart";
 import "package:provider/provider.dart";
 import 'package:synchronized/synchronized.dart';
 import "../tags/mizip_tag.dart";
@@ -43,6 +44,7 @@ class MainPage_State extends State<MainPage>{
               if (tag.isPresent() && tag.isMizipTag()) TagBalance(),
               if (tag.isPresent() && tag.isMizipTag()) TagAdd10(),
               if (tag.isPresent()) DumpTag(),
+              WriteFromDump()
             ],
           );
         },) 

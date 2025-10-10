@@ -45,6 +45,10 @@ class CurrentNFCTag with ChangeNotifier {
     return await innerTag!.dumpTagData();
   }
 
+  Future<void> writeDumpToTag(List<Uint8List> data) async{
+    await innerTag?.writeDumpToTag(data);
+  }
+
   Future<void> setBalance(String value) async{
     final tag = innerTag! as MizipTag;
     await tag.setBalance(value);
