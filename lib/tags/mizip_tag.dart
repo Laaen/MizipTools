@@ -42,10 +42,9 @@ class MizipTag extends MifareClassicTag{
   @override
   Future<void> updateInnerBalance() async {
     try{
-      final data = await getRawBalanceData(); 
+      final balanceBlockNb = await getCurrentBalanceBlockNumber();
+      final data = await getRawBalanceData(balanceBlockNb); 
       balance = Balance(rawBalance: data.rawBalance, rawChecksum: data.rawChecksum, counterByte: data.counterByte);
-      print("Counter byte : ");
-      print(balance.counterByte);
       balance.setValid(true);
     } catch(error){
       Logger.root.warning("Error while getting balance : ${error.toString()}");
@@ -53,9 +52,9 @@ class MizipTag extends MifareClassicTag{
     }
   }
 
-  Future<({Uint8List rawBalance, Uint8List rawChecksum, Uint8List counterByte})> getRawBalanceData() async{
+  Future<({Uint8List rawBalance, Uint8List rawChecksum, Uint8List counterByte})> getRawBalanceData(int blockNb) async{
     return await lock.synchronized(() async {
-      final data = await readBlock(9, retries: 5);
+      final data = await readBlock(blockNb, retries: 5);
       return (rawBalance: data.sublist(1, 3), rawChecksum: data.sublist(3, 4), counterByte: data.sublist(15, 16));
     });
   }
@@ -68,14 +67,28 @@ class MizipTag extends MifareClassicTag{
       
     var newBalance = Balance(rawBalance: Uint8List.fromList(newValue), rawChecksum: Uint8List.fromList([checksum]), counterByte: Uint8List.fromList(balance.counterByte));
     Logger.root.info("New balance : $newBalance");
-    await writeBalance(newBalance);
+    final blockNbToWrite = await getCurrentBalanceBlockNumber();
+    await writeBalance(newBalance, blockNbToWrite);
     await updateInnerBalance();      
     Logger.root.info("Tag balance written succesfully");
-}
+  }
 
-  Future<void> writeBalance(Balance balance) async{
+  Future<int> getCurrentBalanceBlockNumber() async{
+    final rawBlockData = await lock.synchronized(() async {
+      return await readBlock(10, retries: 5);
+    });
+
+    if(rawBlockData.first == 0xAA){
+      return 8;
+    } else {
+      return 9;
+    }
+
+  }
+
+  Future<void> writeBalance(Balance balance, int blockNb) async{
     await lock.synchronized(() async {
-      await writeBlock(9, Uint8List.fromList(balance.getRawBlockValue()), retries: 5);
+      await writeBlock(blockNb, Uint8List.fromList(balance.getRawBlockValue()), retries: 5);
     });
   }
 
