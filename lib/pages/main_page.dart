@@ -26,7 +26,6 @@ class MainPage extends StatefulWidget{
 
 class MainPage_State extends State<MainPage>{
 
-  String tagBalance = "";
   Lock globalLock = Lock(reentrant: true);
 
   @override
@@ -41,8 +40,8 @@ class MainPage_State extends State<MainPage>{
             children: 
             [
               TagData(),
-              if (tag.isPresent() && tag.isMizipTag()) TagBalance(),
-              if (tag.isPresent() && tag.isMizipTag()) TagAdd10(),
+              if (!tag.isPresent() && tag.isMizipTag()) TagBalance(),
+              if (!tag.isPresent() && tag.isMizipTag()) TagAdd10(),
               if (tag.isPresent()) DumpTag(),
               WriteFromDump()
             ],

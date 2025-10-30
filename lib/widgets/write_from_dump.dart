@@ -3,7 +3,9 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
+import 'package:logging/logging.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
@@ -50,8 +52,15 @@ class WriteFromDump extends StatelessWidget{
     showSnackBar(context, "Writing dump to tag");
     await tag.writeDumpToTag(dumpData);
     showSnackBar(context, "Dump successfully written !");
-    // DIsconnect to poll new tag
-    //await FlutterNfcKit.finish();
+    // Disconnect to poll new tag
+    try{
+      await FlutterNfcKit.finish();
+    } on PlatformException catch(e){
+      if (e.code == 503){
+        Logger.root.info("Tag already disconnected");
+        showSnackBar(context, "Error, the tag was removed during the write");
+      }
+    }
   }
 
   List<Uint8List> getDumpDataFromFile(String path) {
