@@ -38,6 +38,7 @@ class WriteFromDump extends StatelessWidget{
       });
   }
 
+  // TODO : Faire en sorte d'avoir uniquement le nom de fichier de visible
   Future<List<DropdownMenuEntry>> getDumpList() async{
     final dir = await getExternalStorageDirectory();
     // Split pour prendre nom du fichier
