@@ -6,6 +6,8 @@ import "package:miziptools/tags/mifare_classic_tag.dart";
 import "package:miziptools/nfc/nfc.dart";
 import "package:miziptools/nfc/currentnfctag.dart";
 import "package:miziptools/misc/snackbar.dart";
+import "package:miziptools/widgets/balance_menu.dart";
+import "package:miziptools/widgets/dump_menu.dart";
 import "package:miziptools/widgets/dump_tag.dart";
 import "package:miziptools/widgets/write_from_dump.dart";
 import "package:provider/provider.dart";
@@ -30,24 +32,24 @@ class MainPage_State extends State<MainPage>{
 
   @override
   Widget build(BuildContext context){
-    return Scaffold(
-      appBar: MizipToolsAppBar(),
-      body: Container(
-        padding: EdgeInsets.fromLTRB(40, 30, 40, 30),
-        child: Consumer<CurrentNFCTag>(builder: (context, tag, child) {
-          return Column(
-            spacing: 20,
-            children: 
-            [
-              TagData(),
-              if (!tag.isPresent() && tag.isMizipTag()) TagBalance(),
-              if (!tag.isPresent() && tag.isMizipTag()) TagAdd10(),
-              if (tag.isPresent()) DumpTag(),
-              WriteFromDump()
-            ],
+    return DefaultTabController(initialIndex: 0,
+      length: 2, 
+      child: Scaffold(
+        appBar: MizipToolsAppBar(),
+        body: Consumer<CurrentNFCTag>(builder: (context, tag, child) {
+          return Container(
+            padding: EdgeInsets.fromLTRB(0, 30, 0, 30),
+            child: 
+              TabBarView(
+                children: [
+                  BalanceMenu(),
+                  DumpMenu()
+              ] 
+            )
           );
-        },) 
-      ),
+          }
+        )
+      )
     );
   }
 

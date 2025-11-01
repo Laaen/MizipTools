@@ -1,0 +1,25 @@
+import 'package:flutter/material.dart';
+import 'package:miziptools/nfc/currentnfctag.dart';
+import 'package:miziptools/widgets/change_tag_balance.dart';
+import 'package:miziptools/widgets/tag_add_10.dart';
+import 'package:miziptools/widgets/tag_data.dart';
+import 'package:provider/provider.dart';
+
+class BalanceMenu extends StatelessWidget{
+
+  const BalanceMenu({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final tag = context.read<CurrentNFCTag>();
+    return Column(
+      spacing: 20,
+      children: [
+        TagData(),
+        if (tag.isPresent() && tag.isMizipTag()) TagBalance(),
+        if (tag.isPresent() && tag.isMizipTag()) TagAdd10(),
+      ],
+    );
+  }
+
+}
