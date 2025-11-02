@@ -1,16 +1,22 @@
-# miziptools
+# MizipTools
 
-A new Flutter project.
+Android App written in Flutter made to fiddle with MiZip NFC tags.  
+⚠️ This app only works with MiZip tags ⚠️
 
-## Getting Started
+Features :
+- ✅ Dump tag data
+- ✅ Write dump to tag
+- ✅ Change tag's balance
+- 🏗️ Change tag's UID
+- 🏗️ Read tag dump
 
-This project is a starting point for a Flutter application.
+This is a rewrite of the Kotlin version, some features are missing such as "Reset tag" and the whole template system  
+They may or may not be included in future versions
 
-A few resources to get you started if this is your first Flutter project:
+## How to install
+Two options :
+- Download the .apk file in "Release", and install it manually on your phone.
+- Clone this repo, install Flutter on your machine (https://docs.flutter.dev/install), and build with ``flutter build apk``
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## How to use
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
