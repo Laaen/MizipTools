@@ -19,7 +19,8 @@ class MizipToolsAppBar extends StatelessWidget implements PreferredSize{
       bottom: const TabBar(
         tabs: [
           Tab(text: "Balance"),
-          Tab(text: "Dumps")
+          Tab(text: "Dumps"),
+          Tab(text: "Advenced")
         ] 
       ),
     );
