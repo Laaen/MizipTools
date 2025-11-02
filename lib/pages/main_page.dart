@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import "package:logging/logging.dart";
+import "package:miziptools/pages/advanced_menu.dart";
 import "package:miziptools/tags/balance.dart";
 import "package:miziptools/tags/mifare_classic_tag.dart";
 import "package:miziptools/nfc/nfc.dart";
@@ -27,8 +28,9 @@ class MainPageState extends State<MainPage>{
 
   @override
   Widget build(BuildContext context){
+    Logger.root.info("Starting app");
     return DefaultTabController(initialIndex: 0,
-      length: 2, 
+      length: 3, 
       child: Scaffold(
         appBar: MizipToolsAppBar(),
         body: Consumer<CurrentNFCTag>(builder: (context, tag, child) {
@@ -38,7 +40,8 @@ class MainPageState extends State<MainPage>{
               TabBarView(
                 children: [
                   BalanceMenu(),
-                  DumpMenu()
+                  DumpMenu(),
+                  AdvancedMenu()
               ] 
             )
           );
@@ -52,6 +55,7 @@ class MainPageState extends State<MainPage>{
   void initState(){
     super.initState();
     final currentTag = context.read<CurrentNFCTag>();
+    Logger.root.info("Starting nfc watch loop");
     watchForTag(currentTag, globalLock, context, onTagLost, onTagDetected);
   }
 

@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:miziptools/widgets/basic/containerWithBorder.dart';
+import 'package:miziptools/nfc/currentnfctag.dart';
+import 'package:miziptools/widgets/change_uid.dart';
+import 'package:miziptools/widgets/tag_data.dart';
+import 'package:provider/provider.dart';
 
 class AdvancedMenu extends StatelessWidget{
 
   const AdvancedMenu({super.key});
 
-  // TODO: Faire le menu
   @override
   Widget build(BuildContext context) {
-    return ContainerWithBorder(child: Text("Salut, je suis dans advanced"));
+    final tag = context.read<CurrentNFCTag>();
+    return Column(
+      spacing: 20,
+      children: [
+        TagData(),
+        if (tag.isPresent()) ChangeUid()
+      ],
+    );
   }
 
 }

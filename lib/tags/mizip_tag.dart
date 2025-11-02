@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
+import 'package:miziptools/misc/generate_keys.dart';
 import 'package:miziptools/tags/balance.dart';
 import 'package:miziptools/tags/mifare_classic_tag.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
@@ -13,24 +14,7 @@ class MizipTag extends MifareClassicTag{
 
   @override
   MifareKeys getKeys(){
-    const baseKeysA = ["6421E1E7E4D6", "C64672F5FF1C", "8F41FA6D413A", "5C490CED29A3"];
-    const baseKeysB = ["4AEEE96063E3", "C825F4CD8983", "118F7E45ED6C", "0BD14A14963F"];
-    const baseUID = "6D33BBC2";
-
-    final transformedUID = _xor(super.uid, baseUID, 8);
-
-    final intermediateKeyA = "$transformedUID${transformedUID.substring(0,4)}";
-    final intermediateKeyB = "${transformedUID.substring(4,8)}$transformedUID";
-
-    final keysA = ["a0a1a2a3a4a5"] + baseKeysA.map((key) => _xor(key, intermediateKeyA, 12)).toList(); 
-
-    final keysB = ["b4c123439eef"] + baseKeysB.map((key) => _xor(key, intermediateKeyB, 12)).toList();
-
-    return (a: keysA, b: keysB);
-  }
-
-  String _xor(String x, String y, int leftPad){
-    return (int.parse(x, radix: 16) ^ int.parse(y, radix: 16)).toRadixString(16).padLeft(leftPad, '0');
+    return generateKeys(this.uid);
   }
 
   @override

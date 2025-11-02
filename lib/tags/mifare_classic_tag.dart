@@ -2,6 +2,10 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
+import 'package:miziptools/extensions/string_extensions.dart';
+import 'package:miziptools/extensions/uint8list_extensions.dart';
+import 'package:miziptools/misc/bcc.dart';
+import 'package:miziptools/misc/generate_keys.dart';
 import 'package:miziptools/tags/balance.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
 import 'package:synchronized/synchronized.dart';
@@ -87,6 +91,28 @@ class MifareClassicTag with ChangeNotifier {
         rethrow;
       }
     }
+  }
+
+  Future<void> setUid(String newUid) async{
+
+    await lock.synchronized(() async{
+      MifareKeys newKeys = generateKeys(newUid);
+      for(final sectorIdx in Iterable.generate(5)){
+        await setsectorKey(sectorIdx, newKeys.a[sectorIdx].toUint8List(), newKeys.b[sectorIdx].toUint8List());
+      }
+
+      final currentBlockZero = await readBlock(0, retries: 5);
+      final newBlockZero = Uint8List.fromList(newUid.toUint8List() + generateBcc(newUid.toUint8List()) + currentBlockZero.sublist(5, 16));
+      await writeBlockZero(newBlockZero, newKeys.b[0].toUint8List());
+    });
+  }
+
+  Future<void> setsectorKey(int sectorNb, Uint8List keyA, Uint8List keyB) async{
+    final sectorData = await readSector(sectorNb, retries: 5);
+    final currentTrailerBlock = Uint8List.fromList(sectorData.slices(16).last);
+
+    final newTrailerBlock = Uint8List.fromList(keyA + currentTrailerBlock.sublist(6, 10) + keyB);
+    await writeBlock(sectorNb * 4 + 3, newTrailerBlock, retries: 5);
   }
 
   Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{

@@ -55,6 +55,10 @@ class CurrentNFCTag with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setUid(String newUid) async{
+    await innerTag!.setUid(newUid);
+  }
+
   bool isMizipTag(){
     return isPresent() && innerTag! is MizipTag;
   }
