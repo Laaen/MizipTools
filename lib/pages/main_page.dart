@@ -8,25 +8,20 @@ import "package:miziptools/nfc/currentnfctag.dart";
 import "package:miziptools/misc/snackbar.dart";
 import "package:miziptools/widgets/balance_menu.dart";
 import "package:miziptools/widgets/dump_menu.dart";
-import "package:miziptools/widgets/dump_tag.dart";
-import "package:miziptools/widgets/write_from_dump.dart";
 import "package:provider/provider.dart";
 import 'package:synchronized/synchronized.dart';
 import "../tags/mizip_tag.dart";
 import "../widgets/appbar.dart";
-import "../widgets/tag_data.dart";
-import "../widgets/change_tag_balance.dart";
-import "../widgets/tag_add_10.dart";
 
 class MainPage extends StatefulWidget{
 
 @override
   State<StatefulWidget> createState() {
-    return MainPage_State();
+    return MainPageState();
   }
 }
 
-class MainPage_State extends State<MainPage>{
+class MainPageState extends State<MainPage>{
 
   Lock globalLock = Lock(reentrant: true);
 
