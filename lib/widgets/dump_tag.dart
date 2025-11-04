@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
@@ -24,7 +25,7 @@ class DumpTag extends StatelessWidget{
 
     final tag = context.read<CurrentNFCTag>();
     final keys = tag.getKeys();
-    final fileName = tag.getUid();
+    final fileName = tag.getUid().toHexString().toUpperCase();
 
     showSnackBar(context, "Dumping tag's data");
     try{
@@ -32,7 +33,7 @@ class DumpTag extends StatelessWidget{
       final stringDump = toStringDump(rawDump);
       final dumpWithKeys = addKeysToDump(stringDump, keys);
       writeDumpToFile(fileName, dumpWithKeys);
-      showSnackBar(context, "Dump done file : $fileName");
+      showSnackBar(context, "Dump done file : $fileName.dump");
     } catch (err){
       showSnackBar(context, "Error while dumping tag : ${err.toString()}");
     }
@@ -54,18 +55,12 @@ class DumpTag extends StatelessWidget{
   List<String> addKeysToDump(List<String> dump, MifareKeys keys){
     var modifiedDump = dump.toList();
     for (final (sectorNb, blockNb) in [3, 7, 11, 15, 19].indexed){
-      final keyA = formatKey(keys.a[sectorNb]);
-      final keyB = formatKey(keys.b[sectorNb]);
+      final keyA = keys.a[sectorNb].toHexString().toUpperCase();
+      final keyB = keys.b[sectorNb].toHexString().toUpperCase();
       final permissions = modifiedDump[blockNb].substring(12, 20);
       modifiedDump[blockNb] = keyA + permissions + keyB;
     }
     return modifiedDump;
-  }
-
-  String formatKey(String key) {
-    return key.characters.slices(2)
-    .map((x) => x.join("").toUpperCase())
-    .join("");
   }
 
   void writeDumpToFile(String fileName, List<String> content) async {

@@ -29,7 +29,7 @@ class CurrentNFCTag with ChangeNotifier {
     return innerTag!.getKeys();
   }
 
-  String getUid(){
+  Uint8List getUid(){
     return innerTag!.uid;
   }
   
@@ -55,7 +55,7 @@ class CurrentNFCTag with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setUid(String newUid) async{
+  Future<void> setUid(Uint8List newUid) async{
     await innerTag!.setUid(newUid);
   }
 

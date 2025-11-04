@@ -15,14 +15,14 @@ class MifareClassicTag with ChangeNotifier {
   /// Lock used to prevent concurrent access to the NFC reader
   Lock lock;
 
-  String uid;
+  Uint8List uid;
   Balance balance = Balance.empty();
 
   MifareClassicTag({required this.uid, required this.lock});
-  MifareClassicTag.empty() : uid = "INVALID_UID", lock = Lock();
+  MifareClassicTag.empty() : uid = Uint8List.fromList([0X00]), lock = Lock();
 
   MifareKeys getKeys(){
-    return (a: List.filled(5, "FFFFFFFFFFFF"), b:List.filled(5, "FFFFFFFFFFFF"));
+    return (a: List.filled(5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])), b:List.filled(5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])));
   }
 
   Future<Balance> getBalance() async{
@@ -93,17 +93,17 @@ class MifareClassicTag with ChangeNotifier {
     }
   }
 
-  Future<void> setUid(String newUid) async{
+  Future<void> setUid(Uint8List newUid) async{
 
     await lock.synchronized(() async{
       MifareKeys newKeys = generateKeys(newUid);
       for(final sectorIdx in Iterable.generate(5)){
-        await setsectorKey(sectorIdx, newKeys.a[sectorIdx].toUint8List(), newKeys.b[sectorIdx].toUint8List());
+        await setsectorKey(sectorIdx, newKeys.a[sectorIdx], newKeys.b[sectorIdx]);
       }
 
       final currentBlockZero = await readBlock(0, retries: 5);
-      final newBlockZero = Uint8List.fromList(newUid.toUint8List() + generateBcc(newUid.toUint8List()) + currentBlockZero.sublist(5, 16));
-      await writeBlockZero(newBlockZero, newKeys.b[0].toUint8List());
+      final newBlockZero = Uint8List.fromList(newUid + generateBcc(newUid) + currentBlockZero.sublist(5, 16));
+      await writeBlockZero(newBlockZero, newKeys.b[0]);
     });
   }
 

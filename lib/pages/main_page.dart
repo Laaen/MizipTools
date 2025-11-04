@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import "package:logging/logging.dart";
+import "package:miziptools/extensions/string_extensions.dart";
 import "package:miziptools/pages/advanced_menu.dart";
 import "package:miziptools/tags/balance.dart";
 import "package:miziptools/tags/mifare_classic_tag.dart";
@@ -72,9 +73,9 @@ class MainPageState extends State<MainPage>{
 
     MifareClassicTag currentTag;
     if (await isMizipTag(tag)){
-      currentTag = MizipTag(uid: tag.id, lock: globalLock);
+      currentTag = MizipTag(uid: tag.id.toUint8List(), lock: globalLock);
     } else {
-      currentTag = MifareClassicTag(uid: tag.id, lock: globalLock);
+      currentTag = MifareClassicTag(uid: tag.id.toUint8List(), lock: globalLock);
     }
     
     if (mounted){
@@ -90,7 +91,7 @@ class MainPageState extends State<MainPage>{
   }
 
   Future<bool> isMizipTag(NFCTag tag) async{
-    final cTag = MizipTag(uid: tag.id, lock: globalLock);
+    final cTag = MizipTag(uid: tag.id.toUint8List(), lock: globalLock);
     Balance balance = await cTag.getBalance();
     return balance.valid;
   }

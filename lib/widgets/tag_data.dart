@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +27,7 @@ class TagData extends StatelessWidget{
       children : [
         Text("Tag data", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),),
         Container(height: 10,),
-        Row(children: [Text("UID: ${tag.getUid()}", style: TextStyle(fontSize: 16))]),
+        Row(children: [Text("UID: ${tag.getUid().toHexString().toUpperCase()}", style: TextStyle(fontSize: 16))]),
         Row(children: [Text("Balance: ${tag.innerTag!.balance.getStringBalance()}\$", style: TextStyle(fontSize: 16))])
       ]
     );

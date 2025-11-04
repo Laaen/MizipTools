@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:miziptools/extensions/string_extensions.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
@@ -54,7 +55,7 @@ class ChangeUid extends StatelessWidget{
     if(_uidFormKey.currentState!.validate()){
       showSnackBar(context, "Changing UID");
       try{
-        await tag.setUid(_uidFormController.text);
+        await tag.setUid(_uidFormController.text.toUint8List());
         showSnackBar(context, "UID change succeful");
       }catch(e){
         showSnackBar(context, "Error : $e");
