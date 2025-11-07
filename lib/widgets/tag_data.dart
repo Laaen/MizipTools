@@ -16,7 +16,7 @@ class TagData extends StatelessWidget{
     if (tag.isMizipTag()){
       return ContainerWithBorder(child: getTagDataDisplay(tag));
     } else if (tag.isMifareClassic()){
-      return ContainerWithBorder(child: Text("Not a mizip tag (Mifare Classic Tag)"));
+      return ContainerWithBorder(child: Text("Not a MiZip tag (Mifare Classic Tag)"));
     } else {
       return ContainerWithBorder(child: Text("No tag detected", style: TextStyle(fontSize: 16)));
     }
