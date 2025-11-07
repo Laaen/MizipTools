@@ -8,6 +8,7 @@ import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
+import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -48,6 +49,7 @@ class WriteFromDump extends StatelessWidget{
   Future<void> writeDump(BuildContext context) async{
     
     final tag = context.read<CurrentNFCTag>();
+    final nfcAdapter = context.read<NfcAdapter>();
     
     final dumpData = getDumpDataFromFile(currentDumpChoice.text);
     showSnackBar(context, "Writing dump to tag");
@@ -55,7 +57,7 @@ class WriteFromDump extends StatelessWidget{
     showSnackBar(context, "Dump successfully written !");
     // Disconnect to poll new tag
     try{
-      await FlutterNfcKit.finish();
+      await nfcAdapter.releaseTag();
     } on PlatformException catch(e){
       if (e.code == 503){
         Logger.root.info("Tag already disconnected");

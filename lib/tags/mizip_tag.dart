@@ -10,7 +10,7 @@ import 'package:miziptools/tags/mifare_keys.dart';
 /// Interface to the Mizip Tag
 class MizipTag extends MifareClassicTag{
 
-  MizipTag({required super.uid, required super.lock});
+  MizipTag({required super.uid, required super.lock, required super.nfcAdapter});
 
   @override
   MifareKeys getKeys(){

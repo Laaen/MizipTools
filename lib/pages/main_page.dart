@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import "package:logging/logging.dart";
 import "package:miziptools/extensions/string_extensions.dart";
+import "package:miziptools/nfc/nfc_adapter.dart";
 import "package:miziptools/pages/advanced_menu.dart";
 import "package:miziptools/tags/balance.dart";
 import "package:miziptools/tags/mifare_classic_tag.dart";
@@ -56,8 +57,9 @@ class MainPageState extends State<MainPage>{
   void initState(){
     super.initState();
     final currentTag = context.read<CurrentNFCTag>();
+    final nfcAdapter = context.read<NfcAdapter>();
     Logger.root.info("Starting nfc watch loop");
-    watchForTag(currentTag, globalLock, context, onTagLost, onTagDetected);
+    watchForTag(currentTag, nfcAdapter, globalLock, context, onTagLost, onTagDetected);
   }
 
   void onTagLost() async {
@@ -65,17 +67,17 @@ class MainPageState extends State<MainPage>{
   }
 
   /// Callback executed when a new tag is detected, gets the tag's handle + its keys
-  Future<void> onTagDetected (Lock globalLock, NFCTag tag) async{
+  Future<void> onTagDetected (Lock globalLock, NFCTag tag, NfcAdapter nfcAdapter) async{
     if(tag.type != NFCTagType.mifare_classic){
       await handleNotMifareClassicTag();
       return;
     }
 
     MifareClassicTag currentTag;
-    if (await isMizipTag(tag)){
-      currentTag = MizipTag(uid: tag.id.toUint8List(), lock: globalLock);
+    if (await isMizipTag(tag, nfcAdapter)){
+      currentTag = MizipTag(uid: tag.id.toUint8List(), lock: globalLock, nfcAdapter: nfcAdapter);
     } else {
-      currentTag = MifareClassicTag(uid: tag.id.toUint8List(), lock: globalLock);
+      currentTag = MifareClassicTag(uid: tag.id.toUint8List(), lock: globalLock, nfcAdapter: nfcAdapter);
     }
     
     if (mounted){
@@ -90,8 +92,8 @@ class MainPageState extends State<MainPage>{
     await Future.delayed(Duration(seconds: 2));
   }
 
-  Future<bool> isMizipTag(NFCTag tag) async{
-    final cTag = MizipTag(uid: tag.id.toUint8List(), lock: globalLock);
+  Future<bool> isMizipTag(NFCTag tag, NfcAdapter nfcAdapter) async{
+    final cTag = MizipTag(uid: tag.id.toUint8List(), lock: globalLock, nfcAdapter: nfcAdapter);
     Balance balance = await cTag.getBalance();
     return balance.valid;
   }

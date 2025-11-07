@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
+import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/tags/mifare_classic_tag.dart';
 import 'package:provider/provider.dart';
 
@@ -10,7 +11,7 @@ import 'package:logging/logging.dart';
 void main() {
   setupLogging();
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(App());
+  runApp(App(nfcAdapter: NfcAdapter(),));
 }
 
 void setupLogging(){
@@ -21,16 +22,19 @@ void setupLogging(){
 }
 
 class App extends StatelessWidget {
-  const App({super.key});
+  const App({super.key, required this.nfcAdapter});
 
-  static MifareClassicTag? tag;
+  final NfcAdapter nfcAdapter;
 
   static final colorScheme = ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 255, 255, 255), brightness: Brightness.dark);
   static final snackBarTheme =  const SnackBarThemeData(backgroundColor: Color.fromARGB(255, 0, 155, 202));
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(providers: [ChangeNotifierProvider.value(value: CurrentNFCTag.init())],
+    return MultiProvider(providers: [
+      ChangeNotifierProvider.value(value: CurrentNFCTag.init()),
+      Provider.value(value: nfcAdapter)
+    ],
         child: MaterialApp(
           title: 'MizipTools',
           theme: ThemeData(colorScheme: colorScheme, snackBarTheme: snackBarTheme, useMaterial3: true),

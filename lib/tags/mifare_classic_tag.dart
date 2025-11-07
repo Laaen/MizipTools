@@ -2,10 +2,9 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
-import 'package:miziptools/extensions/string_extensions.dart';
-import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/misc/bcc.dart';
 import 'package:miziptools/misc/generate_keys.dart';
+import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/tags/balance.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
 import 'package:synchronized/synchronized.dart';
@@ -15,11 +14,12 @@ class MifareClassicTag with ChangeNotifier {
   /// Lock used to prevent concurrent access to the NFC reader
   Lock lock;
 
+  NfcAdapter nfcAdapter;
+
   Uint8List uid;
   Balance balance = Balance.empty();
 
-  MifareClassicTag({required this.uid, required this.lock});
-  MifareClassicTag.empty() : uid = Uint8List.fromList([0X00]), lock = Lock();
+  MifareClassicTag({required this.uid, required this.lock, required this.nfcAdapter});
 
   MifareKeys getKeys(){
     return (a: List.filled(5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])), b:List.filled(5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])));
@@ -76,10 +76,10 @@ class MifareClassicTag with ChangeNotifier {
 
   Future<void> writeBlockZero(Uint8List data, Uint8List key, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
-      if (await FlutterNfcKit.authenticateSector(0, keyB: key) != true){
+      if (await nfcAdapter.authenticateSector(0, keyB: key) != true){
         return await writeBlockZero(data, key, retries: retries - 1);
       } else {
-        await FlutterNfcKit.writeBlock(0, data);
+        await nfcAdapter.writeBlock(0, data);
       }      
     } catch(error) {
       if(retries > 0){
@@ -118,8 +118,8 @@ class MifareClassicTag with ChangeNotifier {
   Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
       return await lock.synchronized(() async{
-        await FlutterNfcKit.authenticateSector(number ~/ 4, keyA: getKeys().a[number ~/ 4]);
-        return await FlutterNfcKit.readBlock(number);
+        await nfcAdapter.authenticateSector(number ~/ 4, keyA: getKeys().a[number ~/ 4]);
+        return await nfcAdapter.readBlock(number);
       });
     } catch(error) {
       if(retries > 0){
@@ -137,8 +137,8 @@ class MifareClassicTag with ChangeNotifier {
   Future<Uint8List> readSector(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
       return await lock.synchronized(() async{
-        await FlutterNfcKit.authenticateSector(number, keyA: getKeys().a[number]);
-        return await FlutterNfcKit.readSector(number);
+        await nfcAdapter.authenticateSector(number, keyA: getKeys().a[number]);
+        return await nfcAdapter.readSector(number);
       });
     } catch(error) {
       if(retries > 0){
@@ -155,8 +155,8 @@ class MifareClassicTag with ChangeNotifier {
   /// Writes the given block, retries a certain amount of times
   Future<void> writeBlock(int number, Uint8List data, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
-      await FlutterNfcKit.authenticateSector(number ~/ 4, keyB: getKeys().b[number ~/ 4]);
-      await FlutterNfcKit.writeBlock(number, data);  
+      await nfcAdapter.authenticateSector(number ~/ 4, keyB: getKeys().b[number ~/ 4]);
+      await nfcAdapter.writeBlock(number, data);  
     } catch(error) {
       if(retries > 0){
         Logger.root.warning("Write failed, retrying");

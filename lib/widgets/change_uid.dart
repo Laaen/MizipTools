@@ -3,6 +3,7 @@ import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:miziptools/extensions/string_extensions.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
+import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/widgets/basic/containerWithBorder.dart';
 import 'package:provider/provider.dart';
 
@@ -53,13 +54,14 @@ class ChangeUid extends StatelessWidget{
 
   Future<void> changeUid(BuildContext context) async{
     final tag = context.read<CurrentNFCTag>();
+    final nfcAdapter = context.read<NfcAdapter>();
     if(_uidFormKey.currentState!.validate()){
       showSnackBar(context, "Changing UID");
       try{
         await tag.setUid(_uidFormController.text.toUint8List());
         showSnackBar(context, "UID change succeful");
         // Release to poll new tag
-        await FlutterNfcKit.finish();
+        await nfcAdapter.releaseTag();
       }catch(e){
         showSnackBar(context, "Error : $e");
       }

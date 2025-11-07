@@ -1,38 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
+import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 
-Future<void> watchForTag(CurrentNFCTag currentTag, Lock globalLock, BuildContext context, Function() onTagLost, Function(Lock, NFCTag) onTagDetected) async{
+Future<void> watchForTag(CurrentNFCTag currentTag, NfcAdapter nfcAdapter, Lock globalLock, BuildContext context, Function() onTagLost, Function(Lock, NFCTag, NfcAdapter) onTagDetected) async{
 
   while (true){
-    await waitForTagLost(currentTag, globalLock);
+    await waitForTagLost(currentTag, nfcAdapter, globalLock);
     await onTagLost();
-    final tag = await waitForNewTag();
-    await onTagDetected(globalLock, tag);
+    final tag = await waitForNewTag(nfcAdapter);
+    await onTagDetected(globalLock, tag, nfcAdapter);
     await Future.delayed(const Duration(milliseconds: 10)); // TODO : Vérifier si utile ou non
   }
 }
 
-Future<void> waitForTagLost(CurrentNFCTag tag, Lock globalLock) async {
-  while (tag.isPresent() && await checkTagPresent(globalLock)){
+Future<void> waitForTagLost(CurrentNFCTag tag, NfcAdapter nfcAdapter, Lock globalLock) async {
+  while (tag.isPresent() && await checkTagPresent(globalLock, nfcAdapter)){
     await Future.delayed(const Duration(milliseconds: 500));
   }
 }
 
-Future<bool> checkTagPresent(Lock globalLock, {int retries = 2, Duration delay = const Duration(milliseconds: 50)}) async{
+Future<bool> checkTagPresent(Lock globalLock, NfcAdapter nfcAdapter, {int retries = 2, Duration delay = const Duration(milliseconds: 50)}) async{
   try{
     await globalLock.synchronized(()async {
       Logger.root.info("Tag Ping");
-      await FlutterNfcKit.transceive("FFCA000000", timeout: Duration(milliseconds: 200));
+      await nfcAdapter.pingTag();
     });
     return true;
   } catch(error){
     if(retries > 0){
       Logger.root.warning("Ping failed, retrying");
       await Future.delayed(delay);
-      return await checkTagPresent(globalLock, retries: retries - 1);
+      return await checkTagPresent(globalLock, nfcAdapter, retries: retries - 1);
     }
     else{
       Logger.root.warning("Tag Lost");
@@ -41,17 +42,17 @@ Future<bool> checkTagPresent(Lock globalLock, {int retries = 2, Duration delay =
   }
 }
 
-Future<NFCTag> waitForNewTag() async{
+Future<NFCTag> waitForNewTag(NfcAdapter nfcAdapter) async{
   NFCTag? tag;
   do{
-    tag = await getNewTag();
+    tag = await getNewTag(nfcAdapter);
   } while (tag == null);
   return tag;
 }
 
-Future<NFCTag?> getNewTag() async {
+Future<NFCTag?> getNewTag(NfcAdapter nfcAdapter) async {
   try {
-    final tag = await FlutterNfcKit.poll(timeout: const Duration(milliseconds: 200), androidCheckNDEF: false);
+    final tag = await nfcAdapter.pollTag();
     return tag;
   } catch (error) {
     Logger.root.fine("No tag found");
