@@ -16,20 +16,8 @@ class Balance {
   Balance({required this.rawBalance, required this.rawChecksum, required this.counterByte});
   
   Balance.empty(): rawBalance = Uint8List(0), rawChecksum = Uint8List(0), counterByte = Uint8List(0);
-  
-  Balance.fromDouble(double value){
-    rawBalance = _rawBalanceFromDouble(value);
-    rawChecksum = _rawChecksum(rawBalance);
-  }
 
-  Uint8List _rawBalanceFromDouble(double value){
-    return Uint8List.fromList((value* 100).toInt().toRadixString(16).padLeft(4, '0').split("").slices(2).map((x) => x.join()).toList().reversed.map((x) => int.parse(x, radix: 16)).toList());
-  }
-
-  Uint8List _rawChecksum(Uint8List rawBalance){
-    return Uint8List.fromList([rawBalance.reduce((acc, curr) => acc ^ curr)]);
-  }
-
+  // TODO : An exception may occur here : FormatException (FormatException: Invalid radix-16 number (at character 1)
   String getStringBalance(){
     final hexaStringArrBalance = _getHexaStringArrBalance();
     return (int.parse(hexaStringArrBalance.join(""), radix: 16) / 100.0).toStringAsFixed(2);
