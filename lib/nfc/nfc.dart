@@ -4,7 +4,6 @@ import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/nfc/nfc_tag.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:logging/logging.dart';
-import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 
 Future<void> watchForTag(CurrentNFCTag currentTag, NfcAdapter nfcAdapter, Lock globalLock, BuildContext context, Function() onTagLost, Function(Lock, NfcTag, NfcAdapter) onTagDetected) async{
 
