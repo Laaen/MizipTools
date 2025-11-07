@@ -20,7 +20,7 @@ class MizipToolsAppBar extends StatelessWidget implements PreferredSize{
         tabs: [
           Tab(text: "Balance"),
           Tab(text: "Dumps"),
-          Tab(text: "Advenced")
+          Tab(text: "Advanced")
         ] 
       ),
     );
