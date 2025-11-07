@@ -3,6 +3,7 @@ import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import "package:logging/logging.dart";
 import "package:miziptools/extensions/string_extensions.dart";
 import "package:miziptools/nfc/nfc_adapter.dart";
+import "package:miziptools/nfc/nfc_tag.dart";
 import "package:miziptools/pages/advanced_menu.dart";
 import "package:miziptools/tags/balance.dart";
 import "package:miziptools/tags/mifare_classic_tag.dart";
@@ -67,8 +68,8 @@ class MainPageState extends State<MainPage>{
   }
 
   /// Callback executed when a new tag is detected, gets the tag's handle + its keys
-  Future<void> onTagDetected (Lock globalLock, NFCTag tag, NfcAdapter nfcAdapter) async{
-    if(tag.type != NFCTagType.mifare_classic){
+  Future<void> onTagDetected (Lock globalLock, NfcTag tag, NfcAdapter nfcAdapter) async{
+    if(tag.type != NfcTagType.mifareClassic){
       await handleNotMifareClassicTag();
       return;
     }
@@ -92,7 +93,7 @@ class MainPageState extends State<MainPage>{
     await Future.delayed(Duration(seconds: 2));
   }
 
-  Future<bool> isMizipTag(NFCTag tag, NfcAdapter nfcAdapter) async{
+  Future<bool> isMizipTag(NfcTag tag, NfcAdapter nfcAdapter) async{
     final cTag = MizipTag(uid: tag.id.toUint8List(), lock: globalLock, nfcAdapter: nfcAdapter);
     Balance balance = await cTag.getBalance();
     return balance.valid;

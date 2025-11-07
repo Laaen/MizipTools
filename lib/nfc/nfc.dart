@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
+import 'package:miziptools/nfc/nfc_tag.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 
-Future<void> watchForTag(CurrentNFCTag currentTag, NfcAdapter nfcAdapter, Lock globalLock, BuildContext context, Function() onTagLost, Function(Lock, NFCTag, NfcAdapter) onTagDetected) async{
+Future<void> watchForTag(CurrentNFCTag currentTag, NfcAdapter nfcAdapter, Lock globalLock, BuildContext context, Function() onTagLost, Function(Lock, NfcTag, NfcAdapter) onTagDetected) async{
 
   while (true){
     await waitForTagLost(currentTag, nfcAdapter, globalLock);
@@ -42,15 +43,15 @@ Future<bool> checkTagPresent(Lock globalLock, NfcAdapter nfcAdapter, {int retrie
   }
 }
 
-Future<NFCTag> waitForNewTag(NfcAdapter nfcAdapter) async{
-  NFCTag? tag;
+Future<NfcTag> waitForNewTag(NfcAdapter nfcAdapter) async{
+  NfcTag? tag;
   do{
     tag = await getNewTag(nfcAdapter);
   } while (tag == null);
   return tag;
 }
 
-Future<NFCTag?> getNewTag(NfcAdapter nfcAdapter) async {
+Future<NfcTag?> getNewTag(NfcAdapter nfcAdapter) async {
   try {
     final tag = await nfcAdapter.pollTag();
     return tag;
