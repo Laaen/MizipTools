@@ -1,7 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
-
 /// Represents the balance of a tag
 /// Is used to convert between raw bytes format to double or String
 class Balance {

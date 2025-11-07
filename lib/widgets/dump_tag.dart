@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
