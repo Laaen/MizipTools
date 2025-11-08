@@ -44,7 +44,7 @@ Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String d
   await tester.pumpAndSettle();
   await tester.tap(find.byType(DropdownMenu));
   await tester.pumpAndSettle();
-  await tester.tap(find.text("${dir.path}/${dumpContent.substring(0, 8)}.dump").last);
+  await tester.tap(find.text("${dumpContent.substring(0, 8)}.dump").last);
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(OutlinedButton, "Write"));
   await tester.pumpAndSettle();
