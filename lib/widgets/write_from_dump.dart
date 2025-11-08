@@ -27,10 +27,16 @@ class WriteFromDump extends StatelessWidget{
         dumpDir = result.data!;
         return ContainerWithBorder(child: 
           Column( spacing: 15,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Write dump", style: TextStyle(fontSize: 18),),
-              DropdownMenu(dropdownMenuEntries: getDumpList(), controller: currentDumpChoice,),
-              OutlinedButton(onPressed: () => writeDump(context), child: Text("Write"),)
+              Text("Write dump to tag", style: TextStyle(fontSize: 18),),
+              Row(spacing: 20,
+                children: [
+                  DropdownMenu(dropdownMenuEntries: getDumpList(), controller: currentDumpChoice, width: 180,),
+                  OutlinedButton(onPressed: () => writeDump(context), child: Text("Write"),)
+                ],
+              )
             ],
           )
         );
