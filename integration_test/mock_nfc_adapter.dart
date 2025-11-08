@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/nfc/nfc_tag.dart';
 
@@ -26,7 +27,7 @@ class MockNfcAdapter extends NfcAdapter{
   @override
   Future<Uint8List> pingTag({Duration timeout = const Duration(milliseconds: 200)}) async{
     Future.delayed(Duration(milliseconds: 500));
-    if (failureMode){
+    if (failureMode || currentTag == null){
       throw PlatformException(code: "503");
     } else {
       return Uint8List(0);
@@ -47,7 +48,10 @@ class MockNfcAdapter extends NfcAdapter{
 
   @override
   Future<void> releaseTag() async {
-    return;
+    final cTag = currentTag;
+    removeTag();
+    await Future.delayed(Duration(milliseconds: 500));
+    setTag(cTag!);
   }
 
   @override
