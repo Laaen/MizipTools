@@ -4,6 +4,8 @@ import 'package:miziptools/extensions/string_extensions.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
 
+MifareKeys defaultKeys = (a: List.generate(5, (_) => Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])), b: List.generate(5, (_) => Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])));
+
 MifareKeys generateKeys(Uint8List uid){
   final baseKeysA = [
     Uint8List.fromList([0x64, 0x21, 0xE1, 0xE7, 0xE4, 0xD6]),

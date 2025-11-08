@@ -30,7 +30,6 @@ class MockNfcTag {
       final tagKeyB = data[sectorNb * 4 + 3].sublist(10, 16);
       result = tagKeyB.equals(keyB);
     }
-    
     // TODO : Comportement à corriger au niveau de MifareCLassicTag : L'auth échoue en cas de throw et pas de retour false
     if (!result){
       throw PlatformException(code: "503") ;

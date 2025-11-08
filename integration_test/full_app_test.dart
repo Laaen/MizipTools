@@ -35,7 +35,7 @@ void main(){
     });
   });
 
-  group("MifareClassictests", (){
+  group("MifareClassic tests", (){
 
       final mockAdapter = MockNfcAdapter();
       final mockMifareClassicTag = MockNfcTag(type: NfcTagType.mifareClassic,
@@ -122,6 +122,18 @@ void main(){
 
       // Content is OK
       expect(mockMifareClassicTag.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(dumpContentWriteFromDumpTest));
+    });
+
+    testWidgets("Test change UID", (tester) async {
+      final newUid = "ABD453C7";
+      await tester.pumpWidget(App(nfcAdapter: mockAdapter));
+      await tester.tap(find.widgetWithText(Tab, "Advanced"));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField), newUid);
+      await tester.tap(find.widgetWithText(OutlinedButton, "Ok"));
+      await tester.pumpAndSettle();
+      expect(find.widgetWithText(SnackBar, "UID changed successfully"), findsOneWidget);
+      expect(mockMifareClassicTag.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(expectedTagContentChangeUidTestMifareClassic));
     });
 
   });

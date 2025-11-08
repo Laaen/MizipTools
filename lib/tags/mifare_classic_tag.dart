@@ -7,6 +7,7 @@ import 'package:miziptools/misc/generate_keys.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/tags/balance.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
+import 'package:miziptools/tags/mizip_tag.dart';
 import 'package:synchronized/synchronized.dart';
 
 class MifareClassicTag with ChangeNotifier {
@@ -99,7 +100,15 @@ class MifareClassicTag with ChangeNotifier {
       // We must get block 0's content before changing the keys !
       final currentBlockZero = await readBlock(0, retries: 5);
       final newBlockZero = Uint8List.fromList(newUid + generateBcc(newUid) + currentBlockZero.sublist(5, 16));
-      MifareKeys newKeys = generateKeys(newUid);
+
+      // Generate keys only if we are MizipTag, else use defaults
+      MifareKeys newKeys;
+      if (this is MizipTag){
+        newKeys = generateKeys(newUid);
+      } else {
+        newKeys = defaultKeys;
+      }
+       
       for(final sectorIdx in Iterable.generate(5)){
         await setsectorKey(sectorIdx, newKeys.a[sectorIdx], newKeys.b[sectorIdx]);
       }
