@@ -58,7 +58,7 @@ class ChangeUid extends StatelessWidget{
       showSnackBar(context, "Changing UID");
       try{
         await tag.setUid(_uidFormController.text.toUint8List());
-        showSnackBar(context, "UID change succeful");
+        showSnackBar(context, "UID changed successfully");
         // Release to poll new tag
         await nfcAdapter.releaseTag();
       }catch(e){
