@@ -57,7 +57,7 @@ class MifareClassicTag with ChangeNotifier {
         await writeSectorZero(data.take(4).toList());
       }catch (error){
         Logger.root.warning("Error while dump writing : $error");
-        return;
+        rethrow;
       }
     });
   }

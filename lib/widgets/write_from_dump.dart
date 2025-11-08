@@ -16,18 +16,20 @@ class WriteFromDump extends StatelessWidget{
 
   WriteFromDump({super.key});
 
+  Directory? dumpDir;
   final currentDumpChoice = TextEditingController();
+  late List<DropdownMenuEntry> filesList;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: getDumpList(), builder: (context, result) {
-
+    return FutureBuilder(future: getExternalStorageDirectory(), builder: (context, result) {
       if(result.hasData && result.data != null){
+        dumpDir = result.data!;
         return ContainerWithBorder(child: 
           Column( spacing: 15,
             children: [
               Text("Write dump", style: TextStyle(fontSize: 18),),
-              DropdownMenu(dropdownMenuEntries: result.data!, controller: currentDumpChoice,),
+              DropdownMenu(dropdownMenuEntries: getDumpList(), controller: currentDumpChoice,),
               OutlinedButton(onPressed: () => writeDump(context), child: Text("Write"),)
             ],
           )
@@ -39,10 +41,9 @@ class WriteFromDump extends StatelessWidget{
   }
 
   // TODO : Faire en sorte d'avoir uniquement le nom de fichier de visible
-  Future<List<DropdownMenuEntry>> getDumpList() async{
-    final dir = await getExternalStorageDirectory();
+  List<DropdownMenuEntry> getDumpList(){
     // Split pour prendre nom du fichier
-    return dir!.listSync().map((entry) => DropdownMenuEntry(value: entry, label: entry.path)).toList();
+    return dumpDir!.listSync().map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last)).toList();
   }
 
   Future<void> writeDump(BuildContext context) async{
@@ -50,7 +51,7 @@ class WriteFromDump extends StatelessWidget{
     final tag = context.read<CurrentNFCTag>();
     final nfcAdapter = context.read<NfcAdapter>();
     
-    final dumpData = getDumpDataFromFile(currentDumpChoice.text);
+    final dumpData = getDumpDataFromFile("${dumpDir!.path}/${currentDumpChoice.text}");
     showSnackBar(context, "Writing dump to tag");
     await tag.writeDumpToTag(dumpData);
     showSnackBar(context, "Dump successfully written !");
