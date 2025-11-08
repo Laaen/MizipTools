@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
+import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/misc/bcc.dart';
 import 'package:miziptools/misc/generate_keys.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
@@ -95,13 +96,13 @@ class MifareClassicTag with ChangeNotifier {
   Future<void> setUid(Uint8List newUid) async{
 
     await lock.synchronized(() async{
+      // We must get block 0's content before changing the keys !
+      final currentBlockZero = await readBlock(0, retries: 5);
+      final newBlockZero = Uint8List.fromList(newUid + generateBcc(newUid) + currentBlockZero.sublist(5, 16));
       MifareKeys newKeys = generateKeys(newUid);
       for(final sectorIdx in Iterable.generate(5)){
         await setsectorKey(sectorIdx, newKeys.a[sectorIdx], newKeys.b[sectorIdx]);
       }
-
-      final currentBlockZero = await readBlock(0, retries: 5);
-      final newBlockZero = Uint8List.fromList(newUid + generateBcc(newUid) + currentBlockZero.sublist(5, 16));
       await writeBlockZero(newBlockZero, newKeys.b[0]);
     });
   }
