@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
-import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/misc/bcc.dart';
 import 'package:miziptools/misc/generate_keys.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';

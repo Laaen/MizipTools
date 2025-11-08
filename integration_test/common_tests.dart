@@ -6,8 +6,6 @@ import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/main.dart';
 import 'package:miziptools/widgets/dump_tag.dart' show DumpTag;
 import 'package:path_provider/path_provider.dart';
-
-import 'full_app_test.dart' show generateMockMifareClassic;
 import 'mock_nfc_adapter.dart';
 import 'mock_nfc_tag.dart';
 
