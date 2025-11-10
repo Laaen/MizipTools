@@ -17,6 +17,7 @@ dependencies:
   collection: ^1.19.0
   path_provider: ^2.1.5
   provider: ^6.1.5+1
+  google_fonts: ^6.3.2
 
 dev_dependencies:
   integration_test:

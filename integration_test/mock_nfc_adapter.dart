@@ -16,7 +16,7 @@ class MockNfcAdapter extends NfcAdapter{
   
   MockNfcAdapter();
 
-  void setTag(MockNfcTag tag){
+  void setTag(MockNfcTag? tag){
     currentTag = tag;
   }
 

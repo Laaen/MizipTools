@@ -16,8 +16,6 @@ import 'expected_tag_content.dart';
 import 'mock_nfc_adapter.dart';
 import 'mock_nfc_tag.dart';
 
-
-
 void main(){
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   group("No tag tests", (){
@@ -35,6 +33,11 @@ void main(){
       await tester.pumpAndSettle();
       expect(find.widgetWithText(TagData, "No tag detected"), findsWidgets);
     });
+
+    testWidgets("Test read dump", (tester) async {
+      await testReadDump(tester, null, exampleDumpTestReadDump);
+    });
+
   });
 
   group("MifareClassic tests", (){
@@ -67,6 +70,10 @@ void main(){
 
     testWidgets("Test write from dump", (tester) async {
       await testWriteFromDump(tester, generateMockMifareClassic(), dumpContentWriteFromDumpTest);
+    });
+
+    testWidgets("Test read dump", (tester) async {
+      await testReadDump(tester, generateMockMifareClassic(), exampleDumpTestReadDump);
     });
 
     testWidgets("Test change UID", (tester) async {
@@ -144,6 +151,10 @@ void main(){
 
     testWidgets("Test write from dump", (tester) async {
       await testWriteFromDump(tester, generateMockMizipTag(), dumpContentWriteFromDumpTest);
+    });
+
+    testWidgets("Test read dump", (tester) async {
+      await testReadDump(tester, generateMockMizipTag(), exampleDumpTestReadDump);
     });
 
     testWidgets("Test change UID", (tester) async {

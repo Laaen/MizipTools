@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/main.dart';
+import 'package:miziptools/widgets/dialog_read_dump.dart';
 import 'package:miziptools/widgets/dump_tag.dart' show DumpTag;
 import 'package:path_provider/path_provider.dart';
 import 'mock_nfc_adapter.dart';
@@ -29,6 +30,9 @@ Future<void> testDumpTag(WidgetTester tester, MockNfcTag mockTag) async{
   final expectedContent = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
   final fileContent = File(file.path).readAsStringSync();
   expect(fileContent, equals(expectedContent));
+
+  // Cleanup
+  File(file.path).deleteSync();
 }
 
 Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String dumpContent) async{
@@ -42,9 +46,12 @@ Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String d
   await tester.pumpWidget(App(nfcAdapter: mockAdapter));
   await tester.tap(find.widgetWithText(Tab, "Dumps"));
   await tester.pumpAndSettle();
-  await tester.tap(find.byType(DropdownMenu));
+  await Future.delayed(Duration(seconds: 1));
   await tester.pumpAndSettle();
-  await tester.tap(find.text("${dumpContent.substring(0, 8)}.dump").last);
+  await tester.tap(find.byType(DropdownMenu).first);
+  await tester.pumpAndSettle();
+  // The first found text is bugged
+  await tester.tap(find.text(dumpContent.substring(0, 8)).at(1));
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(OutlinedButton, "Write"));
   await tester.pumpAndSettle();
@@ -52,6 +59,38 @@ Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String d
 
   // Content is OK
   expect(mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(dumpContent));
+
+  // Cleanup
+  File("${dir!.path}/${dumpContent.substring(0, 8)}.dump").deleteSync();
+}
+
+Future<void> testReadDump(WidgetTester tester, MockNfcTag? mockTag, String dumpData) async{
+  final mockAdapter = MockNfcAdapter();
+  mockAdapter.setTag(mockTag);
+
+  // Create the dump
+  final dir = await getExternalStorageDirectory();
+  File("${dir!.path}/${dumpData.substring(0, 8)}.dump").writeAsStringSync(dumpData);
+
+  await tester.pumpWidget(App(nfcAdapter: mockAdapter));
+  await tester.tap(find.widgetWithText(Tab, "Dumps"));
+  await tester.pumpAndSettle();
+  await Future.delayed(Duration(seconds: 1));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byType(DropdownMenu).last);
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(dumpData.substring(0, 8)).last);
+  await tester.pumpAndSettle();
+  await tester.tap(find.widgetWithText(OutlinedButton, "Read"));
+  await tester.pumpAndSettle();
+  expect(find.byType(ReadDumpDialog), findsOne);
+  await tester.tap(find.widgetWithText(OutlinedButton, "Close"));
+  await tester.pumpAndSettle();
+  expect(find.byType(ReadDumpDialog), findsNothing);
+
+  // Cleanup
+  File("${dir!.path}/${dumpData.substring(0, 8)}.dump").deleteSync();
+
 }
 
 Future<void> testChangeUid(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedContent) async{

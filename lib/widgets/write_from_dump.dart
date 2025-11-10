@@ -33,7 +33,7 @@ class WriteFromDump extends StatelessWidget{
               Text("Write dump to tag", style: TextStyle(fontSize: 18),),
               Row(spacing: 20,
                 children: [
-                  DropdownMenu(dropdownMenuEntries: getDumpList(), controller: currentDumpChoice, width: 180,),
+                  DropdownMenu(dropdownMenuEntries: getDumpList(), controller: currentDumpChoice, width: 158.6,),
                   OutlinedButton(onPressed: () => writeDump(context), child: Text("Write"),)
                 ],
               )
@@ -41,15 +41,14 @@ class WriteFromDump extends StatelessWidget{
           )
         );
       } else {
+        // TODO : Mettre quelquechose ici
         return Text("blip");
       }
       });
   }
 
-  // TODO : Faire en sorte d'avoir uniquement le nom de fichier de visible
   List<DropdownMenuEntry> getDumpList(){
-    // Split pour prendre nom du fichier
-    return dumpDir!.listSync().map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last)).toList();
+    return dumpDir!.listSync().map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).toList();
   }
 
   Future<void> writeDump(BuildContext context) async{
@@ -57,7 +56,7 @@ class WriteFromDump extends StatelessWidget{
     final tag = context.read<CurrentNFCTag>();
     final nfcAdapter = context.read<NfcAdapter>();
     
-    final dumpData = getDumpDataFromFile("${dumpDir!.path}/${currentDumpChoice.text}");
+    final dumpData = getDumpDataFromFile("${dumpDir!.path}/${currentDumpChoice.text}.dump");
     showSnackBar(context, "Writing dump to tag");
     await tag.writeDumpToTag(dumpData);
     showSnackBar(context, "Dump successfully written !");

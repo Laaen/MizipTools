@@ -63,7 +63,9 @@ class MainPageState extends State<MainPage>{
   }
 
   void onTagLost() async {
-    context.read<CurrentNFCTag>().setTagAbsent();
+    if(mounted){
+      context.read<CurrentNFCTag>().setTagAbsent();
+    } 
   }
 
   /// Callback executed when a new tag is detected, gets the tag's handle + its keys
