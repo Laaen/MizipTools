@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:miziptools/widgets/basic/containerWithBorder.dart';
+import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ReadDumpDialog extends StatelessWidget {
@@ -8,7 +8,7 @@ class ReadDumpDialog extends StatelessWidget {
   final String title;
   final String dataToDisplay;
 
-  ReadDumpDialog ({super.key, required this.title, required this.dataToDisplay});
+  const ReadDumpDialog ({super.key, required this.title, required this.dataToDisplay});
 
 
   @override

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
-import 'package:miziptools/widgets/basic/containerWithBorder.dart';
+import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:provider/provider.dart';
 
 class TagData extends StatelessWidget{

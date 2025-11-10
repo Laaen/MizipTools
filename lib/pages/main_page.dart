@@ -18,6 +18,8 @@ import "../widgets/appbar.dart";
 
 class MainPage extends StatefulWidget{
 
+const MainPage({super.key});
+
 @override
   State<StatefulWidget> createState() {
     return MainPageState();

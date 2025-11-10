@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import "package:miziptools/nfc/currentnfctag.dart";
 import "package:miziptools/misc/snackbar.dart";
-import "package:miziptools/widgets/basic/containerWithBorder.dart";
+import "package:miziptools/widgets/basic/container_with_border.dart";
 import "package:provider/provider.dart";
 
 
@@ -30,9 +30,12 @@ class TagAdd10 extends StatelessWidget{
         await tag.setBalance(newBalance.toString());
       }
     } catch (e) {
-      showSnackBar(context, "Error while adding 10\$");
+      if(context.mounted){
+        showSnackBar(context, "Error while adding 10\$");
+      }
     }
-    showSnackBar(context, "Balance changed successfully");  
+    if(context.mounted){
+      showSnackBar(context, "Balance changed successfully");  
+    }
   }
-
 }

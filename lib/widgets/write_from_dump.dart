@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +6,7 @@ import 'package:logging/logging.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
-import 'package:miziptools/widgets/basic/containerWithBorder.dart';
+import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -41,8 +39,7 @@ class WriteFromDump extends StatelessWidget{
           )
         );
       } else {
-        // TODO : Mettre quelquechose ici
-        return Text("blip");
+        return Text("Loading dump directory ...");
       }
       });
   }
@@ -59,14 +56,18 @@ class WriteFromDump extends StatelessWidget{
     final dumpData = getDumpDataFromFile("${dumpDir!.path}/${currentDumpChoice.text}.dump");
     showSnackBar(context, "Writing dump to tag");
     await tag.writeDumpToTag(dumpData);
-    showSnackBar(context, "Dump successfully written !");
+    if(context.mounted){
+      showSnackBar(context, "Dump successfully written !");
+    }
     // Disconnect to poll new tag
     try{
       await nfcAdapter.releaseTag();
     } on PlatformException catch(e){
-      if (e.code == 503){
+      if (e.code == "503"){
         Logger.root.info("Tag already disconnected");
-        showSnackBar(context, "Error, the tag was removed during the write");
+        if(context.mounted) {
+          showSnackBar(context, "Error, the tag was removed during the write");
+        }
       }
     }
   }

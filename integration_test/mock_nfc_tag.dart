@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
@@ -30,6 +28,7 @@ class MockNfcTag {
       final tagKeyB = data[sectorNb * 4 + 3].sublist(10, 16);
       result = tagKeyB.equals(keyB);
     }
+    
     // TODO : Comportement à corriger au niveau de MifareCLassicTag : L'auth échoue en cas de throw et pas de retour false
     if (!result){
       throw PlatformException(code: "503") ;

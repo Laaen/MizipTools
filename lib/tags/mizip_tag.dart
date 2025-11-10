@@ -14,7 +14,7 @@ class MizipTag extends MifareClassicTag{
 
   @override
   MifareKeys getKeys(){
-    return generateKeys(this.uid);
+    return generateKeys(uid);
   }
 
   @override

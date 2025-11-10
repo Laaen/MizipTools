@@ -3,7 +3,7 @@ import 'package:miziptools/extensions/string_extensions.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
-import 'package:miziptools/widgets/basic/containerWithBorder.dart';
+import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:provider/provider.dart';
 
 class ChangeUid extends StatelessWidget{
@@ -58,11 +58,15 @@ class ChangeUid extends StatelessWidget{
       showSnackBar(context, "Changing UID");
       try{
         await tag.setUid(_uidFormController.text.toUint8List());
-        showSnackBar(context, "UID changed successfully");
+        if(context.mounted){
+          showSnackBar(context, "UID changed successfully");
+        }
         // Release to poll new tag
         await nfcAdapter.releaseTag();
       }catch(e){
-        showSnackBar(context, "Error : $e");
+        if(context.mounted){
+          showSnackBar(context, "Error : $e");
+        }
       }
     }
   }

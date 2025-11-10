@@ -5,7 +5,7 @@ import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
-import 'package:miziptools/widgets/basic/containerWithBorder.dart';
+import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -32,9 +32,13 @@ class DumpTag extends StatelessWidget{
       final stringDump = toStringDump(rawDump);
       final dumpWithKeys = addKeysToDump(stringDump, keys);
       writeDumpToFile(fileName, dumpWithKeys);
-      showSnackBar(context, "Dump done file : $fileName.dump");
+      if(context.mounted){
+        showSnackBar(context, "Dump done file : $fileName.dump");
+      }
     } catch (err){
-      showSnackBar(context, "Error while dumping tag : ${err.toString()}");
+      if(context.mounted){
+        showSnackBar(context, "Error while dumping tag : ${err.toString()}");
+      }
     }
   }
 

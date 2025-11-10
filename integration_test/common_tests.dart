@@ -61,7 +61,7 @@ Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String d
   expect(mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(dumpContent));
 
   // Cleanup
-  File("${dir!.path}/${dumpContent.substring(0, 8)}.dump").deleteSync();
+  File("${dir.path}/${dumpContent.substring(0, 8)}.dump").deleteSync();
 }
 
 Future<void> testReadDump(WidgetTester tester, MockNfcTag? mockTag, String dumpData) async{
@@ -89,7 +89,7 @@ Future<void> testReadDump(WidgetTester tester, MockNfcTag? mockTag, String dumpD
   expect(find.byType(ReadDumpDialog), findsNothing);
 
   // Cleanup
-  File("${dir!.path}/${dumpData.substring(0, 8)}.dump").deleteSync();
+  File("${dir.path}/${dumpData.substring(0, 8)}.dump").deleteSync();
 
 }
 
