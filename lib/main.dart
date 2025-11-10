@@ -25,8 +25,8 @@ class App extends StatelessWidget {
 
   final NfcAdapter nfcAdapter;
 
-  static final colorScheme = ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 255, 255, 255), brightness: Brightness.dark);
-  static final snackBarTheme =  const SnackBarThemeData(backgroundColor: Color.fromARGB(255, 0, 155, 202));
+  static final colorScheme = ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 255, 204, 0), brightness: Brightness.dark);
+  static final snackBarTheme =  const SnackBarThemeData(backgroundColor: Color.fromARGB(255, 255, 204, 0));
 
   @override
   Widget build(BuildContext context) {
