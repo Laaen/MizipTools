@@ -1,4 +1,4 @@
-package com.example.miziptools
+package com.laen.miziptools
 
 import io.flutter.embedding.android.FlutterActivity
 
