@@ -49,7 +49,7 @@ class MockNfcAdapter extends NfcAdapter{
   Future<void> releaseTag() async {
     final cTag = currentTag;
     removeTag();
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(Duration(milliseconds: 700));
     setTag(cTag!);
   }
 
