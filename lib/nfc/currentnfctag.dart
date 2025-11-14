@@ -1,8 +1,17 @@
+import 'dart:io';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
+import 'package:miziptools/extensions/uint8list_extensions.dart';
+import 'package:miziptools/misc/generate_keys.dart';
+import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/tags/balance.dart';
 import 'package:miziptools/tags/mifare_classic_tag.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
 import 'package:miziptools/tags/mizip_tag.dart';
+import 'package:path_provider/path_provider.dart';
 
 class CurrentNFCTag with ChangeNotifier {
   
@@ -46,6 +55,7 @@ class CurrentNFCTag with ChangeNotifier {
   }
 
   Future<void> writeDumpToTag(List<Uint8List> data) async{
+    await saveCurrentUID();
     await innerTag?.writeDumpToTag(data);
   }
 
@@ -56,7 +66,68 @@ class CurrentNFCTag with ChangeNotifier {
   }
 
   Future<void> setUid(Uint8List newUid) async{
+    await saveCurrentUID();
     await innerTag!.setUid(newUid);
+  }
+
+  Future<bool> authenticateSector(int sectorNb, Uint8List? keyA, keyB) async{
+    return await innerTag!.authenticateSector(sectorNb, keyA: keyA, keyB: keyB);
+  }
+
+  Future<void> releaseTag() async{
+    await innerTag!.releaseTag();
+    setTagAbsent();
+  }
+
+  Future<void> autoRepair(Uint8List oldUid) async{
+    MifareKeys validKeys = (a: [], b: []);
+
+    MifareKeys candidateCurrentUid = generateKeys(innerTag!.uid);
+    MifareKeys candidateOldUid = generateKeys(oldUid);
+    MifareKeys candidateMifareClassic = (a: List.filled(5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])), b:List.filled(5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])));
+
+    // Test keys A
+    for(final (index, keys) in IterableZip([candidateMifareClassic.a, candidateCurrentUid.a, candidateOldUid.a]).indexed){
+      for(final key in keys){
+        print(key.toHexString());
+        try{
+          if(await innerTag!.authenticateSector(index, keyA: key)){
+            validKeys.a.add(key);
+            break;
+          }
+        } catch (e){
+          print(e);
+          rethrow;
+        }
+
+      }
+    }
+
+    // Test keys B
+    for(final (index, keys) in IterableZip([candidateMifareClassic.a, candidateCurrentUid.a, candidateOldUid.a]).indexed){
+      for(final key in keys){
+        print(key.toHexString());
+        if(await innerTag!.authenticateSector(index, keyA: key)){
+          validKeys.a.add(key);
+          break;
+        }
+      }
+    }
+
+    print(validKeys);
+
+    await rewriteKeys(validKeys);
+  }
+
+  Future<bool> rewriteKeys(MifareKeys keys) async{
+      for (final (index, _) in keys.a.indexed){
+        try{
+          await innerTag!.setsectorKey(index, keys.a[index], keys.b[index]);  
+        } catch (_){
+          return false;
+        }
+      }
+      return true;
   }
 
   bool isMizipTag(){
@@ -65,6 +136,22 @@ class CurrentNFCTag with ChangeNotifier {
 
   bool isMifareClassic(){
     return isPresent();
+  }
+
+  Future<bool> saveCurrentUID() async {
+    final dataDir = await getExternalStorageDirectory();
+    if (dataDir == null){
+      return false;
+    }
+
+    try{
+      File("${dataDir.path}/uid_save").writeAsStringSync(innerTag?.uid.toHexString().toUpperCase() ?? "");
+    } on FileSystemException catch (e){
+      Logger.root.severe("Error while saving UID : $e");
+      return false;
+    }
+
+    return true;
   }
 
 }

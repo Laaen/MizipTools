@@ -44,7 +44,6 @@ class WriteFromDump extends StatelessWidget{
   Future<void> writeDump(BuildContext context) async{
     
     final tag = context.read<CurrentNFCTag>();
-    final nfcAdapter = context.read<NfcAdapter>();
     final dataDir = context.read<Directory>();
 
     final dumpData = getDumpDataFromFile("${dataDir.path}/${currentDumpChoice.text}.dump");
@@ -55,7 +54,7 @@ class WriteFromDump extends StatelessWidget{
     }
     // Disconnect to poll new tag
     try{
-      await nfcAdapter.releaseTag();
+      await tag.releaseTag();
     } on PlatformException catch(e){
       if (e.code == "503"){
         Logger.root.info("Tag already disconnected");

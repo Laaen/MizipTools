@@ -53,7 +53,6 @@ class ChangeUid extends StatelessWidget{
 
   Future<void> changeUid(BuildContext context) async{
     final tag = context.read<CurrentNFCTag>();
-    final nfcAdapter = context.read<NfcAdapter>();
     if(_uidFormKey.currentState!.validate()){
       showSnackBar(context, "Changing UID");
       try{
@@ -62,7 +61,7 @@ class ChangeUid extends StatelessWidget{
           showSnackBar(context, "UID changed successfully");
         }
         // Release to poll new tag
-        await nfcAdapter.releaseTag();
+        await tag.releaseTag();
       }catch(e){
         if(context.mounted){
           showSnackBar(context, "Error : $e");

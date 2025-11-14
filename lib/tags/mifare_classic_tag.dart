@@ -123,6 +123,14 @@ class MifareClassicTag with ChangeNotifier {
     await writeBlock(sectorNb * 4 + 3, newTrailerBlock, retries: 5);
   }
 
+  Future<bool> authenticateSector(int sectorNb, {Uint8List? keyA, Uint8List? keyB}) async{
+    return await nfcAdapter.authenticateSector(sectorNb, keyA: keyA, keyB: keyB);
+  }
+
+  Future<void> releaseTag() async{
+    await nfcAdapter.releaseTag();
+  }
+
   Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
       return await lock.synchronized(() async{
