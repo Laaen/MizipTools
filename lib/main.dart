@@ -1,16 +1,21 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import "pages/main_page.dart";
 import 'package:logging/logging.dart';
 
 
-void main() {
+void main() async{
   setupLogging();
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(App(nfcAdapter: NfcAdapter(),));
+  final externalDir = await getExternalStorageDirectory();
+  // TODO: Check if null value can cause issues
+  runApp(App(nfcAdapter: NfcAdapter(), dataDir: externalDir!,));
 }
 
 void setupLogging(){
@@ -21,9 +26,10 @@ void setupLogging(){
 }
 
 class App extends StatelessWidget {
-  const App({super.key, required this.nfcAdapter});
+  const App({super.key, required this.nfcAdapter, required this.dataDir});
 
   final NfcAdapter nfcAdapter;
+  final Directory dataDir;
 
   static final colorScheme = ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 255, 204, 0), brightness: Brightness.dark);
   static final snackBarTheme =  const SnackBarThemeData(backgroundColor: Color.fromARGB(255, 255, 204, 0));
@@ -32,7 +38,8 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
       ChangeNotifierProvider.value(value: CurrentNFCTag.init()),
-      Provider.value(value: nfcAdapter)
+      Provider.value(value: nfcAdapter),
+      Provider.value(value: dataDir)
     ],
         child: MaterialApp(
           title: 'MizipTools',
