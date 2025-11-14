@@ -31,7 +31,7 @@ class DumpTag extends StatelessWidget{
       final rawDump = await tag.dumpTagData();
       final stringDump = toStringDump(rawDump);
       final dumpWithKeys = addKeysToDump(stringDump, keys);
-      writeDumpToFile(fileName, dumpWithKeys);
+      writeDumpToFile(context, fileName, dumpWithKeys);
       if(context.mounted){
         showSnackBar(context, "Dump done file : $fileName.dump");
       }
@@ -66,8 +66,8 @@ class DumpTag extends StatelessWidget{
     return modifiedDump;
   }
 
-  void writeDumpToFile(String fileName, List<String> content) async {
-    final dir = await getExternalStorageDirectory();
+  void writeDumpToFile(BuildContext context, String fileName, List<String> content) async {
+    final dir = context.read<Directory>();
     final fileFullPath = "${dir!.path}/$fileName.dump";
 
     final file = File(fileFullPath).openWrite();
