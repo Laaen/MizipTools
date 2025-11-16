@@ -11,10 +11,11 @@ import 'mock_nfc_adapter.dart';
 import 'mock_nfc_tag.dart';
 
 Future<void> testDumpTag(WidgetTester tester, MockNfcTag mockTag) async{
+  final dir = await getExternalStorageDirectory();
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
 
-  await tester.pumpWidget(App(nfcAdapter: mockAdapter));
+  await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir!,));
   await tester.tap(find.widgetWithText(Tab, "Dumps"));
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(DumpTag, "Dump Tag"));
@@ -22,8 +23,7 @@ Future<void> testDumpTag(WidgetTester tester, MockNfcTag mockTag) async{
   expect(find.widgetWithText(SnackBar, "Dump done file : ${mockTag.getUid().toUpperCase()}.dump"), findsOneWidget);
       
   // File exists
-  final dir = await getExternalStorageDirectory();
-  final file = dir!.listSync().first;
+  final file = dir.listSync().first;
   expect(file.path.split("/").last, equals("${mockTag.getUid().toUpperCase()}.dump"));
 
   // Content is OK
@@ -43,7 +43,7 @@ Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String d
   final dir = await getExternalStorageDirectory();
   File("${dir!.path}/${dumpContent.substring(0, 8)}.dump").writeAsStringSync(dumpContent);
 
-  await tester.pumpWidget(App(nfcAdapter: mockAdapter));
+  await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir,));
   await tester.tap(find.widgetWithText(Tab, "Dumps"));
   await tester.pumpAndSettle();
   await Future.delayed(Duration(seconds: 1));
@@ -60,6 +60,9 @@ Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String d
   // Content is OK
   expect(mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(dumpContent));
 
+  // Backup of previous UID is here
+  // TODO : Ajouter
+
   // Cleanup
   File("${dir.path}/${dumpContent.substring(0, 8)}.dump").deleteSync();
 }
@@ -72,7 +75,7 @@ Future<void> testReadDump(WidgetTester tester, MockNfcTag? mockTag, String dumpD
   final dir = await getExternalStorageDirectory();
   File("${dir!.path}/${dumpData.substring(0, 8)}.dump").writeAsStringSync(dumpData);
 
-  await tester.pumpWidget(App(nfcAdapter: mockAdapter));
+  await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir,));
   await tester.tap(find.widgetWithText(Tab, "Dumps"));
   await tester.pumpAndSettle();
   await Future.delayed(Duration(seconds: 1));
@@ -94,15 +97,22 @@ Future<void> testReadDump(WidgetTester tester, MockNfcTag? mockTag, String dumpD
 }
 
 Future<void> testChangeUid(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedContent) async{
+  final dir = await getExternalStorageDirectory();
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
 
-  await tester.pumpWidget(App(nfcAdapter: mockAdapter));
+  await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir!,));
   await tester.tap(find.widgetWithText(Tab, "Advanced"));
   await tester.pumpAndSettle();
-  await tester.enterText(find.byType(TextFormField), newUid);
-  await tester.tap(find.widgetWithText(OutlinedButton, "Ok"));
+  await tester.enterText(find.byType(TextFormField).first, newUid);
+  await tester.pumpAndSettle();
+  await tester.tap(find.widgetWithText(OutlinedButton, "Ok").first);
   await tester.pumpAndSettle();
   expect(find.widgetWithText(SnackBar, "UID changed successfully"), findsOneWidget);
+  await tester.pumpAndSettle();
   expect(mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(expectedContent));
+
+  // Backup of previous UID is here
+  // TODO : Ajouter
+
 }
