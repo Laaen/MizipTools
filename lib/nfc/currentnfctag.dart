@@ -89,24 +89,6 @@ class CurrentNFCTag with ChangeNotifier {
     // Test keys A
     for(final (index, keys) in IterableZip([candidateMifareClassic.a, candidateCurrentUid.a, candidateOldUid.a]).indexed){
       for(final key in keys){
-        print(key.toHexString());
-        try{
-          if(await innerTag!.authenticateSector(index, keyA: key)){
-            validKeys.a.add(key);
-            break;
-          }
-        } catch (e){
-          print(e);
-          rethrow;
-        }
-
-      }
-    }
-
-    // Test keys B
-    for(final (index, keys) in IterableZip([candidateMifareClassic.a, candidateCurrentUid.a, candidateOldUid.a]).indexed){
-      for(final key in keys){
-        print(key.toHexString());
         if(await innerTag!.authenticateSector(index, keyA: key)){
           validKeys.a.add(key);
           break;
@@ -114,16 +96,27 @@ class CurrentNFCTag with ChangeNotifier {
       }
     }
 
-    print(validKeys);
+    // Test keys B
+    for(final (index, keys) in IterableZip([candidateMifareClassic.b, candidateCurrentUid.b, candidateOldUid.b]).indexed){
+      for(final key in keys){
+        if(await innerTag!.authenticateSector(index, keyB: key)){
+          validKeys.b.add(key);
+          break;
+        }
+      }
+    }
 
-    await rewriteKeys(validKeys);
+    print(validKeys.a.map((elt) => elt.toHexString().toUpperCase()).toList());
+    print(validKeys.b.map((elt) => elt.toHexString().toUpperCase()).toList());
+
+    await rewriteKeys(validKeys, candidateCurrentUid);
   }
 
-  Future<bool> rewriteKeys(MifareKeys keys) async{
-      for (final (index, _) in keys.a.indexed){
+  Future<bool> rewriteKeys(MifareKeys currentKeys, correctKeys) async{
+      for (final (index, _) in currentKeys.a.indexed){
         try{
-          await innerTag!.setsectorKey(index, keys.a[index], keys.b[index]);  
-        } catch (_){
+          await innerTag!.setsectorKey(index, correctKeys.a[index], correctKeys.b[index], currentKeyA: currentKeys.a[index], currentKeyB: currentKeys.b[index]);  
+        } catch (e){
           return false;
         }
       }

@@ -11,6 +11,7 @@ import 'package:miziptools/widgets/dump_tag.dart';
 import 'package:miziptools/widgets/tag_add_10.dart';
 import 'package:miziptools/widgets/tag_data.dart';
 import 'package:miziptools/widgets/write_from_dump.dart';
+import 'package:path_provider/path_provider.dart';
 import 'common_tests.dart';
 import 'expected_tag_content.dart';
 import 'mock_nfc_adapter.dart';
@@ -20,7 +21,8 @@ void main(){
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   group("No tag tests", (){
     testWidgets("Start The app, and check displayed data in all menus", (tester) async {
-      await tester.pumpWidget(App(nfcAdapter: MockNfcAdapter()));
+      final dataDir = await getExternalStorageDirectory();
+      await tester.pumpWidget(App(nfcAdapter: MockNfcAdapter(), dataDir: dataDir!,));
       await tester.pumpAndSettle();
 
       expect(find.widgetWithText(TagData, "No tag detected"), findsWidgets);
@@ -42,11 +44,11 @@ void main(){
 
   group("MifareClassic tests", (){
     testWidgets("Start The app, and check displayed data in all menus", (tester) async {
-
+      final dataDir = await getExternalStorageDirectory();
       final mockAdapter = MockNfcAdapter();
       final mockMifareClassicTag = generateMockMifareClassic();
       mockAdapter.setTag(mockMifareClassicTag);
-      await tester.pumpWidget(App(nfcAdapter: mockAdapter));
+      await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dataDir!,));
 
       await tester.tap(find.widgetWithText(Tab, "Balance"));
       await tester.pumpAndSettle();
@@ -79,16 +81,40 @@ void main(){
     testWidgets("Test change UID", (tester) async {
       await testChangeUid(tester, generateMockMifareClassic(), "ABD453C7", expectedTagContentChangeUidTestMifareClassic);
     });
+
+    testWidgets("Test auto-repair", (tester) async{
+      final dataDir = await getExternalStorageDirectory();
+      final mockAdapter = MockNfcAdapter();
+      final mockMifareClassicTag = MockNfcTag(data: brokenTag.split("\n").map((x) => x.toUint8List()).toList(), type: NfcTagType.mifareClassic);
+      mockAdapter.setTag(mockMifareClassicTag);
+
+      final oldUid = "ABD453C7";
+
+      await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dataDir!,));
+
+      await tester.tap(find.widgetWithText(Tab, "Advanced"));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField).last, oldUid);
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(OutlinedButton, "Ok").last);
+      await tester.pumpAndSettle();
+      await Future.delayed(Duration(seconds: 3));
+      expect(find.widgetWithText(SnackBar, "Repair successful"), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(mockMifareClassicTag.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(expectedRepairedTag));
+
+    });
+
   });
 
   group("MiZip tests", (){
     testWidgets("Start The app, and check displayed data in all menus", (tester) async {
-
+      final dataDir = await getExternalStorageDirectory();
       final mockAdapter = MockNfcAdapter();
       final mockMizipTag = generateMockMizipTag();
       mockAdapter.setTag(mockMizipTag);
 
-      await tester.pumpWidget(App(nfcAdapter: mockAdapter));
+      await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dataDir!,));
 
       await tester.tap(find.widgetWithText(Tab, "Balance"));
       await tester.pumpAndSettle();
@@ -112,13 +138,13 @@ void main(){
     });
 
     testWidgets("Change balance", (tester) async{
-
+      final dataDir = await getExternalStorageDirectory();
       final mockAdapter = MockNfcAdapter();
       final mockMizipTag = generateMockMizipTag();
       mockAdapter.setTag(mockMizipTag);
 
       final newBalance = "26.92";
-      await tester.pumpWidget(App(nfcAdapter: mockAdapter));
+      await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dataDir!,));
       await tester.tap(find.widgetWithText(Tab, "Balance"));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextFormField), newBalance);
@@ -130,12 +156,12 @@ void main(){
     });
 
     testWidgets("Add 10\$", (tester) async{
-
+      final dataDir = await getExternalStorageDirectory();
       final mockAdapter = MockNfcAdapter();
       final mockMizipTag = generateMockMizipTag();
       mockAdapter.setTag(mockMizipTag);
 
-      await tester.pumpWidget(App(nfcAdapter: mockAdapter));
+      await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dataDir!,));
       await tester.tap(find.widgetWithText(Tab, "Balance"));
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(OutlinedButton, "Add 10\$")); 
