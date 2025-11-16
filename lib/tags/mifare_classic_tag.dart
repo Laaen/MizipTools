@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
+import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/misc/bcc.dart';
 import 'package:miziptools/misc/generate_keys.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
@@ -76,6 +77,7 @@ class MifareClassicTag with ChangeNotifier {
     await writeBlockZero(data[0], newKey, retries: 5);
   }
 
+  // TODO : Test if lock is necessary
   Future<void> writeBlockZero(Uint8List data, Uint8List key, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     try{
       if (await nfcAdapter.authenticateSector(0, keyB: key) != true){
@@ -143,8 +145,8 @@ class MifareClassicTag with ChangeNotifier {
         if(await nfcAdapter.authenticateSector(number ~/ 4, keyA: getKeys().a[number ~/ 4])){
           return await nfcAdapter.readBlock(number);
         } else {
-          Logger.root.severe("Read failed : Authentication failure with keyA : ${getKeys().a[number ~/ 4]}");
-          throw ReadSectorAuthenticationFailed("Read failed : Authentication failure with keyA : ${getKeys().a[number ~/ 4]}");
+          Logger.root.severe("Read failed : Authentication failure with keyA : ${getKeys().a[number ~/ 4].toHexString()}");
+          throw ReadSectorAuthenticationFailed("Read failed : Authentication failure with keyA : ${getKeys().a[number ~/ 4].toHexString()}");
         }
       });
     } on NfcAdapterCommunicationException catch(_){
@@ -154,6 +156,10 @@ class MifareClassicTag with ChangeNotifier {
     } on NfcAdapterTagRemovedException catch(_){
       Logger.root.severe("Read failed : Tag was removed");
       throw ReadTagRemovedException("Read failed : Tag was removed");
+    } on ReadSectorAuthenticationFailed{
+      Logger.root.warning("Read failed, retrying");
+      await Future.delayed(delay);
+      return await readBlock(number, retries: retries - 1);
     } catch(e){
       Logger.root.severe("Read failed : $e");
       throw ReadUnknownException("Read failed : Unknown exception $e");
@@ -171,8 +177,8 @@ class MifareClassicTag with ChangeNotifier {
         if(await nfcAdapter.authenticateSector(number, keyA: getKeys().a[number])){
           return await nfcAdapter.readSector(number);
         } else {
-          Logger.root.severe("Read failed : Authentication failure with keyA : ${getKeys().a[number]}");
-          throw ReadSectorAuthenticationFailed("Read failed : Authentication failure with keyA : ${getKeys().a[number]}");
+          Logger.root.severe("Read failed : Authentication failure with keyA : ${getKeys().a[number].toHexString()}");
+          throw ReadSectorAuthenticationFailed("Read failed : Authentication failure with keyA : ${getKeys().a[number].toHexString()}");
         }
       });
     } on NfcAdapterCommunicationException catch(_){
@@ -182,6 +188,10 @@ class MifareClassicTag with ChangeNotifier {
     } on NfcAdapterTagRemovedException catch(_){
       Logger.root.severe("Read failed : Tag was removed");
       throw ReadTagRemovedException("Read failed : Tag was removed");
+    } on ReadSectorAuthenticationFailed{
+      Logger.root.warning("Read failed, retrying");
+      await Future.delayed(delay);
+      return await readSector(number, retries: retries - 1);
     } catch(e){
       Logger.root.severe("Read failed : $e");
       throw ReadUnknownException("Read failed : Unknown exception $e");
@@ -197,13 +207,14 @@ class MifareClassicTag with ChangeNotifier {
     }
 
     try{
-      if(await nfcAdapter.authenticateSector(number ~/ 4, keyB: getKeys().b[number ~/ 4])){
-        await nfcAdapter.writeBlock(number, data); 
-      } else {
-        Logger.root.severe("Write failed: Authentication failed with keyB : ${getKeys().b[number ~/ 4]}");
-        throw WriteSectorAuthenticationFailed("Write failed: Authentication failed with keyB : ${getKeys().b[number ~/ 4]}");
-      }
-       
+      return await lock.synchronized(()async{
+        if(await nfcAdapter.authenticateSector(number ~/ 4, keyB: getKeys().b[number ~/ 4])){
+          await nfcAdapter.writeBlock(number, data); 
+        } else {
+          Logger.root.severe("Write failed: Authentication failed with keyB : ${getKeys().b[number ~/ 4].toHexString()}");
+          throw WriteSectorAuthenticationFailed("Write failed: Authentication failed with keyB : ${getKeys().b[number ~/ 4].toHexString()}");
+        }
+      });
     } on NfcAdapterCommunicationException catch(_){
       Logger.root.warning("Write failed, retrying");
       await Future.delayed(delay);
@@ -211,6 +222,10 @@ class MifareClassicTag with ChangeNotifier {
     } on NfcAdapterTagRemovedException catch(_){
       Logger.root.severe("Write failed : Tag was removed");
       throw WriteTagRemovedException("Write failed : Tag was removed");
+    } on WriteSectorAuthenticationFailed{
+      Logger.root.warning("Write failed, retrying");
+      await Future.delayed(delay);
+      return await writeBlock(number, data, retries: retries - 1);
     } catch(e){
       Logger.root.severe("Write failed : $e");
       throw WriteUnknownException("Write failed : Unknown exception $e");
