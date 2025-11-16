@@ -38,7 +38,7 @@ class WriteFromDump extends StatelessWidget{
   }
 
   List<DropdownMenuEntry> getDumpList(Directory dataDir){
-    return dataDir.listSync().map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).toList();
+    return dataDir.listSync().map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).where((name) => name.label != "uid_save").toList();
   }
 
   Future<void> writeDump(BuildContext context) async{
