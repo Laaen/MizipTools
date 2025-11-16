@@ -26,8 +26,10 @@ class MockNfcAdapter extends NfcAdapter{
   @override
   Future<Uint8List> pingTag({Duration timeout = const Duration(milliseconds: 200)}) async{
     Future.delayed(Duration(milliseconds: 500));
-    if (failureMode || currentTag == null){
-      throw PlatformException(code: "503");
+    if (currentTag == null){
+      throw NfcAdapterTagRemovedException("Tag was removed");
+    } else if (failureMode){
+      throw NfcAdapterCommunicationException("Communication error");
     } else {
       return Uint8List(0);
     }
@@ -37,11 +39,11 @@ class MockNfcAdapter extends NfcAdapter{
   Future<NfcTag> pollTag({Duration timeout = const Duration(milliseconds: 200)}) async{
     await Future.delayed(Duration(milliseconds: 500));
     if (failureMode){
-      throw PlatformException(code: "503");
+      throw NfcAdapterCommunicationException("Communication error");
     } else if (currentTag != null) {
       return NfcTag(type: currentTag!.type, id: currentTag!.getUid());
     } else{
-      throw PlatformException(code: "503");
+      throw NfcAdapterTagRemovedException("Tag was removed");
     }
   }
 
