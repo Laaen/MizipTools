@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/misc/snackbar.dart';
-import 'package:miziptools/exceptions/nfc_exceptions.dart';
 import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:provider/provider.dart';
 

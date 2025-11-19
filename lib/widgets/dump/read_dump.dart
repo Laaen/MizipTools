@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:miziptools/widgets/dump/dialog_read_dump.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class ReadDump extends StatelessWidget{

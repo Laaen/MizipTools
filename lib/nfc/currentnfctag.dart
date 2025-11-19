@@ -2,11 +2,9 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/misc/generate_keys.dart';
-import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/tags/balance.dart';
 import 'package:miziptools/tags/mifare_classic_tag.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
@@ -105,9 +103,6 @@ class CurrentNFCTag with ChangeNotifier {
         }
       }
     }
-
-    print(validKeys.a.map((elt) => elt.toHexString().toUpperCase()).toList());
-    print(validKeys.b.map((elt) => elt.toHexString().toUpperCase()).toList());
 
     await rewriteKeys(validKeys, candidateCurrentUid);
   }

@@ -7,7 +7,7 @@ import 'package:miziptools/misc/bcc.dart';
 import 'package:miziptools/misc/generate_keys.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/tags/balance.dart';
-import 'package:miziptools/tags/exceptions.dart';
+import 'package:miziptools/exceptions/nfc_exceptions.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
 import 'package:miziptools/tags/mizip_tag.dart';
 import 'package:synchronized/synchronized.dart';

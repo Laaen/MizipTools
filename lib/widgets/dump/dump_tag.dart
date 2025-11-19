@@ -6,7 +6,6 @@ import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/tags/mifare_keys.dart';
 import 'package:miziptools/widgets/basic/container_with_border.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class DumpTag extends StatelessWidget{
@@ -68,7 +67,7 @@ class DumpTag extends StatelessWidget{
 
   void writeDumpToFile(BuildContext context, String fileName, List<String> content) async {
     final dir = context.read<Directory>();
-    final fileFullPath = "${dir!.path}/$fileName.dump";
+    final fileFullPath = "${dir.path}/$fileName.dump";
 
     final file = File(fileFullPath).openWrite();
     file.writeAll(content, "\n");
