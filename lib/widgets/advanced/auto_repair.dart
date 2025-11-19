@@ -49,7 +49,6 @@ class AutoRepair extends StatelessWidget {
     );
   }
 
-
   String? uidFieldValidator(String? data){
     data = data?.toUpperCase();
 

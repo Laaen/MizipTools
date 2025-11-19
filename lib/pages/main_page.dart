@@ -14,7 +14,7 @@ import "package:miziptools/pages/dump_menu.dart";
 import "package:provider/provider.dart";
 import 'package:synchronized/synchronized.dart';
 import "../tags/mizip_tag.dart";
-import "../widgets/appbar.dart";
+import "../widgets/common/appbar.dart";
 
 class MainPage extends StatefulWidget{
 
