@@ -28,7 +28,7 @@ class TagData extends StatelessWidget{
         Text("Tag data", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),),
         Container(height: 10,),
         Row(children: [Text("UID: ${tag.getUid().toHexString().toUpperCase()}", style: TextStyle(fontSize: 16))]),
-        Row(children: [Text("Balance: ${tag.innerTag!.balance.getStringBalance()}\$", style: TextStyle(fontSize: 16))])
+        Row(children: [Text("Balance: ${tag.getBalance().getStringBalance()}\$", style: TextStyle(fontSize: 16))])
       ]
     );
   }
