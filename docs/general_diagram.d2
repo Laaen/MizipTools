@@ -5,38 +5,21 @@ vars: {
   }
 }
 
-App{
+...@classes.d2
 
-}
+App
 
-MainPage{
+MainPage
 
-}
+watchForTag: @submodules/watch_for_tag.d2
 
-watchForTag{
-  explanation: |md
-    Used to discover NFC tags  
-    Internally uses NfcAdapter for: 
-    - poll
-    - ping
-  |
-}
+MizipTag
 
-MizipTag{
+NfcAdapter
 
-}
+MifareClassicTag
 
-NfcAdapter{
-
-}
-
-MifareClassicTag{
-
-}
-
-CurrentNfcTag{
-
-}
+CurrentNfcTag
 
 FlutterNfcKit{
   explanation: |md
