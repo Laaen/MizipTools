@@ -7,7 +7,6 @@ import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/misc/generate_keys.dart';
 import 'package:miziptools/tags/balance.dart';
 import 'package:miziptools/tags/mifare_classic_tag.dart';
-import 'package:miziptools/tags/mifare_keys.dart';
 import 'package:miziptools/tags/mizip_tag.dart';
 import 'package:path_provider/path_provider.dart';
 

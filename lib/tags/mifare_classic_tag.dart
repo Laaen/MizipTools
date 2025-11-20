@@ -1,16 +1,15 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
-import 'package:miziptools/misc/bcc.dart';
 import 'package:miziptools/misc/generate_keys.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/tags/balance.dart';
 import 'package:miziptools/exceptions/nfc_exceptions.dart';
-import 'package:miziptools/tags/mifare_keys.dart';
 import 'package:miziptools/tags/mizip_tag.dart';
 import 'package:synchronized/synchronized.dart';
+
+typedef MifareKeys = ({List<Uint8List> a, List<Uint8List> b});
 
 class MifareClassicTag with ChangeNotifier {
   
@@ -23,6 +22,10 @@ class MifareClassicTag with ChangeNotifier {
   Balance balance = Balance.empty();
 
   MifareClassicTag({required this.uid, required this.lock, required this.nfcAdapter});
+
+  static Uint8List generateBcc(Uint8List uid){
+    return Uint8List.fromList([uid.reduce((a, b) => a ^ b)]);
+  }
 
   MifareKeys getKeys(){
     return (a: List.filled(5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])), b:List.filled(5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])));

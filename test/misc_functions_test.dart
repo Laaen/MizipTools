@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:miziptools/misc/bcc.dart';
 import 'package:miziptools/misc/generate_keys.dart';
+import 'package:miziptools/tags/mifare_classic_tag.dart';
 import 'package:test/test.dart';
 
 void main(){
@@ -31,7 +31,7 @@ void main(){
 
   group("BCC generation tests", (){
     test("Generate a correct BCC", (){
-      expect(generateBcc(Uint8List.fromList([0x1D, 0xF9, 0x4B, 0x5E])), equals(Uint8List.fromList([0xF1])));
+      expect(MifareClassicTag.generateBcc(Uint8List.fromList([0x1D, 0xF9, 0x4B, 0x5E])), equals(Uint8List.fromList([0xF1])));
     });
   });
 }

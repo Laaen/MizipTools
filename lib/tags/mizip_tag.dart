@@ -5,7 +5,6 @@ import 'package:logging/logging.dart';
 import 'package:miziptools/misc/generate_keys.dart';
 import 'package:miziptools/tags/balance.dart';
 import 'package:miziptools/tags/mifare_classic_tag.dart';
-import 'package:miziptools/tags/mifare_keys.dart';
 
 /// Interface to the Mizip Tag
 class MizipTag extends MifareClassicTag{

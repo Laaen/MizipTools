@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:miziptools/extensions/string_extensions.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
-import 'package:miziptools/tags/mifare_keys.dart';
+import 'package:miziptools/tags/mifare_classic_tag.dart';
 
 MifareKeys defaultKeys = (a: List.generate(5, (_) => Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])), b: List.generate(5, (_) => Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])));
 

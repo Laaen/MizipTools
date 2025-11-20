@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/misc/snackbar.dart';
-import 'package:miziptools/tags/mifare_keys.dart';
 import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:provider/provider.dart';
+
+import '../../tags/mifare_classic_tag.dart';
 
 class DumpTag extends StatelessWidget{
 
