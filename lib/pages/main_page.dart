@@ -98,7 +98,13 @@ class MainPageState extends State<MainPage>{
 
   Future<bool> isMizipTag(NfcTag tag, NfcAdapter nfcAdapter) async{
     final cTag = MizipTag(uid: tag.id.toUint8List(), lock: globalLock, nfcAdapter: nfcAdapter);
-    Balance balance = await cTag.getBalance();
+    try{
+      await cTag.updateInnerBalance();
+    } catch (e){
+      Logger.root.warning("Error while getting balance : $e");
+      return false;
+    }
+    Balance balance = cTag.getBalance();
     return balance.valid;
   }
 }

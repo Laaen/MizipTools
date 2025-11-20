@@ -17,22 +17,16 @@ class MizipTag extends MifareClassicTag{
   }
 
   @override
-  Future<Balance> getBalance() async{
-    await updateInnerBalance();
+  Balance getBalance(){
     return balance;
   }
 
   @override
   Future<void> updateInnerBalance() async {
-    try{
-      final balanceBlockNb = await getCurrentBalanceBlockNumber();
-      final data = await getRawBalanceData(balanceBlockNb); 
-      balance = Balance(rawBalance: data.rawBalance, rawChecksum: data.rawChecksum, counterByte: data.counterByte);
-      balance.setValid(true);
-    } catch(error){
-      Logger.root.warning("Error while getting balance : ${error.toString()}");
-      balance = Balance.empty();
-    }
+    final balanceBlockNb = await getCurrentBalanceBlockNumber();
+    final data = await getRawBalanceData(balanceBlockNb); 
+    balance = Balance(rawBalance: data.rawBalance, rawChecksum: data.rawChecksum, counterByte: data.counterByte);
+    balance.setValid(true);
   }
 
   Future<({Uint8List rawBalance, Uint8List rawChecksum, Uint8List counterByte})> getRawBalanceData(int blockNb) async{

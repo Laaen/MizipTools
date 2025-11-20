@@ -39,9 +39,13 @@ class CurrentNFCTag with ChangeNotifier {
     return innerTag!.uid;
   }
   
-  Future<Balance> getBalance() async{
-    return await innerTag!.getBalance();
+  Balance getBalance(){
+    return innerTag!.getBalance();
   }
+
+  Future<void> updateInnerBalance() async{
+    await innerTag!.updateInnerBalance();
+  } 
 
   Future<Uint8List> readSector(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
     return await innerTag!.readSector(number);

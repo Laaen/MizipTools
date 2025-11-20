@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import "package:miziptools/nfc/currentnfctag.dart";
 import "package:miziptools/misc/snackbar.dart";
+import "package:miziptools/tags/balance.dart";
 import "package:miziptools/widgets/basic/container_with_border.dart";
 import "package:provider/provider.dart";
 
@@ -20,9 +21,9 @@ class TagAdd10 extends StatelessWidget{
     
     showSnackBar(context, "Adding 10\$");
     final tag = context.read<CurrentNFCTag>();
-
     try {
-      final currentBalance = await tag.getBalance();
+      await tag.updateInnerBalance();
+      final currentBalance = tag.getBalance();
       final newBalance = currentBalance.getDoubleBalance() + 10;
       if (newBalance > 100){
         await tag.setBalance(100.toString());
@@ -39,3 +40,4 @@ class TagAdd10 extends StatelessWidget{
     }
   }
 }
+

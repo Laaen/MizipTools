@@ -31,7 +31,7 @@ class MifareClassicTag with ChangeNotifier {
     return (a: List.filled(5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])), b:List.filled(5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])));
   }
 
-  Future<Balance> getBalance() async{
+  Balance getBalance(){
     return balance;
   }
 
