@@ -1,4 +1,7 @@
+import "dart:math";
+
 import 'package:flutter/material.dart';
+import "package:miziptools/exceptions/nfc_exception_handler.dart";
 import "package:miziptools/nfc/currentnfctag.dart";
 import "package:miziptools/misc/snackbar.dart";
 import "package:miziptools/tags/balance.dart";
@@ -21,20 +24,33 @@ class TagAdd10 extends StatelessWidget{
     
     showSnackBar(context, "Adding 10\$");
     final tag = context.read<CurrentNFCTag>();
-    try {
+
+    try{
       await tag.updateInnerBalance();
-      final currentBalance = tag.getBalance();
-      final newBalance = currentBalance.getDoubleBalance() + 10;
-      if (newBalance > 100){
-        await tag.setBalance(100.toString());
-      } else {
-        await tag.setBalance(newBalance.toString());
-      }
-    } catch (e) {
+    } catch(e){
       if(context.mounted){
-        showSnackBar(context, "Error while adding 10\$");
+        showSnackBar(context, "Error: Could not get tag's current balance");
       }
+      return;
     }
+
+    final currentBalance = tag.getBalance();
+    if(!currentBalance.isValid()){
+      if(context.mounted){
+        showSnackBar(context, "Error: The retreived balance is incorrect");
+      }
+      return;
+    }
+
+    final newBalance = min(currentBalance.getDoubleBalance() + 10, 100.0);
+
+    try {
+      await tag.setBalance(newBalance.toString());
+    } on Exception catch (e) {
+      // ignore: use_build_context_synchronously
+      NfcExceptionHandler.handleException(e, context);
+    }
+
     if(context.mounted){
       showSnackBar(context, "Balance changed successfully");  
     }
