@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:miziptools/exceptions/nfc_exception_handler.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/widgets/basic/container_with_border.dart';
@@ -68,10 +69,9 @@ class TagBalance extends StatelessWidget{
         if(context.mounted){
           showSnackBar(context, "Balance changed successfully");  
         }
-      } catch (e){
-        if(context.mounted){
-          showSnackBar(context, "Error while changing balance : $e");
-        }
+      } on Exception catch (e){
+        // ignore: use_build_context_synchronously
+        NfcExceptionHandler.handleException(e, context);
       }
 
     }
