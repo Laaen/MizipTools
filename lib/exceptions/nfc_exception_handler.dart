@@ -21,6 +21,8 @@ class NfcExceptionHandler {
         NfcExceptionHandler.showSnackbar(context, "Error while writing : Maximum number of retries reached");
       case WriteUnknownException _:
         NfcExceptionHandler.showSnackbar(context, "Error while writing : Unknow error");
+      case ReleaseFailedException _:
+        NfcExceptionHandler.showSnackbar(context, "Error while releasing the tag : Tag was lost");
     }
   }
 

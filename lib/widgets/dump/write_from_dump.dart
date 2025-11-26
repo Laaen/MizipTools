@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
+import 'package:miziptools/exceptions/nfc_exception_handler.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/widgets/basic/container_with_border.dart';
@@ -45,22 +46,36 @@ class WriteFromDump extends StatelessWidget{
     final tag = context.read<CurrentNFCTag>();
     final dataDir = context.read<Directory>();
 
-    final dumpData = getDumpDataFromFile("${dataDir.path}/${currentDumpChoice.text}.dump");
     showSnackBar(context, "Writing dump to tag");
-    await tag.writeDumpToTag(dumpData);
+
+    List<Uint8List> dumpData;
+
+    try{
+      dumpData = getDumpDataFromFile("${dataDir.path}/${currentDumpChoice.text}.dump");
+    } catch (e){
+      if(context.mounted){
+        showSnackBar(context, "Error while reading dump file : $e");
+      }
+      return;
+    }
+
+    try{
+      await tag.writeDumpToTag(dumpData);
+    } on Exception catch(e){
+      // ignore: use_build_context_synchronously
+      NfcExceptionHandler.handleException(e, context);
+    }
+    
     if(context.mounted){
       showSnackBar(context, "Dump successfully written !");
     }
+
     // Disconnect to poll new tag
     try{
       await tag.releaseTag();
-    } on PlatformException catch(e){
-      if (e.code == "503"){
-        Logger.root.info("Tag already disconnected");
-        if(context.mounted) {
-          showSnackBar(context, "Error, the tag was removed during the write");
-        }
-      }
+    } on Exception catch (e){
+      // ignore: use_build_context_synchronously
+      NfcExceptionHandler.handleException(e, context);
     }
   }
 

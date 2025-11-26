@@ -39,3 +39,9 @@ class WriteSectorAuthenticationFailed extends WriteFailedException{
 class WriteUnknownException extends ReadFailedException{
   WriteUnknownException(super.cause);
 }
+
+class ReleaseFailedException implements Exception{
+  String cause;
+  ReleaseFailedException(this.cause);
+}
+

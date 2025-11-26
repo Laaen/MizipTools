@@ -135,7 +135,11 @@ class MifareClassicTag with ChangeNotifier {
   }
 
   Future<void> releaseTag() async{
-    await nfcAdapter.releaseTag();
+    try{
+      await nfcAdapter.releaseTag();
+    } catch (e){
+      throw ReleaseFailedException(e.toString());
+    }
   }
 
   Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
