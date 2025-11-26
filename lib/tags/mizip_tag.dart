@@ -26,6 +26,7 @@ class MizipTag extends MifareClassicTag{
     final balanceBlockNb = await getCurrentBalanceBlockNumber();
     final data = await getRawBalanceData(balanceBlockNb); 
     balance = Balance(rawBalance: data.rawBalance, rawChecksum: data.rawChecksum, counterByte: data.counterByte);
+    // TODO: We shouldn't set Balance status like that
     balance.setValid(true);
   }
 
