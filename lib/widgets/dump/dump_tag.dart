@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:miziptools/exceptions/nfc_exception_handler.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/misc/snackbar.dart';
@@ -27,32 +28,47 @@ class DumpTag extends StatelessWidget{
     final fileName = tag.getUid().toHexString().toUpperCase();
 
     showSnackBar(context, "Dumping tag's data");
+
+    List<Uint8List> rawDump = [];
     try{
-      final rawDump = await tag.dumpTagData();
-      final stringDump = toStringDump(rawDump);
-      final dumpWithKeys = addKeysToDump(stringDump, keys);
-      writeDumpToFile(context, fileName, dumpWithKeys);
-      if(context.mounted){
-        showSnackBar(context, "Dump done file : $fileName.dump");
-      }
-    } catch (err){
-      if(context.mounted){
-        showSnackBar(context, "Error while dumping tag : ${err.toString()}");
-      }
+      rawDump = await tag.dumpTagData();
+    } on Exception catch(e){
+      // ignore: use_build_context_synchronously
+      NfcExceptionHandler.handleException(e, context);
     }
+
+    List<String> stringDump = [];
+    try{
+      stringDump = toStringDump(rawDump);
+      stringDump = addKeysToDump(stringDump, keys);
+    } catch (e){
+      if(context.mounted){
+        showSnackBar(context, "Error while processing dump : $e");
+      }
+      return;
+    }
+
+    try{
+      writeDumpToFile(context, fileName, stringDump);
+    } catch (e){
+      if(context.mounted){
+        showSnackBar(context, "Error while writing dump to file : $e");
+      }
+      return;
+    }
+
+    if(context.mounted){
+      showSnackBar(context, "Dump done file : $fileName.dump");
+    }
+
   }
 
   List<String> toStringDump(List<Uint8List> rawDump){
     List<String> result = [];
     for(final block in rawDump){
-      result.add(formatLineData(block));
+      result.add(block.toHexString().toUpperCase());
     }
     return result;
-  }
-
-  String formatLineData(Uint8List lineData){
-    return lineData.map((byte) => byte.toRadixString(16).padLeft(2, '0').toUpperCase())
-    .join("");
   }
 
   List<String> addKeysToDump(List<String> dump, MifareKeys keys){
