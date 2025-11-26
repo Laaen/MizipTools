@@ -13,8 +13,7 @@ class DumpMenu extends StatelessWidget{
    @override
   Widget build(BuildContext context) {
     final tag = context.read<CurrentNFCTag>();
-    return Column(
-      spacing: 20,
+    return  ListView(
       children: [
         TagData(),
         if (tag.isPresent()) DumpTag(),

@@ -10,7 +10,7 @@ class ContainerWithBorder extends StatelessWidget{
   Widget build(BuildContext context) {
 
     final padding = EdgeInsets.all(20);
-    final margin = EdgeInsets.fromLTRB(30, 0, 30, 0);
+    final margin = EdgeInsets.fromLTRB(30, 10, 30, 10);
     final alignment =  Alignment.center;
     final decoration = BoxDecoration(
         color: Theme.of(context).colorScheme.onSecondary, 
