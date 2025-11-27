@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:miziptools/widgets/dump/dialog_read_dump.dart';
 import 'package:provider/provider.dart';
@@ -38,9 +39,17 @@ class ReadDump extends StatelessWidget{
 
   Future<void> readDump(BuildContext context) async{
     final dataDir = context.read<Directory>();
-    final fileContent = File("${dataDir.path}/${currentDumpChoice.text}.dump").readAsStringSync();
-    showDialog<String>(context: context, builder: (context) {
-      return ReadDumpDialog(title: currentDumpChoice.text, dataToDisplay: fileContent,);
-    });
+
+    try{
+      final fileContent = File("${dataDir.path}/${currentDumpChoice.text}.dump").readAsStringSync();
+      showDialog<String>(context: context, builder: (context) {
+        return ReadDumpDialog(title: currentDumpChoice.text, dataToDisplay: fileContent,);
+      });
+    } catch(e){
+      if(context.mounted){
+        showSnackBar(context, "Error while reading dump : $e");
+      }
+    }
+
   }
 }
