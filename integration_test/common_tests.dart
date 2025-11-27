@@ -23,7 +23,7 @@ Future<void> testDumpTag(WidgetTester tester, MockNfcTag mockTag) async{
   expect(find.widgetWithText(SnackBar, "Dump done file : ${mockTag.getUid().toUpperCase()}.dump"), findsOneWidget);
       
   // File exists
-  final file = dir.listSync().last;
+  final file = dir.listSync().where((f) => f.path.split("/").last != "uid_save").last;
   expect(file.path.split("/").last, equals("${mockTag.getUid().toUpperCase()}.dump"));
 
   // Content is OK
