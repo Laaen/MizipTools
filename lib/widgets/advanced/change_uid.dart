@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:miziptools/exceptions/nfc_exception_handler.dart';
 import 'package:miziptools/extensions/string_extensions.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
+import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:provider/provider.dart';
 
@@ -56,15 +58,18 @@ class ChangeUid extends StatelessWidget{
       showSnackBar(context, "Changing UID");
       try{
         await tag.setUid(_uidFormController.text.toUint8List());
-        if(context.mounted){
-          showSnackBar(context, "UID changed successfully");
-        }
-        // Release to poll new tag
+      } on NfcAdapterException catch(e){
+        NfcExceptionHandler.handleException(e, context);
+      }
+        
+      if(context.mounted){
+        showSnackBar(context, "UID changed successfully");
+      }
+
+      try{
         await tag.releaseTag();
-      }catch(e){
-        if(context.mounted){
-          showSnackBar(context, "Error : $e");
-        }
+      } on NfcAdapterException catch(e){
+        NfcExceptionHandler.handleException(e, context);
       }
     }
   }
