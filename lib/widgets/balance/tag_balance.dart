@@ -72,6 +72,7 @@ class TagBalance extends StatelessWidget{
       } on Exception catch (e){
         // ignore: use_build_context_synchronously
         NfcExceptionHandler.handleException(e, context);
+        return;
       }
 
     }

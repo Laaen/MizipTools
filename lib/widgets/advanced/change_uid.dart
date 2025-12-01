@@ -60,6 +60,7 @@ class ChangeUid extends StatelessWidget{
         await tag.setUid(_uidFormController.text.toUint8List());
       } on NfcAdapterException catch(e){
         NfcExceptionHandler.handleException(e, context);
+        return;
       }
         
       if(context.mounted){
@@ -70,6 +71,7 @@ class ChangeUid extends StatelessWidget{
         await tag.releaseTag();
       } on NfcAdapterException catch(e){
         NfcExceptionHandler.handleException(e, context);
+        return;
       }
     }
   }

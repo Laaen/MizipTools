@@ -48,6 +48,7 @@ class TagAdd10 extends StatelessWidget{
     } on Exception catch (e) {
       // ignore: use_build_context_synchronously
       NfcExceptionHandler.handleException(e, context);
+      return;
     }
 
     if(context.mounted){
