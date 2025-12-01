@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:miziptools/exceptions/nfc_exception_handler.dart';
 import 'package:miziptools/extensions/string_extensions.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
+import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:provider/provider.dart';
 
@@ -62,19 +64,27 @@ class AutoRepair extends StatelessWidget {
   Future<void> autoRepair(BuildContext context) async{
     final tag = context.read<CurrentNFCTag>();
     if(_uidFormKey.currentState!.validate()){
+      
       showSnackBar(context, "Trying to auto-repair");
+
       try{
         await tag.autoRepair(_uidFormController.text.toUint8List());
         if(context.mounted){
           showSnackBar(context, "Repair successful");
-        }
+        }      
+      } on NfcAdapterException catch(e) {
+        NfcExceptionHandler.handleException(e, context);
+        return;
+      }
+
+      try{
         // Release to poll new tag
         await tag.releaseTag();
-      }catch(e){
-        if(context.mounted){
-          showSnackBar(context, "Error while repairing : $e");
-        }
+      } on NfcAdapterException catch(e){
+        NfcExceptionHandler.handleException(e, context);
+        return;
       }
+  
     }
   }
 
