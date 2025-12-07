@@ -123,11 +123,13 @@ class MifareClassicTag with ChangeNotifier {
   }
 
   Future<void> setsectorKey(int sectorNb, Uint8List newKeyA, Uint8List newKeyB, {Uint8List? currentKeyA, Uint8List? currentKeyB}) async{
-    final sectorData = await readSector(sectorNb, retries: 5, keyA: currentKeyA);
-    final currentTrailerBlock = Uint8List.fromList(sectorData.slices(16).last);
+    await lock.synchronized(() async{
+      final sectorData = await readSector(sectorNb, retries: 5, keyA: currentKeyA);
+      final currentTrailerBlock = Uint8List.fromList(sectorData.slices(16).last);
 
-    final newTrailerBlock = Uint8List.fromList(newKeyA + currentTrailerBlock.sublist(6, 10) + newKeyB);
-    await writeBlock(sectorNb * 4 + 3, newTrailerBlock, retries: 5, keyB: currentKeyB);
+      final newTrailerBlock = Uint8List.fromList(newKeyA + currentTrailerBlock.sublist(6, 10) + newKeyB);
+      await writeBlock(sectorNb * 4 + 3, newTrailerBlock, retries: 5, keyB: currentKeyB);
+    });
   }
 
   Future<bool> authenticateSector(int sectorNb, {Uint8List? keyA, Uint8List? keyB}) async{
