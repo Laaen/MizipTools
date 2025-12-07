@@ -77,27 +77,7 @@ class MifareClassicTag with ChangeNotifier {
 
     // Block 0, we need to use the new B key of the sector
     final newKey = data[3].sublist(10, 16);
-    await writeBlockZero(data[0], newKey, retries: 5);
-  }
-
-  // TODO : Test if lock is necessary
-  Future<void> writeBlockZero(Uint8List data, Uint8List key, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
-    try{
-      if (await nfcAdapter.authenticateSector(0, keyB: key) != true){
-        return await writeBlockZero(data, key, retries: retries - 1);
-      } else {
-        await nfcAdapter.writeBlock(0, data);
-      }      
-    } catch(error) {
-      if(retries > 0){
-        Logger.root.warning("Write failed, retrying");
-        await Future.delayed(delay);
-        await writeBlockZero(data, key, retries: retries - 1);
-      } else {
-        Logger.root.severe("Failed to write block 0");
-        rethrow;
-      }
-    }
+    await writeBlock(0, data[0], keyB: newKey, retries: 5);
   }
 
   Future<void> setUid(Uint8List newUid) async{
@@ -118,7 +98,8 @@ class MifareClassicTag with ChangeNotifier {
       for(final sectorIdx in Iterable.generate(5)){
         await setsectorKey(sectorIdx, newKeys.a[sectorIdx], newKeys.b[sectorIdx]);
       }
-      await writeBlockZero(newBlockZero, newKeys.b[0]);
+
+      await writeBlock(0, newBlockZero, keyB: newKeys.b[0], retries: 5);
     });
   }
 
