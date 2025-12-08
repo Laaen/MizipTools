@@ -38,6 +38,9 @@ Future<void> testDumpTag(WidgetTester tester, MockNfcTag mockTag) async{
 Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String dumpContent) async{
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
+
+  // To compare with saved_uid
+  final startUid = mockTag.getUid();
       
   // Create the dump
   final dir = await getExternalStorageDirectory();
@@ -62,6 +65,8 @@ Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String d
 
   // Backup of previous UID is here
   // TODO : Ajouter
+  expect(await File("${dir.path}/uid_save").exists(), equals(true));
+  expect(File("${dir.path}/uid_save").readAsLinesSync().first, equals(startUid.toUpperCase()));
 
   // Cleanup
   File("${dir.path}/${dumpContent.substring(0, 8)}.dump").deleteSync();
@@ -101,6 +106,9 @@ Future<void> testChangeUid(WidgetTester tester, MockNfcTag mockTag, String newUi
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
 
+  // To compare with saved_uid
+  final startUid = mockTag.getUid();
+
   await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir!,));
   await tester.tap(find.widgetWithText(Tab, "Advanced"));
   await tester.pumpAndSettle();
@@ -114,5 +122,7 @@ Future<void> testChangeUid(WidgetTester tester, MockNfcTag mockTag, String newUi
 
   // Backup of previous UID is here
   // TODO : Ajouter
+  expect(await File("${dir.path}/uid_save").exists(), equals(true));
+  expect(File("${dir.path}/uid_save").readAsLinesSync().first, equals(startUid.toUpperCase()));
 
 }
