@@ -56,7 +56,7 @@ class CurrentNFCTag with ChangeNotifier {
   }
 
   Future<void> writeDumpToTag(List<Uint8List> data) async{
-    await saveCurrentUID();
+    await saveUID(data[0].sublist(0, 4).toHexString().toUpperCase());
     await innerTag?.writeDumpToTag(data);
   }
 
@@ -67,7 +67,7 @@ class CurrentNFCTag with ChangeNotifier {
   }
 
   Future<void> setUid(Uint8List newUid) async{
-    await saveCurrentUID();
+    await saveUID(newUid.toHexString().toUpperCase());
     await innerTag!.setUid(newUid);
   }
 
@@ -129,14 +129,14 @@ class CurrentNFCTag with ChangeNotifier {
     return isPresent();
   }
 
-  Future<bool> saveCurrentUID() async {
+  Future<bool> saveUID(String uid) async {
     final dataDir = await getExternalStorageDirectory();
     if (dataDir == null){
       return false;
     }
 
     try{
-      File("${dataDir.path}/uid_save").writeAsStringSync(innerTag?.uid.toHexString().toUpperCase() ?? "");
+      File("${dataDir.path}/uid_save").writeAsStringSync(uid);
     } on FileSystemException catch (e){
       Logger.root.severe("Error while saving UID : $e");
       return false;
