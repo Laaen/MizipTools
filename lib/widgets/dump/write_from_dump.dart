@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:logging/logging.dart';
 import 'package:miziptools/exceptions/nfc_exception_handler.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';

@@ -50,7 +50,9 @@ class DumpTag extends StatelessWidget{
     }
 
     try{
-      writeDumpToFile(context, fileName, stringDump);
+      if(context.mounted){
+        writeDumpToFile(context, fileName, stringDump);
+      }
     } catch (e){
       if(context.mounted){
         showSnackBar(context, "Error while writing dump to file : $e");

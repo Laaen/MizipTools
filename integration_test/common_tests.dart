@@ -64,7 +64,6 @@ Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String d
   expect(mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(dumpContent));
 
   // Backup of previous UID is here
-  // TODO : Ajouter
   expect(await File("${dir.path}/uid_save").exists(), equals(true));
   expect(File("${dir.path}/uid_save").readAsLinesSync().first, equals(startUid.toUpperCase()));
 
@@ -121,7 +120,6 @@ Future<void> testChangeUid(WidgetTester tester, MockNfcTag mockTag, String newUi
   expect(mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(expectedContent));
 
   // Backup of previous UID is here
-  // TODO : Ajouter
   expect(await File("${dir.path}/uid_save").exists(), equals(true));
   expect(File("${dir.path}/uid_save").readAsLinesSync().first, equals(startUid.toUpperCase()));
 
