@@ -11,9 +11,26 @@ class Balance {
   /// On balance reading fail, it is marked as not valid
   bool valid = false;
 
-  Balance({required this.rawBalance, required this.rawChecksum, required this.counterByte});
+  Balance({required this.rawBalance, required this.rawChecksum, required this.counterByte}){
+    checkBalance();
+  }
   
   Balance.empty(): rawBalance = Uint8List(0), rawChecksum = Uint8List(0), counterByte = Uint8List(0);
+
+  // Checks if balance is valid
+  void checkBalance(){
+    if (rawBalance.length != 2 || rawChecksum.length != 1 || counterByte.length != 1){
+      valid = false;
+    }
+    // TODO : Find a better way 
+    try{
+      getStringBalance();
+    } catch(_){
+      valid = false;
+    }
+    valid = true;
+
+  }
 
   // TODO : An exception may occur here : FormatException (FormatException: Invalid radix-16 number (at character 1)
   String getStringBalance(){
