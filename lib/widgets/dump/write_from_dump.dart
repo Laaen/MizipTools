@@ -43,10 +43,11 @@ class WriteFromDump extends StatelessWidget{
 
   Future<void> writeDump(BuildContext context) async{
 
-    if(currentDumpChoice.text == ""){
+    if(currentDumpChoice.text.isEmpty){
       if(context.mounted){
         showSnackBar(context, "You must select a file");
       }
+      return;
     }
     
     final tag = context.read<CurrentNFCTag>();
