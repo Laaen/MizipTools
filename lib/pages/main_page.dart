@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import "package:logging/logging.dart";
+import "package:miziptools/exceptions/nfc_exception_handler.dart";
 import "package:miziptools/extensions/string_extensions.dart";
 import "package:miziptools/nfc/nfc_adapter.dart";
 import "package:miziptools/nfc/nfc_tag.dart";
@@ -86,7 +87,12 @@ class MainPageState extends State<MainPage>{
     
     if (mounted){
       var t = context.read<CurrentNFCTag>();
-      await t.updateInnerTag(currentTag);  
+      try{
+        await t.updateInnerTag(currentTag);  
+      } on Exception catch(e){
+        // ignore: use_build_context_synchronously
+        NfcExceptionHandler.handleException(e, context);
+      } 
     }
   }
 
