@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:miziptools/data_dir/data_dir.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -38,8 +39,8 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
       ChangeNotifierProvider.value(value: CurrentNFCTag.init()),
+      ChangeNotifierProvider.value(value: DataDir(dataDir: dataDir)),
       Provider.value(value: nfcAdapter),
-      Provider.value(value: dataDir)
     ],
         child: MaterialApp(
           title: 'MizipTools',

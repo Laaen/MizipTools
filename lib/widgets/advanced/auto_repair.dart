@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:miziptools/data_dir/data_dir.dart';
 import 'package:miziptools/exceptions/nfc_exception_handler.dart';
 import 'package:miziptools/extensions/string_extensions.dart';
 import 'package:miziptools/misc/snackbar.dart';
@@ -92,8 +93,8 @@ class AutoRepair extends StatelessWidget {
 
   String getSavedUid(BuildContext context){
     try{
-      final dataDir = context.read<Directory>();
-      return File("${dataDir.path}/save_uid").readAsStringSync();
+      final dataDir = context.read<DataDir>();
+      return dataDir.readFile("uid_save");
     } on FileSystemException catch(e){
       Logger.root.severe("Error while reading save uid file : $e");
       return "00000000";

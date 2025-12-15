@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:miziptools/data_dir/data_dir.dart';
 import 'package:miziptools/misc/snackbar.dart';
 import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:miziptools/widgets/dump/dialog_read_dump.dart';
@@ -14,7 +15,7 @@ class ReadDump extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
 
-    final dataDir = context.read<Directory>();
+    final dataDir = context.read<DataDir>();
 
     return ContainerWithBorder(child: 
       Column( spacing: 15,
@@ -24,7 +25,7 @@ class ReadDump extends StatelessWidget{
           Text("Read dump", style: TextStyle(fontSize: 18),),
           Row(spacing: 15,
             children: [
-              DropdownMenu(dropdownMenuEntries: getDumpList(dataDir), controller: currentDumpChoice, width: 160,),
+              DropdownMenu(dropdownMenuEntries: getDumpList(dataDir.getFilesList()), controller: currentDumpChoice, width: 160,),
               OutlinedButton(onPressed: () => readDump(context), child: Text("Read"),)
             ],
           )
@@ -33,15 +34,15 @@ class ReadDump extends StatelessWidget{
     );
   }
 
-  List<DropdownMenuEntry> getDumpList(Directory dataDir){
-    return dataDir.listSync().map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).where((name) => name.label != "uid_save").toList();
+  List<DropdownMenuEntry> getDumpList(List<FileSystemEntity> dataDir){
+    return dataDir.map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).where((name) => name.label != "uid_save").toList();
   }
 
   Future<void> readDump(BuildContext context) async{
-    final dataDir = context.read<Directory>();
+    final dataDir = context.read<DataDir>();
 
     try{
-      final fileContent = File("${dataDir.path}/${currentDumpChoice.text}.dump").readAsStringSync();
+      final fileContent = dataDir.readFile("${currentDumpChoice.text}.dump");
       showDialog<String>(context: context, builder: (context) {
         return ReadDumpDialog(title: currentDumpChoice.text, dataToDisplay: fileContent,);
       });

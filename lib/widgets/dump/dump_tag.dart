@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:miziptools/data_dir/data_dir.dart';
 import 'package:miziptools/exceptions/nfc_exception_handler.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
@@ -86,12 +87,8 @@ class DumpTag extends StatelessWidget{
   }
 
   void writeDumpToFile(BuildContext context, String fileName, List<String> content) async {
-    final dir = context.read<Directory>();
-    final fileFullPath = "${dir.path}/$fileName.dump";
-
-    final file = File(fileFullPath).openWrite();
-    file.writeAll(content, "\n");
-    file.close();
+    final dir = context.read<DataDir>();
+    dir.writeFile("$fileName.dump", content.join("\n"));
   }
 
 }
