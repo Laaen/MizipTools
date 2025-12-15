@@ -39,6 +39,14 @@ class ReadDump extends StatelessWidget{
   }
 
   Future<void> readDump(BuildContext context) async{
+
+    if(currentDumpChoice.text.isEmpty){
+      if(context.mounted){
+        showSnackBar(context, "You must select a file");
+      }
+      return;
+    }
+
     final dataDir = context.read<DataDir>();
 
     try{
