@@ -73,7 +73,7 @@ class AutoRepair extends StatelessWidget {
         if(context.mounted){
           showSnackBar(context, "Repair successful");
         }      
-      } on NfcAdapterException catch(e) {
+      } on Exception catch(e) {
         // ignore: use_build_context_synchronously
         NfcExceptionHandler.handleException(e, context);
         return;
@@ -82,7 +82,7 @@ class AutoRepair extends StatelessWidget {
       try{
         // Release to poll new tag
         await tag.releaseTag();
-      } on NfcAdapterException catch(e){
+      } on Exception catch(e){
         // ignore: use_build_context_synchronously
         NfcExceptionHandler.handleException(e, context);
         return;

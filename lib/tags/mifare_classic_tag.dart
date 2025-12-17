@@ -95,11 +95,20 @@ class MifareClassicTag with ChangeNotifier {
         newKeys = defaultKeys;
       }
        
-      for(final sectorIdx in Iterable.generate(5)){
-        await setsectorKey(sectorIdx, newKeys.a[sectorIdx], newKeys.b[sectorIdx]);
+      for(final sectorIdx in Iterable.generate(4)){
+        await setsectorKey(sectorIdx + 1, newKeys.a[sectorIdx + 1], newKeys.b[sectorIdx + 1]);
       }
 
+      await setsectorKey(0, newKeys.a[0], newKeys.b[0]);
       await writeBlock(0, newBlockZero, keyB: newKeys.b[0], retries: 5);
+    });
+  }
+
+  Future<void> rewriteKeys(MifareKeys currentKeys, correctKeys) async{
+    return await lock.synchronized(() async {
+      for (final (index, _) in currentKeys.a.indexed){
+          await setsectorKey(index, correctKeys.a[index], correctKeys.b[index], currentKeyA: currentKeys.a[index], currentKeyB: currentKeys.b[index]);  
+      }
     });
   }
 

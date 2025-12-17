@@ -90,7 +90,7 @@ class CurrentNFCTag with ChangeNotifier {
     // Test keys A
     for(final (index, keys) in IterableZip([candidateMifareClassic.a, candidateCurrentUid.a, candidateOldUid.a]).indexed){
       for(final key in keys){
-        if(await innerTag!.authenticateSector(index, keyA: key)){
+        if(await tryAuthenticate(index, keyA: key)){
           validKeys.a.add(key);
           break;
         }
@@ -100,25 +100,28 @@ class CurrentNFCTag with ChangeNotifier {
     // Test keys B
     for(final (index, keys) in IterableZip([candidateMifareClassic.b, candidateCurrentUid.b, candidateOldUid.b]).indexed){
       for(final key in keys){
-        if(await innerTag!.authenticateSector(index, keyB: key)){
+        if(await tryAuthenticate(index, keyB: key)){
           validKeys.b.add(key);
           break;
         }
       }
     }
 
-    await rewriteKeys(validKeys, candidateCurrentUid);
+    print(validKeys.a.map((k) => k.toHexString().toUpperCase()));
+    print(validKeys.b.map((k) => k.toHexString().toUpperCase()));
+    await innerTag!.rewriteKeys(validKeys, candidateCurrentUid);
   }
 
-  Future<bool> rewriteKeys(MifareKeys currentKeys, correctKeys) async{
-      for (final (index, _) in currentKeys.a.indexed){
-        try{
-          await innerTag!.setsectorKey(index, correctKeys.a[index], correctKeys.b[index], currentKeyA: currentKeys.a[index], currentKeyB: currentKeys.b[index]);  
-        } catch (e){
-          return false;
-        }
+  Future<bool> tryAuthenticate(int sectorNb, {Uint8List? keyA, Uint8List? keyB, int nbRetries = 2}) async{
+    if (! await innerTag!.authenticateSector(sectorNb, keyA: keyA, keyB: keyB)){
+      if (nbRetries > 0){
+        return tryAuthenticate(sectorNb, keyA: keyA, keyB: keyB, nbRetries: nbRetries - 1);
+      } else {
+        return false;
       }
+    } else{
       return true;
+    }
   }
 
   bool isMizipTag(){
