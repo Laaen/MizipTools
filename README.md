@@ -1,17 +1,15 @@
 # MizipTools
 
-Android App written in Flutter made to fiddle with MiZip NFC tags.  
+Android App written in Flutter made to modify MiZip NFC tags.  
 ⚠️ This app only works with MiZip tags ⚠️
 
 Features :
-- ✅ Dump tag data
+- ✅ Dump tag's data
 - ✅ Write dump to tag
 - ✅ Change tag's balance
 - ✅ Change tag's UID
-- ✅ Read tag dump
+- ✅ Read tag's dump
 
-This is a rewrite of the Kotlin version, some features are missing such as "Reset tag" and the whole template system  
-They may or may not be included in future versions
 
 ## How to install
 ⚠️ **If you're upgrading from the Kotlin version, backup your dumps, they will be erased when installing this version**  ⚠️  
@@ -30,13 +28,13 @@ Go [here](https://github.com/Laaen/MizipTools/wiki/Dump-Tag), to learn how to do
 
 ### Change tag's balance
 This feature is mostly safe, if something goes wrong, you can restore your tag's dump    
-[link](https://github.com/Laaen/MizipTools/wiki/Change-Balance)
+[Link to the wiki](https://github.com/Laaen/MizipTools/wiki/Change-Balance)
 
 ### Restore dump
 ⚠️ If something goes wrong during the restoration, your tag can be left in a corrupted state, go [here](https://github.com/Laaen/MizipTools/wiki/Potential-fixes-for-broken-tags) to see possible solutions ⚠️  
-[link](https://github.com/Laaen/MizipTools/wiki/Restore-Dump)
+[Link to the wiki](https://github.com/Laaen/MizipTools/wiki/Restore-Dump)
 
 ### Change UID
 ⚠️ **Using this feature on a non CUID tag is strongly not advised, it will not work, and will very likely brick your tag** ⚠️  
 ⚠️ If something goes wrong during the uid change, your tag can be left in a corrupted state, go [here](https://github.com/Laaen/MizipTools/wiki/Potential-fixes-for-broken-tags) to see possible solutions ⚠️  
-[link](https://github.com/Laaen/MizipTools/wiki/Change-UID)
+[Link to the wiki](https://github.com/Laaen/MizipTools/wiki/Change-UID)
