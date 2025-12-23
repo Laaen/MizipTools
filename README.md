@@ -14,7 +14,7 @@ This is a rewrite of the Kotlin version, some features are missing such as "Rese
 They may or may not be included in future versions
 
 ## How to install
-⚠️ **If you're upgrading from the Kotclin version backup your dumps, they will be erased when installing this version**  ⚠️  
+⚠️ **If you're upgrading from the Kotlin version, backup your dumps, they will be erased when installing this version**  ⚠️  
 
 Two options :
 - Download the .apk file in "Release", and install it manually on your phone.
