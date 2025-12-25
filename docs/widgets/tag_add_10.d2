@@ -1,0 +1,58 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 2
+grid-rows: 6
+horizontal-gap: 150
+vertical-gap: 50
+
+
+press_button: "Press OK"
+update_balance: "tag.updateInnerBalance"
+get_balance: "Get balance (max 100)"
+check_balance: "Check balance validity"
+set_balance: "tag.setBalance"
+ok_message: "Balance changed successfully"
+
+2,0{
+    class: empty
+    inner.class: empty_image
+}
+
+update_ko: "Error: Could not get tag's current balance"
+
+2,2{
+    class: empty
+    inner.class: empty_image
+}
+
+check_ko: "Error: The retreived balance is incorrect"
+
+set_ko: "NfcExceptionHandler.handleException"
+
+2,3{
+    class: empty
+    inner.class: empty_image
+}
+
+2,4{
+    class: empty
+    inner.class: empty_image
+}
+
+press_button -> update_balance
+update_balance -> update_ko: "KO"
+update_balance -> get_balance: "OK"
+get_balance -> check_balance
+check_balance -> check_ko: "KO"
+check_balance -> set_balance: "OK"
+set_balance -> set_ko: "KO"
+set_balance -> ok_message: "OK"

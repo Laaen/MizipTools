@@ -1,0 +1,37 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 2
+grid-rows: 4
+horizontal-gap: 150
+vertical-gap: 50
+
+
+press_button: "Press OK"
+check_uid: "Check UID given by user"
+set_uid: "tag.setUid"
+release: "Release tag"
+
+2,0{
+    class: empty
+    inner.class: empty_image
+}
+
+check_uid_ko: "UID must be 8 chars | Must be valid hexa"
+set_uid_ko: "NfcExceptionHandler.handleException"
+release_ko: "NfcExceptionHandler.handleException"
+
+press_button -> check_uid
+check_uid -> check_uid_ko: "KO"
+check_uid -> set_uid: "OK"
+set_uid -> set_uid_ko: "KO"
+set_uid -> release : "OK"
+release -> release_ko : "KO"

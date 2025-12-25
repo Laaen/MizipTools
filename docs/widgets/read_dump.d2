@@ -1,0 +1,35 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 2
+grid-rows: 3
+horizontal-gap: 150
+vertical-gap: 50
+
+press_button: "Press OK"
+read_dump: "Read tag dump file"
+show_dump: "Show dump in dialog"
+
+2,0{
+    class: empty
+    inner.class: empty_image
+}
+
+read_ko: "Error while reading dump :"
+
+2,2{
+    class: empty
+    inner.class: empty_image
+}
+
+press_button -> read_dump
+read_dump -> read_ko: "KO"
+read_dump -> show_dump: "OK"

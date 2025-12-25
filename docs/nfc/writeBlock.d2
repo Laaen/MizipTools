@@ -1,0 +1,78 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 3
+grid-rows: 5
+horizontal-gap: 150
+vertical-gap: 50
+
+0,0{
+    class: empty
+    inner.class: empty_image
+}
+0,1{
+    class: empty
+    inner.class: empty_image
+}
+0,2{
+    class: empty
+    inner.class: empty_image
+}
+0,3{
+    class: empty
+    inner.class: empty_image
+}
+
+adapter_write_ko: Log error
+
+check_retries: nb_retries == 0{
+    shape: diamond
+}
+
+get_key_b: Get provided key or getKeys()
+get_lock: Get lock
+authenticate: Authenticate to sector
+adapter_write: nfcAdapter.writeBlock
+
+nb_retries_ko: throw WriteRetriesExcedeedException
+
+2,1{
+    class: empty
+    inner.class: empty_image
+}
+
+2,2{
+    class: empty
+    inner.class: empty_image
+}
+
+2,3{
+    class: empty
+    inner.class: empty_image
+}
+
+2,4{
+    class: empty
+    inner.class: empty_image
+}
+
+check_retries -> nb_retries_ko: True
+check_retries -> get_key_b: False
+get_key_b -> get_lock
+get_lock -> authenticate
+authenticate -> 0,3.inner: "KO"
+authenticate -> adapter_write: "OK"
+adapter_write -> adapter_write_ko: "KO"
+adapter_write_ko -- 0,3.inner
+0,3.inner -- 0,2.inner
+0,2.inner -- 0,1.inner
+0,1.inner -- 0,0.inner
+0,0.inner -> check_retries

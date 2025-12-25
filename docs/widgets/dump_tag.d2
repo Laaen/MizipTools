@@ -1,0 +1,59 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 2
+grid-rows: 7
+horizontal-gap: 150
+vertical-gap: 50
+
+
+press_button: "Press OK"
+get_tag_data: "Get tag's UID and keys"
+get_data: "tag.dumpTagData"
+convert: "Convert raw dump to string"
+add_keys: "Add keys to trailer blocks in dump"
+write: "Write dump to file"
+ok_message: "Dump done file : \$fileName.dump"
+
+2,0{
+    class: empty
+    inner.class: empty_image
+}
+
+2,1{
+    class: empty
+    inner.class: empty_image
+}
+
+get_data_ko: "NfcExceptionHandler.handleException"
+convert_ko: "Error while processing dump"
+
+2,2{
+    class: empty
+    inner.class: empty_image
+}
+
+write_ko: "Error while writing dump to file"
+
+2,3{
+    class: empty
+    inner.class: empty_image
+}
+
+press_button -> get_tag_data
+get_tag_data -> get_data
+get_data -> get_data_ko: "KO"
+get_data -> convert: "OK"
+convert -> convert_ko: "KO"
+convert -> add_keys: "OK"
+add_keys -> write
+write -> write_ko: "KO"
+write -> ok_message: "OK"

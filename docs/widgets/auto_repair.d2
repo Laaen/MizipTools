@@ -1,0 +1,37 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 2
+grid-rows: 4
+horizontal-gap: 150
+vertical-gap: 50
+
+
+press_button: "Press OK"
+check_uid: "Check UID given by user"
+repair_tag: "tag.autoRepair"
+release: "Release tag"
+
+2,0{
+    class: empty
+    inner.class: empty_image
+}
+
+check_uid_ko: "UID must be 8 chars | Must be valid hexa"
+repair_tag_ko: "NfcExceptionHandler.handleException"
+release_ko: "NfcExceptionHandler.handleException"
+
+press_button -> check_uid
+check_uid -> check_uid_ko: "KO"
+check_uid -> repair_tag: "OK"
+repair_tag -> repair_tag_ko: "KO"
+repair_tag -> release : "OK"
+release -> release_ko: "KO"

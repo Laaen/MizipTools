@@ -1,0 +1,40 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 2
+grid-rows: 4
+horizontal-gap: 150
+vertical-gap: 50
+
+
+press_button: "Press OK"
+validate: "newBalanceValidator"
+set_balance: "tag.setBalance"
+show_success: "Balance changed successfully"
+
+2,0{
+    class: empty
+    inner.class: empty_image
+}
+
+validate_ko: "Decorate form with error message"
+set_ko: "NfcExceptionHandler.handleException"
+
+2,3{
+    class: empty
+    inner.class: empty_image
+}
+
+press_button -> validate
+validate ->validate_ko: "KO"
+validate -> set_balance: "OK"
+set_balance -> show_success : "OK"
+set_balance -> set_ko: "KO"

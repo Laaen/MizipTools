@@ -1,0 +1,22 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 1
+grid-rows: 6
+horizontal-gap: 150
+vertical-gap: 50
+
+get_lock: Get lock
+write_blocks: Write blocks 
+write_sector_zero: Write sector 0
+
+get_lock -> write_blocks
+write_blocks -> write_sector_zero

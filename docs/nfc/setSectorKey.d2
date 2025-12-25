@@ -1,0 +1,27 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 1
+grid-rows: 6
+horizontal-gap: 150
+vertical-gap: 50
+
+
+get_lock: Get lock
+read_sector: Read full sector
+get_trailer_block: Get sector's trailer block
+generate_trailer: Generate new trailer block
+write_trailer: Write new trailer block
+
+get_lock -> read_sector
+read_sector -> get_trailer_block
+get_trailer_block -> generate_trailer
+generate_trailer -> write_trailer

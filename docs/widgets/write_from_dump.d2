@@ -1,0 +1,39 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 2
+grid-rows: 4
+horizontal-gap: 150
+vertical-gap: 50
+
+
+press_button: "Press OK"
+read_data_from_file: "Get dump data from file"
+write_dump_to_tag: "tag.writeDumpToTag"
+release: "Release Tag (Trigger new discovery)"
+
+2,0{
+    class: empty
+    inner.class: empty_image
+}
+
+read_data_ko: "Error while reading dump file : \$e"
+
+write_dump_ko: "NfcExceptionHandler.handleException"
+release_ko: "NfcExceptionHandler.handleException"
+
+
+press_button -> read_data_from_file
+read_data_from_file -> read_data_ko: "KO"
+read_data_from_file -> write_dump_to_tag: "OK"
+write_dump_to_tag -> write_dump_ko: "KO"
+write_dump_to_tag -> release: "OK"
+release -> release_ko: "KO"

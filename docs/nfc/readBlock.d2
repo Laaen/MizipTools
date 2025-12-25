@@ -1,0 +1,78 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 3
+grid-rows: 5
+horizontal-gap: 150
+vertical-gap: 50
+
+0,0{
+    class: empty
+    inner.class: empty_image
+}
+0,1{
+    class: empty
+    inner.class: empty_image
+}
+0,2{
+    class: empty
+    inner.class: empty_image
+}
+0,3{
+    class: empty
+    inner.class: empty_image
+}
+
+adapter_read_ko: Log error
+
+check_retries: nb_retries == 0{
+    shape: diamond
+}
+
+get_key_a: Get provided key or getKeys()
+get_lock: Get lock
+authenticate: Authenticate to sector
+adapter_read: nfcAdapter.readSector
+
+nb_retries_ko: throw ReadRetriesExcedeedException
+
+2,1{
+    class: empty
+    inner.class: empty_image
+}
+
+2,2{
+    class: empty
+    inner.class: empty_image
+}
+
+2,3{
+    class: empty
+    inner.class: empty_image
+}
+
+2,4{
+    class: empty
+    inner.class: empty_image
+}
+
+check_retries -> nb_retries_ko: True
+check_retries -> get_key_a: False
+get_key_a -> get_lock
+get_lock -> authenticate
+authenticate -> 0,3.inner: "KO"
+authenticate -> adapter_read: "OK"
+adapter_read -> adapter_read_ko: "KO"
+adapter_read_ko -- 0,3.inner
+0,3.inner -- 0,2.inner
+0,2.inner -- 0,1.inner
+0,1.inner -- 0,0.inner
+0,0.inner -> check_retries

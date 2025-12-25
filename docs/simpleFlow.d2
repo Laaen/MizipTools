@@ -1,0 +1,25 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@classes.d2
+
+direction: down
+
+grid-columns: 1
+grid-rows: 4
+horizontal-gap: 150
+vertical-gap: 50
+
+
+put_tag: Put the tag on the phone
+get_uid: Read tag's UID
+calculate_keys: Calculate keys from UID
+read_balance: Read tag's balance
+
+put_tag -> get_uid
+get_uid -> calculate_keys
+calculate_keys -> read_balance

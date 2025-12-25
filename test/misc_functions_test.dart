@@ -1,0 +1,37 @@
+import 'package:flutter/services.dart';
+import 'package:miziptools/misc/generate_keys.dart';
+import 'package:miziptools/tags/mifare_classic_tag.dart';
+import 'package:test/test.dart';
+
+void main(){
+
+  group("Key generation tests", (){
+    test("Generate a correct set of keys", (){
+
+      final keysA = [
+        Uint8List.fromList([0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5]),
+        Uint8List.fromList([0x34, 0x64, 0x0E, 0x8A, 0xB4, 0x93]),
+        Uint8List.fromList([0x96, 0x03, 0x9D, 0x98, 0xAF, 0x59]),
+        Uint8List.fromList([0xDF, 0x04, 0x15, 0x00, 0x11, 0x7F]),
+        Uint8List.fromList([0x0C, 0x0C, 0xE3, 0x80, 0x79, 0xE6]),
+      ];
+
+      final keysB = [
+        Uint8List.fromList([0xB4, 0xC1, 0x23, 0x43, 0x9E, 0xEF]),
+        Uint8List.fromList([0xA5, 0x83, 0xB9, 0x25, 0x8C, 0x8E]),
+        Uint8List.fromList([0x27, 0x48, 0xA4, 0x88, 0x66, 0xEE]),
+        Uint8List.fromList([0xFE, 0xE2, 0x2E, 0x00, 0x02, 0x01]),
+        Uint8List.fromList([0xE4, 0xBC, 0x1A, 0x51, 0x79, 0x52]),
+      ];
+
+      expect(generateKeys(Uint8List.fromList([0x3D, 0x76, 0x54, 0xAF])).a, equals(keysA));
+      expect(generateKeys(Uint8List.fromList([0x3D, 0x76, 0x54, 0xAF])).b, equals(keysB));
+    });
+  });
+
+  group("BCC generation tests", (){
+    test("Generate a correct BCC", (){
+      expect(MifareClassicTag.generateBcc(Uint8List.fromList([0x1D, 0xF9, 0x4B, 0x5E])), equals(Uint8List.fromList([0xF1])));
+    });
+  });
+}

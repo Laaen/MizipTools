@@ -1,0 +1,29 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 1
+grid-rows: 6
+horizontal-gap: 150
+vertical-gap: 50
+
+
+get_lock: Get lock
+read_block_0: Read block 0
+generate_new_block_0: Generate new block 0
+generate_keys: Generate keys
+set_sector_key: Set sectors keys
+write_block_0: Write block 0
+
+get_lock -> read_block_0
+read_block_0 -> generate_new_block_0
+generate_new_block_0 -> generate_keys
+generate_keys -> set_sector_key
+set_sector_key -> write_block_0

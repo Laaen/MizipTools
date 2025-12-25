@@ -1,0 +1,50 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@classes.d2
+
+App
+
+MainPage
+
+watchForTag: @submodules/watch_for_tag.d2
+
+MizipTag
+
+NfcAdapter
+
+MifareClassicTag
+
+CurrentNfcTag
+
+FlutterNfcKit{
+  explanation: |md
+    - authenticateSector
+    - writeBlock
+    - readBlock
+    - readSector
+    - transceive
+    - poll
+    - finish
+  |
+}
+
+
+App -> CurrentNfcTag: holds
+App -> NfcAdapter: holds
+App -> MainPage: launches
+MainPage -> watchForTag: launches
+watchForTag -> NfcAdapter: uses
+watchForTag -> CurrentNfcTag: updates inner tag
+CurrentNfcTag -> MifareClassicTag: holds
+NfcAdapter -> FlutterNfcKit : calls primitive
+MizipTag -> MifareClassicTag: inherits{
+  style: {
+    stroke-dash: 3
+  }
+}
+MifareClassicTag -> NfcAdapter: Performs action on tag

@@ -1,0 +1,54 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+...@../classes.d2
+
+direction: down
+
+grid-columns: 3
+grid-rows: 3
+horizontal-gap: 150
+vertical-gap: 50
+
+No tag Detected
+
+0,1{
+    class: empty
+    inner.class: empty_image
+}
+
+0,2{
+    class: empty
+    inner.class: empty_image
+}
+
+Check tag type
+getTagDataDisplay
+showMessage{
+    label:"UID: XXXXXXXX\nBalance: XX.YY\$"
+}
+mifareTag: "Not a MiZip tag (Mifare Classic Tag)"
+
+2,1{
+    class: empty
+    inner.class: empty_image
+}
+
+2,2{
+    class: empty
+    inner.class: empty_image
+}
+
+2,3{
+    class: empty
+    inner.class: empty_image
+}
+
+Check Tag Type -> No tag Detected: "unknown"
+Check Tag Type -> mifareTag: "Mifare classic"
+Check Tag Type -> getTagDataDisplay: "MiZip"
+getTagDataDisplay -> showMessage: "Display"
