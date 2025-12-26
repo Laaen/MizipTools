@@ -29,10 +29,10 @@ class ChangeUid extends StatelessWidget{
     );
 
     return ContainerWithBorder(
-      child: Row(
-        spacing: 20,
+      child: Column(
+        spacing: 15,
         children: [
-          Expanded(child: Form(key: _uidFormKey, child: textField)),
+          Form(key: _uidFormKey, child: textField),
           OutlinedButton(onPressed: ()async => changeUid(context), child: Text("Ok"))
         ],
       )

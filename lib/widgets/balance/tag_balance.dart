@@ -19,10 +19,10 @@ class TagBalance extends StatelessWidget{
 
     return Form(
       child: ContainerWithBorder(
-        child: Row(
-          spacing: 20,
+        child: Column(
+          spacing: 15,
           children: [
-            Expanded(child: Form(key: _tagBalanceForm, child: textField)),
+            Form(key: _tagBalanceForm, child: textField),
             OutlinedButton(onPressed: () => changeBalance(context), child: Text("Ok"))],
         ),
       )

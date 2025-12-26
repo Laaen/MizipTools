@@ -96,6 +96,8 @@ void main(){
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextFormField).last, oldUid);
       await tester.pumpAndSettle();
+      await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Ok").last);
+      await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(OutlinedButton, "Ok").last);
       await tester.pumpAndSettle();
       await Future.delayed(Duration(seconds: 3));

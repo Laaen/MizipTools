@@ -51,6 +51,8 @@ Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String d
   await tester.pumpAndSettle();
   await Future.delayed(Duration(seconds: 1));
   await tester.pumpAndSettle();
+  await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Write"));
+  await tester.pumpAndSettle();
   await tester.tap(find.byType(DropdownMenu).first);
   await tester.pumpAndSettle();
   // The first found text is bugged
@@ -84,6 +86,8 @@ Future<void> testReadDump(WidgetTester tester, MockNfcTag? mockTag, String dumpD
   await tester.pumpAndSettle();
   await Future.delayed(Duration(seconds: 1));
   await tester.pumpAndSettle();
+  await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Read"));
+  await tester.pumpAndSettle();
   await tester.tap(find.byType(DropdownMenu).last);
   await tester.pumpAndSettle();
   await tester.tap(find.text(dumpData.substring(0, 8)).last);
@@ -112,6 +116,8 @@ Future<void> testChangeUid(WidgetTester tester, MockNfcTag mockTag, String newUi
   await tester.tap(find.widgetWithText(Tab, "Advanced"));
   await tester.pumpAndSettle();
   await tester.enterText(find.byType(TextFormField).first, newUid);
+  await tester.pumpAndSettle();
+  await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Ok").first);
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(OutlinedButton, "Ok").first);
   await tester.pumpAndSettle();

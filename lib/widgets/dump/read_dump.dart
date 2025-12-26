@@ -23,7 +23,7 @@ class ReadDump extends StatelessWidget{
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text("Read dump", style: TextStyle(fontSize: 18),),
-          Row(spacing: 15,
+          Column(spacing: 15,
             children: [
               DropdownMenu(dropdownMenuEntries: getDumpList(dataDir.getFilesList()), controller: currentDumpChoice, width: 160,),
               OutlinedButton(onPressed: () => readDump(context), child: Text("Read"),)

@@ -26,7 +26,7 @@ class WriteFromDump extends StatelessWidget{
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text("Write dump to tag", style: TextStyle(fontSize: 18),),
-          Row(spacing: 20,
+          Column(spacing: 15,
             children: [
               DropdownMenu(dropdownMenuEntries: getDumpList(dataDir.getFilesList()), controller: currentDumpChoice, width: 158.6,),
               OutlinedButton(onPressed: () => writeDump(context), child: Text("Write"),)
