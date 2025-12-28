@@ -128,6 +128,7 @@ class MifareClassicTag with ChangeNotifier {
   /// 
   /// Throws [NfcAdapterTagRemovedException] | [NfcAdapterCommunicationException] | [NfcAdapterException]
   Future<bool> authenticateSector(int sectorNb, {int retries = 2, Uint8List? keyA, Uint8List? keyB}) async{
+    Logger.root.info("Authenticating to sector $sectorNb with keys A: ${keyA?.toHexString()} B: ${keyB?.toHexString()}");
     bool result = false;
     for(final _ in Iterable.generate(retries)){
       result = await nfcAdapter.authenticateSector(sectorNb, keyA: keyA, keyB: keyB);
