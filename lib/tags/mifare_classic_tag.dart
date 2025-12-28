@@ -146,69 +146,60 @@ class MifareClassicTag with ChangeNotifier {
     }
   }
 
+  /// Returns the block's data
+  /// 
+  /// Throws [RetriesExcedeedException] | [SectorAuthenticationFailed] | [NfcAdapterCommunicationException] | [NfcAdapterTagRemovedException] | [NfcAdapterException]
   Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
-    if(retries == 0){
-      Logger.root.severe("Failed to read block $number");
-      throw ReadRetriesExcedeedException("Failed to read block $number : number of retries excedeed");
-    }
-    try{
-      return await lock.synchronized(() async{
-        if(await nfcAdapter.authenticateSector(number ~/ 4, keyA: getKeys().a[number ~/ 4])){
-          return await nfcAdapter.readBlock(number);
+
+    Uint8List result = Uint8List(0);
+
+    return await lock.synchronized(() async {
+      for(final _ in Iterable.generate(retries)){
+        Future.delayed(delay);
+        if(await authenticateSector(number ~/ 4, keyA: getKeys().a[number ~/ 4])){
+          result = await nfcAdapter.readBlock(number);
         } else {
           Logger.root.severe("Read failed : Authentication failure with keyA : ${getKeys().a[number ~/ 4].toHexString()}");
-          throw ReadSectorAuthenticationFailed("Read failed : Authentication failure with keyA : ${getKeys().a[number ~/ 4].toHexString()}");
+          throw SectorAuthenticationFailed("Read failed : Authentication failure with keyA : ${getKeys().a[number ~/ 4].toHexString()}");
         }
-      });
-    } on NfcAdapterCommunicationException catch(_){
-      Logger.root.warning("Read failed, retrying");
-      await Future.delayed(delay);
-      return await readBlock(number, retries: retries - 1);
-    } on NfcAdapterTagRemovedException catch(_){
-      Logger.root.severe("Read failed : Tag was removed");
-      throw ReadTagRemovedException("Read failed : Tag was removed");
-    } on ReadSectorAuthenticationFailed{
-      Logger.root.warning("Read failed, retrying");
-      await Future.delayed(delay);
-      return await readBlock(number, retries: retries - 1);
-    } catch(e){
-      Logger.root.severe("Read failed : $e");
-      throw ReadUnknownException("Read failed : Unknown exception $e");
-    }
+
+        if(result.isNotEmpty){
+          return result;
+        }
+
+      }
+      Logger.root.severe("Failed to read block $number");
+      throw RetriesExcedeedException("Failed to read block $number : number of retries excedeed");
+    });
   }
 
-  Future<Uint8List> readSector(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10), Uint8List? keyA}) async{
-    if(retries == 0){
-      Logger.root.severe("Failed to read block $number");
-      throw ReadRetriesExcedeedException("Failed to read block $number : number of retries excedeed");
-    }
 
+  /// Returns the sector's data
+  /// 
+  /// Throws [RetriesExcedeedException] | [SectorAuthenticationFailed] | [NfcAdapterCommunicationException] | [NfcAdapterTagRemovedException] | [NfcAdapterException]
+  Future<Uint8List> readSector(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10), Uint8List? keyA}) async{
+
+    Uint8List result = Uint8List(0);
     final key = keyA ?? getKeys().a[number];
 
-    try{
-      return await lock.synchronized(() async{
-        if(await nfcAdapter.authenticateSector(number, keyA: key)){
-          return await nfcAdapter.readSector(number);
+    return await lock.synchronized(() async {
+      for(final _ in Iterable.generate(retries)){
+        Future.delayed(delay);
+        if(await authenticateSector(number, keyA: key)){
+          result = await nfcAdapter.readSector(number);
         } else {
-          Logger.root.severe("Read failed : Authentication failure with keyA : ${key.toHexString()}");
-          throw ReadSectorAuthenticationFailed("Read failed : Authentication failure with keyA : ${key.toHexString()}");
+          Logger.root.severe("Read failed : Authentication failure with keyA : $key");
+          throw SectorAuthenticationFailed("Read failed : Authentication failure with keyA : $key");
         }
-      });
-    } on NfcAdapterCommunicationException catch(_){
-      Logger.root.warning("Read failed, retrying");
-      await Future.delayed(delay);
-      return await readSector(number, retries: retries - 1);
-    } on NfcAdapterTagRemovedException catch(_){
-      Logger.root.severe("Read failed : Tag was removed");
-      throw ReadTagRemovedException("Read failed : Tag was removed");
-    } on ReadSectorAuthenticationFailed{
-      Logger.root.warning("Read failed, retrying");
-      await Future.delayed(delay);
-      return await readSector(number, retries: retries - 1);
-    } catch(e){
-      Logger.root.severe("Read failed : $e");
-      throw ReadUnknownException("Read failed : Unknown exception $e");
-    }
+
+        if(result.isNotEmpty){
+          return result;
+        }
+
+      }
+      Logger.root.severe("Failed to read block $number");
+      throw RetriesExcedeedException("Failed to read block $number : number of retries excedeed");
+    });
   }
   
 
