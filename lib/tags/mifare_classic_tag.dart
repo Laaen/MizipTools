@@ -122,8 +122,20 @@ class MifareClassicTag with ChangeNotifier {
     });
   }
 
-  Future<bool> authenticateSector(int sectorNb, {Uint8List? keyA, Uint8List? keyB}) async{
-    return await nfcAdapter.authenticateSector(sectorNb, keyA: keyA, keyB: keyB);
+  /// Returns wether the authentication is successful of not.
+  /// 
+  /// Some retries are needed because it can fail even if the provided key is the good one.
+  /// 
+  /// Throws [NfcAdapterTagRemovedException] | [NfcAdapterCommunicationException] | [NfcAdapterException]
+  Future<bool> authenticateSector(int sectorNb, {int retries = 2, Uint8List? keyA, Uint8List? keyB}) async{
+    bool result = false;
+    for(final _ in Iterable.generate(retries)){
+      result = await nfcAdapter.authenticateSector(sectorNb, keyA: keyA, keyB: keyB);
+      if(result){
+        return true;
+      }
+    }
+    return result;
   }
 
   Future<void> releaseTag() async{
