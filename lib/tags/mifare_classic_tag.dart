@@ -152,6 +152,7 @@ class MifareClassicTag with ChangeNotifier {
   Future<Uint8List> readBlock(int number, {int retries = 0, Duration delay = const Duration(milliseconds: 10)}) async{
 
     Uint8List result = Uint8List(0);
+    Logger.root.info("Reading block $number with key ${getKeys().a[number ~/ 4].toHexString()}");
 
     return await lock.synchronized(() async {
       for(final _ in Iterable.generate(retries)){
@@ -182,14 +183,16 @@ class MifareClassicTag with ChangeNotifier {
     Uint8List result = Uint8List(0);
     final key = keyA ?? getKeys().a[number];
 
+    Logger.root.info("Reading sector $number with key ${key.toHexString()}");
+
     return await lock.synchronized(() async {
       for(final _ in Iterable.generate(retries)){
         Future.delayed(delay);
         if(await authenticateSector(number, keyA: key)){
           result = await nfcAdapter.readSector(number);
         } else {
-          Logger.root.severe("Read failed : Authentication failure with keyA : $key");
-          throw SectorAuthenticationFailed("Read failed : Authentication failure with keyA : $key");
+          Logger.root.severe("Read failed : Authentication failure with keyA : ${key.toHexString()}");
+          throw SectorAuthenticationFailed("Read failed : Authentication failure with keyA : ${key.toHexString()}");
         }
 
         if(result.isNotEmpty){
