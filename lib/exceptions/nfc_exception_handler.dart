@@ -17,14 +17,6 @@ class NfcExceptionHandler {
         NfcExceptionHandler.displaySnackbar(context, "Tag was removed");
       case const (NfcAdapterException):
         NfcExceptionHandler.displaySnackbar(context, "Unknown exception");
-      case const (WriteTagRemovedException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while writing : Tag was removed");
-      case const (WriteSectorAuthenticationFailed):
-        NfcExceptionHandler.displaySnackbar(context, "Error while writing : Incorrect key");
-      case const (WriteRetriesExcedeedException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while writing : Maximum number of retries reached");
-      case const (WriteUnknownException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while writing : Unknown error");
       case const (ReleaseFailedException):
         NfcExceptionHandler.displaySnackbar(context, "Error while releasing the tag : Tag was lost");
     }

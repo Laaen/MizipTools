@@ -206,38 +206,33 @@ class MifareClassicTag with ChangeNotifier {
   }
   
 
-  /// Writes the given block, retries a certain amount of times
+  /// Writes the given data to the block
+  /// 
+  /// Throws [RetriesExcedeedException] | [SectorAuthenticationFailed] | [NfcAdapterCommunicationException] | [NfcAdapterTagRemovedException] | [NfcAdapterException]
   Future<void> writeBlock(int number, Uint8List data, {int retries = 0, Duration delay = const Duration(milliseconds: 10), Uint8List? keyB}) async{
-    if(retries == 0){
-      Logger.root.severe("Failed to write block $number");
-      throw WriteRetriesExcedeedException("Failed to write block $number : number of retries excedeed");
-    }
 
+    bool result = false;
     final key = keyB ?? getKeys().b[number ~/ 4];
 
-    try{
-      return await lock.synchronized(()async{
-        if(await nfcAdapter.authenticateSector(number ~/ 4, keyB: key)){
-          await nfcAdapter.writeBlock(number, data); 
+    Logger.root.info("Writing data : (${data.toHexString()}) to block $number with key ${key.toHexString()}");
+
+    return await lock.synchronized(() async {
+      for(final _ in Iterable.generate(retries)){
+        Future.delayed(delay);
+        if(await authenticateSector(number ~/ 4, keyB: key)){
+          result = await nfcAdapter.writeBlock(number, data);
         } else {
-          Logger.root.severe("Write failed: Authentication failed with keyB : ${key.toHexString()}");
-          throw WriteSectorAuthenticationFailed("Write failed: Authentication failed with keyB : ${key.toHexString()}");
+          Logger.root.severe("Write failed : Authentication failure with keyB : ${key.toHexString()}");
+          throw SectorAuthenticationFailed("Write failed : Authentication failure with keyB : ${key.toHexString()}");
         }
-      });
-    } on NfcAdapterCommunicationException catch(_){
-      Logger.root.warning("Write failed, retrying");
-      await Future.delayed(delay);
-      return await writeBlock(number, data, retries: retries - 1);
-    } on NfcAdapterTagRemovedException catch(_){
-      Logger.root.severe("Write failed : Tag was removed");
-      throw WriteTagRemovedException("Write failed : Tag was removed");
-    } on WriteSectorAuthenticationFailed{
-      Logger.root.warning("Write failed, retrying");
-      await Future.delayed(delay);
-      return await writeBlock(number, data, retries: retries - 1);
-    } catch(e){
-      Logger.root.severe("Write failed : $e");
-      throw WriteUnknownException("Write failed : Unknown exception $e");
-    }
+
+        if(result){
+          return;
+        }
+
+      }
+      Logger.root.severe("Failed to write block $number");
+      throw RetriesExcedeedException("Failed to write block $number : number of retries excedeed");
+    });
   }
 }

@@ -39,8 +39,9 @@ class MockNfcTag {
     return Uint8List.fromList(data.sublist(sectorNb * 4, sectorNb * 4 + 4).flattened.toList());
   }
 
-  void writeBlock(int blockNb, Uint8List newData){
+  bool writeBlock(int blockNb, Uint8List newData){
     data[blockNb] = newData;
+    return true;
   }
 
 

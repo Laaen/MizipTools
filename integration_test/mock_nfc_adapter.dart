@@ -61,7 +61,7 @@ class MockNfcAdapter extends NfcAdapter{
   }
 
   @override
-  Future<void> writeBlock(int blockNb, Uint8List data) async{
+  Future<bool> writeBlock(int blockNb, Uint8List data) async{
     return currentTag!.writeBlock(blockNb, data);
   }
 
