@@ -13,7 +13,7 @@ class NfcExceptionHandler {
       case const (ReadRetriesExcedeedException):
         NfcExceptionHandler.displaySnackbar(context, "Error while reading : Maximum number of retries reached");
       case const (ReadUnknownException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while reading : Unknow error");
+        NfcExceptionHandler.displaySnackbar(context, "Error while reading : Unknown error");
       case const (WriteTagRemovedException):
         NfcExceptionHandler.displaySnackbar(context, "Error while writing : Tag was removed");
       case const (WriteSectorAuthenticationFailed):
@@ -21,7 +21,7 @@ class NfcExceptionHandler {
       case const (WriteRetriesExcedeedException):
         NfcExceptionHandler.displaySnackbar(context, "Error while writing : Maximum number of retries reached");
       case const (WriteUnknownException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while writing : Unknow error");
+        NfcExceptionHandler.displaySnackbar(context, "Error while writing : Unknown error");
       case const (ReleaseFailedException):
         NfcExceptionHandler.displaySnackbar(context, "Error while releasing the tag : Tag was lost");
     }
