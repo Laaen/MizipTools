@@ -7,6 +7,8 @@ class MockNfcTag {
 
   List<Uint8List> data;
   final NfcTagType type;
+  // If the tag should fail when writing to block 0
+  bool failureBlockZero = false;
 
   MockNfcTag({required this.data, required this.type});
 
@@ -40,9 +42,16 @@ class MockNfcTag {
   }
 
   bool writeBlock(int blockNb, Uint8List newData){
+    // Fail write on block zero
+    if(failureBlockZero && (blockNb == 0)){
+      return false;
+    }
     data[blockNb] = newData;
     return true;
   }
 
+  void setFailureBlockZero(bool value){
+    failureBlockZero = value;
+  }
 
 }

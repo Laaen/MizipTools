@@ -52,6 +52,7 @@ class MifareClassicTag with ChangeNotifier {
     return dump;
   }
 
+  // TODO : Make an explicit error if trying to write to block 0 if tag is not CUID
   Future<void> writeDumpToTag(List<Uint8List> data) async{
     await lock.synchronized(() async{
       try{
@@ -60,11 +61,12 @@ class MifareClassicTag with ChangeNotifier {
         for (var (idx, line) in data.skip(4).indexed){
           await writeBlock(currentBlockNb + idx, line, retries: 5);
         }
-        await writeSectorZero(data.take(4).toList());
       }catch (error){
         Logger.root.warning("Error while dump writing : $error");
         rethrow;
       }
+      // We want to throw a special exception
+      await writeSectorZero(data.take(4).toList());
     });
   }
 
@@ -76,10 +78,17 @@ class MifareClassicTag with ChangeNotifier {
     await writeBlock(3, data[3], retries: 5);
 
     // Block 0, we need to use the new B key of the sector
-    final newKey = data[3].sublist(10, 16);
-    await writeBlock(0, data[0], keyB: newKey, retries: 5);
+
+    // If a fail here, the tag is not a CUID one
+    try{
+      final newKey = data[3].sublist(10, 16);
+      await writeBlock(0, data[0], keyB: newKey, retries: 5);
+    } catch (_){
+      throw WriteSectorZeroException("Error while writing block 0");
+    }
   }
 
+  // TODO : Make an explicit error if trying to write to block 0 if tag is not CUID
   Future<void> setUid(Uint8List newUid) async{
 
     await lock.synchronized(() async{

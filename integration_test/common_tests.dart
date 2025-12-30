@@ -73,6 +73,46 @@ Future<void> testWriteFromDump(WidgetTester tester, MockNfcTag mockTag, String d
   File("${dir.path}/${dumpContent.substring(0, 8)}.dump").deleteSync();
 }
 
+Future<void> testWriteFromDumpFail(WidgetTester tester, MockNfcTag mockTag, String dumpContent) async{
+  final mockAdapter = MockNfcAdapter();
+  mockTag.setFailureBlockZero(true);
+  mockAdapter.setTag(mockTag);
+
+  // To compare with saved_uid
+  final newUid = dumpContent.substring(0, 8);
+      
+  // Create the dump
+  final dir = await getExternalStorageDirectory();
+  File("${dir!.path}/${dumpContent.substring(0, 8)}.dump").writeAsStringSync(dumpContent);
+
+  await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir,));
+  await tester.tap(find.widgetWithText(Tab, "Dumps"));
+  await tester.pumpAndSettle();
+  await Future.delayed(Duration(seconds: 1));
+  await tester.pumpAndSettle();
+  await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Write"));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byType(DropdownMenu).first);
+  await tester.pumpAndSettle();
+  // The first found text is bugged
+  await tester.tap(find.text(dumpContent.substring(0, 8)).at(1));
+  await tester.pumpAndSettle();
+  await tester.tap(find.widgetWithText(OutlinedButton, "Write"));
+  await tester.pumpAndSettle();
+  expect(find.widgetWithText(SnackBar, "Warning : Sector 0 write failed, tag is not a CUID one"), findsOneWidget);
+
+  // Content is partially written
+  // The first block will be different than the dump
+  expect(mockTag.data.map((block) => block.toHexString().toUpperCase()).toList().sublist(1), equals(dumpContent.split("\n").sublist(1)));
+
+  // Backup of previous UID is here
+  expect(await File("${dir.path}/uid_save").exists(), equals(true));
+  expect(File("${dir.path}/uid_save").readAsLinesSync().first, equals(newUid));
+
+  // Cleanup
+  File("${dir.path}/${dumpContent.substring(0, 8)}.dump").deleteSync();
+}
+
 Future<void> testReadDump(WidgetTester tester, MockNfcTag? mockTag, String dumpData) async{
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);

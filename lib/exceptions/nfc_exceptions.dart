@@ -13,3 +13,7 @@ class ReleaseFailedException implements Exception{
   ReleaseFailedException(this.cause);
 }
 
+class WriteSectorZeroException implements Exception{
+  String cause;
+  WriteSectorZeroException(this.cause);
+}

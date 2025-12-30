@@ -74,6 +74,10 @@ void main(){
       await testWriteFromDump(tester, generateMockMifareClassic(), dumpContentWriteFromDumpTest);
     });
 
+    testWidgets("Test write dump to no CUID tag fails with message", (tester) async {
+      await testWriteFromDumpFail(tester, generateMockMifareClassic(), dumpContentWriteFromDumpTest);
+    });
+
     testWidgets("Test read dump", (tester) async {
       await testReadDump(tester, generateMockMifareClassic(), exampleDumpTestReadDump);
     });
@@ -179,6 +183,10 @@ void main(){
 
     testWidgets("Test write from dump", (tester) async {
       await testWriteFromDump(tester, generateMockMizipTag(), dumpContentWriteFromDumpTest);
+    });
+
+    testWidgets("Test write dump to no CUID tag fails with message", (tester) async {
+      await testWriteFromDumpFail(tester, generateMockMifareClassic(), dumpContentWriteFromDumpTest);
     });
 
     testWidgets("Test read dump", (tester) async {

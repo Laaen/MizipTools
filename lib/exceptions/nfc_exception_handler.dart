@@ -19,6 +19,8 @@ class NfcExceptionHandler {
         NfcExceptionHandler.displaySnackbar(context, "Unknown exception");
       case const (ReleaseFailedException):
         NfcExceptionHandler.displaySnackbar(context, "Error while releasing the tag : Tag was lost");
+      case const(WriteSectorZeroException):
+        NfcExceptionHandler.displaySnackbar(context, "Warning : Sector 0 write failed, tag is not a CUID one");
     }
   }
 
