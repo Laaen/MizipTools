@@ -86,6 +86,10 @@ void main(){
       await testChangeUid(tester, generateMockMifareClassic(), "ABD453C7", expectedTagContentChangeUidTestMifareClassic);
     });
 
+    testWidgets("Test change UID Fail", (tester) async {
+      await testChangeUidFail(tester, generateMockMifareClassic(), "ABD453C7", expectedTagContentChangeUidTestMifareClassic);
+    });
+
     testWidgets("Test auto-repair", (tester) async{
       final dataDir = await getExternalStorageDirectory();
       final mockAdapter = MockNfcAdapter();
@@ -186,7 +190,7 @@ void main(){
     });
 
     testWidgets("Test write dump to no CUID tag fails with message", (tester) async {
-      await testWriteFromDumpFail(tester, generateMockMifareClassic(), dumpContentWriteFromDumpTest);
+      await testWriteFromDumpFail(tester, generateMockMizipTag(), dumpContentWriteFromDumpTest);
     });
 
     testWidgets("Test read dump", (tester) async {
@@ -194,7 +198,11 @@ void main(){
     });
 
     testWidgets("Test change UID", (tester) async {
-      await testChangeUid(tester, generateMockMizipTag(), "ABD453C7", expectedTagCOntentChangeUidTestMizip);
+      await testChangeUid(tester, generateMockMizipTag(), "ABD453C7", expectedTagContentChangeUidTestMizip);
+    });
+
+    testWidgets("Test change UID Fail", (tester) async {
+      await testChangeUidFail(tester, generateMockMizipTag(), "ABD453C7", expectedTagContentChangeUidTestMizip);
     });
 
   });

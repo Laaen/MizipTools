@@ -170,3 +170,34 @@ Future<void> testChangeUid(WidgetTester tester, MockNfcTag mockTag, String newUi
   expect(File("${dir.path}/uid_save").readAsLinesSync().first, equals(newUid));
 
 }
+
+Future<void> testChangeUidFail(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedContent) async{
+  final dir = await getExternalStorageDirectory();
+  final mockAdapter = MockNfcAdapter();
+  mockTag.setFailureBlockZero(true);
+  mockAdapter.setTag(mockTag);
+
+  // To compare with saved_uid
+  final newUid = expectedContent.substring(0, 8);
+
+  await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir!,));
+  await tester.tap(find.widgetWithText(Tab, "Advanced"));
+  await tester.pumpAndSettle();
+  await tester.enterText(find.byType(TextFormField).first, newUid);
+  await tester.pumpAndSettle();
+  await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Ok").first);
+  await tester.pumpAndSettle();
+  await tester.tap(find.widgetWithText(OutlinedButton, "Ok").first);
+  await tester.pumpAndSettle();
+  expect(find.widgetWithText(SnackBar, "Warning : Sector 0 write failed, tag is not a CUID one"), findsOneWidget);
+  await tester.pumpAndSettle();
+
+  // Content is partially written
+  // The first block will be different than the dump
+  expect(mockTag.data.map((block) => block.toHexString().toUpperCase()).toList().sublist(1), equals(expectedContent.split("\n").sublist(1)));
+
+  // Backup of previous UID is here
+  expect(await File("${dir.path}/uid_save").exists(), equals(true));
+  expect(File("${dir.path}/uid_save").readAsLinesSync().first, equals(newUid));
+
+}
