@@ -106,9 +106,6 @@ class CurrentNFCTag with ChangeNotifier {
         }
       }
     }
-
-    print(validKeys.a.map((k) => k.toHexString().toUpperCase()));
-    print(validKeys.b.map((k) => k.toHexString().toUpperCase()));
     await innerTag!.rewriteKeys(validKeys, candidateCurrentUid);
   }
 
