@@ -6,3 +6,5 @@
 
 ### 2.0.1
 - Fixed UI overflow for some widgets
+- Added warning message in case of trying to write a dump or change the uid on a non CUID tag
+- Reorganized tests
