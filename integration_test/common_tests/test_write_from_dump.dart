@@ -8,8 +8,6 @@ import 'package:path_provider/path_provider.dart';
 import '../mock_nfc_adapter.dart';
 import '../mock_nfc_tag.dart';
 
-// TODO : Add test write to tag with incorrect key
-
 Future<void> testWriteFromDumpSuccesful(WidgetTester tester, MockNfcTag mockTag) async{
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
@@ -27,15 +25,17 @@ Future<void> testWriteFromDumpBlockZeroFail(WidgetTester tester, MockNfcTag mock
   await commonWriteFromDumpExec(tester, mockAdapter, dumpContentWriteFromDumpTest, "Warning : Sector 0 write failed, tag is not a CUID one", expectedResult.toUpperCase());
 }
 
-/*
-Future<void> testWriteFromDumpKeyFail(WidgetTester tester, MockNfcTag mockTag) async{
+Future<void> testWriteFromDumpBadKey(WidgetTester tester, MockNfcTag mockTag) async{
   final mockAdapter = MockNfcAdapter();
-  mockTag.setFailureBlockZero(true);
+  mockTag.setDenyAuthList([1]);
   mockAdapter.setTag(mockTag);
 
-  await commonWriteFromDumpExec(tester, mockAdapter, dumpContentWriteFromDumpTest, "Warning : Sector 0 write failed, tag is not a CUID one", dumpContentWriteFromDumpTest);
+
+  // Nothing should be changed
+  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
+  await commonWriteFromDumpExec(tester, mockAdapter, dumpContentWriteFromDumpTest, "Incorrect keys", expectedResult);
 }
-*/
+
 
 Future<void> commonWriteFromDumpExec(WidgetTester tester, MockNfcAdapter mockAdapter, String dumpContent, String expectedSnackBarMessage, String expectedTagContent) async{  
   final dir = await getExternalStorageDirectory();

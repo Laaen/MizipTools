@@ -6,12 +6,22 @@ import 'package:path_provider/path_provider.dart';
 import '../mock_nfc_adapter.dart';
 import '../mock_nfc_tag.dart';
 
-Future<void> testAutoRepair(WidgetTester tester, MockNfcTag mockTag) async{
+Future<void> testAutoRepairSuccess(WidgetTester tester, MockNfcTag mockTag) async{
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
 
   await commonAutoRepairExec(tester, mockAdapter, "Repair successful", expectedAutoRepairSuccess);
+}
 
+Future<void> testAutoRepairKeyFail(WidgetTester tester, MockNfcTag mockTag) async{
+  final mockAdapter = MockNfcAdapter();
+  mockTag.setDenyAuthList([1]);
+  mockAdapter.setTag(mockTag);
+
+  // Nothing changed
+  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
+
+  await commonAutoRepairExec(tester, mockAdapter, "Incorrect keys", expectedResult);
 }
 
 Future<void> commonAutoRepairExec(WidgetTester tester, MockNfcAdapter mockAdapter, String expectedSnackBarMessage, String expectedResult) async{

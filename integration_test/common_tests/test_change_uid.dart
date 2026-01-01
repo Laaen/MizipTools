@@ -21,6 +21,16 @@ Future<void> testChangeUidFailBlockZero(WidgetTester tester, MockNfcTag mockTag,
   await commonChangeUidExec(tester, mockAdapter, newUid, "Warning : Sector 0 write failed, tag is not a CUID one", expectedResult);
 }
 
+Future<void> testChangeUidBadKey(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
+  final mockAdapter = MockNfcAdapter();
+  mockTag.setDenyAuthList([1]);
+  mockAdapter.setTag(mockTag);
+
+  // Nothing changed
+  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
+  await commonChangeUidExec(tester, mockAdapter, newUid, "Incorrect keys", expectedResult);
+}
+
 Future<void> commonChangeUidExec(WidgetTester tester, MockNfcAdapter mockAdapter, String newUid, String expectedSnackBarMessage, String expectedResult) async{
   final dir = await getExternalStorageDirectory();
 

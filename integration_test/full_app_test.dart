@@ -30,8 +30,12 @@ void main(){
       await testTagDataMifareClassic(tester, generateMockMifareClassic());
     });
 
-    testWidgets("Test dump tag", (tester) async {
+    testWidgets("Test dump tag success", (tester) async {
       await testDumpTagSuccesful(tester, generateMockMifareClassic());
+    });
+
+    testWidgets("Test dump tag incorrect keys", (tester) async{
+      await testDumpTagKeyError(tester, generateMockMifareClassic());
     });
 
     testWidgets("Test write from dump", (tester) async {
@@ -42,11 +46,9 @@ void main(){
       await testWriteFromDumpBlockZeroFail(tester, generateMockMifareClassic());
     });
 
-    /*
     testWidgets("Test writing dump to a MifareClassic with unknown keys fails", (tester) async {
-      await testWriteFromDumpKeyFail(tester, generateMockMifareClassic());
+      await testWriteFromDumpBadKey(tester, generateMockMifareClassic());
     });
-    */
 
     testWidgets("Test read dump", (tester) async {
       await testReadDumpSuccessful(tester, generateMockMifareClassic(), exampleDumpTestReadDump);
@@ -60,8 +62,16 @@ void main(){
       await testChangeUidFailBlockZero(tester, generateMockMifareClassic(), "ABD453C7", expectedTagContentChangeUidTestMifareClassicFailBlockZero);
     });
 
-    testWidgets("Test auto-repair", (tester) async{
-      await testAutoRepair(tester, generateBrokenTag());
+    testWidgets("Test change UID fail with bad keys", (tester) async {
+      await testChangeUidBadKey(tester, generateMockMifareClassic(), "ABD453C7", "");
+    });
+
+    testWidgets("Test auto-repair success", (tester) async{
+      await testAutoRepairSuccess(tester, generateBrokenTag());
+    });
+
+    testWidgets("Test auto-repair key fail", (tester) async{
+      await testAutoRepairKeyFail(tester, generateBrokenTag());
     });
 
   });
@@ -71,7 +81,7 @@ void main(){
       await testTagDataMizip(tester, generateMockMizipTag());
     });
 
-    testWidgets("Change balance", (tester) async{
+    testWidgets("Change balance success", (tester) async{
       await testChangeBalanceSuccess(tester, generateMockMizipTag(), "26.92");
     });
 
@@ -79,8 +89,12 @@ void main(){
       await testAdd10Success(tester, generateMockMizipTag());
     });
 
-    testWidgets("Test dump tag", (tester) async {
+    testWidgets("Test dump tag success", (tester) async {
       await testDumpTagSuccesful(tester, generateMockMizipTag());
+    });
+
+    testWidgets("Test dump tag incorrect keys", (tester) async{
+      await testDumpTagKeyError(tester, generateMockMizipTag());
     });
 
     testWidgets("Test write from dump", (tester) async {
@@ -89,6 +103,10 @@ void main(){
 
     testWidgets("Test write dump to no CUID tag fails with message", (tester) async {
       await testWriteFromDumpBlockZeroFail(tester, generateMockMizipTag());
+    });
+
+    testWidgets("Test writing dump with unknown keys fails", (tester) async {
+      await testWriteFromDumpBadKey(tester, generateMockMizipTag());
     });
 
     testWidgets("Test read dump", (tester) async {
@@ -101,6 +119,10 @@ void main(){
 
     testWidgets("Test change UID Fail on block 0 write", (tester) async {
       await testChangeUidFailBlockZero(tester, generateMockMizipTag(), "ABD453C7", expectedTagContentChangeUidTestMizipFailBlockZero);
+    });
+
+    testWidgets("Test change UID fail with bad keys", (tester) async {
+      await testChangeUidBadKey(tester, generateMockMizipTag(), "ABD453C7", "");
     });
 
   });

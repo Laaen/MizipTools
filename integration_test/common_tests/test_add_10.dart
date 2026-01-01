@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
@@ -15,7 +14,6 @@ Future<void> testAdd10Success(WidgetTester tester, MockNfcTag mockTag) async{
 
 Future<void> commonAdd10Exec(WidgetTester tester, MockNfcAdapter mockAdapter, String expectedSnackBarMessage, String expectedResult) async{
   final dataDir = await getExternalStorageDirectory();
-
 
   await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dataDir!,));
   await tester.tap(find.widgetWithText(Tab, "Balance"));
