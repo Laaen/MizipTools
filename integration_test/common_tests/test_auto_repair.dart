@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/main.dart';
 import 'package:path_provider/path_provider.dart';
-import '../mock_nfc_adapter.dart';
-import '../mock_nfc_tag.dart';
+import '../mock/mock_nfc_adapter.dart';
+import '../mock/mock_nfc_tag.dart';
 
 Future<void> testAutoRepairSuccess(WidgetTester tester, MockNfcTag mockTag) async{
   final mockAdapter = MockNfcAdapter();
@@ -13,7 +13,7 @@ Future<void> testAutoRepairSuccess(WidgetTester tester, MockNfcTag mockTag) asyn
   await commonAutoRepairExec(tester, mockAdapter, "Repair successful", expectedAutoRepairSuccess);
 }
 
-Future<void> testAutoRepairKeyFail(WidgetTester tester, MockNfcTag mockTag) async{
+Future<void> testAutoRepairWrongKey(WidgetTester tester, MockNfcTag mockTag) async{
   final mockAdapter = MockNfcAdapter();
   mockTag.setDenyAuthList([1]);
   mockAdapter.setTag(mockTag);
@@ -24,7 +24,7 @@ Future<void> testAutoRepairKeyFail(WidgetTester tester, MockNfcTag mockTag) asyn
   await commonAutoRepairExec(tester, mockAdapter, "Incorrect keys", expectedResult);
 }
 
-Future<void> testAutoRepairTagDisconnected(WidgetTester tester, MockNfcTag mockTag) async{
+Future<void> testAutoRepairTagRemoved(WidgetTester tester, MockNfcTag mockTag) async{
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
 
@@ -48,7 +48,7 @@ Future<void> commonAutoRepairExec(WidgetTester tester, MockNfcAdapter mockAdapte
       await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Ok").last);
       await tester.pumpAndSettle();
       if(disconnectTag){
-        mockAdapter.setFailureMode(true);
+        mockAdapter.setTagRemoved(true);
       }
       await tester.tap(find.widgetWithText(OutlinedButton, "Ok").last);
       await tester.pumpAndSettle();

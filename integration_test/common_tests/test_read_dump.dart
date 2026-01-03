@@ -5,12 +5,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:miziptools/main.dart';
 import 'package:miziptools/widgets/dump/dialog_read_dump.dart';
 import 'package:path_provider/path_provider.dart';
-import '../mock_nfc_adapter.dart';
-import '../mock_nfc_tag.dart';
+import '../mock/mock_nfc_adapter.dart';
+import '../mock/mock_nfc_tag.dart';
 
 // TODO : Add test for error message if no file selected
 
-Future<void> testReadDumpSuccessful(WidgetTester tester, MockNfcTag? mockTag, String dumpData) async{
+Future<void> testReadDumpSuccess(WidgetTester tester, MockNfcTag? mockTag, String dumpData) async{
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
 

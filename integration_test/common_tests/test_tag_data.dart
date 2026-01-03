@@ -10,8 +10,8 @@ import 'package:miziptools/widgets/dump/dump_tag.dart';
 import 'package:miziptools/widgets/dump/read_dump.dart';
 import 'package:miziptools/widgets/dump/write_from_dump.dart';
 import 'package:path_provider/path_provider.dart';
-import '../mock_nfc_adapter.dart';
-import '../mock_nfc_tag.dart';
+import '../mock/mock_nfc_adapter.dart';
+import '../mock/mock_nfc_tag.dart';
 
 typedef WidgetsToFind = ({List<Type> balance, List<Type> dumps, List<Type> advanced});
 

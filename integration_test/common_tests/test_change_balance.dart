@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/main.dart';
 import 'package:path_provider/path_provider.dart';
-import '../mock_nfc_adapter.dart';
-import '../mock_nfc_tag.dart';
+import '../mock/mock_nfc_adapter.dart';
+import '../mock/mock_nfc_tag.dart';
 
 Future<void> testChangeBalanceSuccess(WidgetTester tester, MockNfcTag mockTag, String newBalance) async{
   final mockAdapter = MockNfcAdapter();
@@ -30,7 +30,7 @@ Future<void> commonChangeBalanceExec(WidgetTester tester, MockNfcAdapter mockAda
   await tester.pumpAndSettle();
   await tester.enterText(find.byType(TextFormField), newBalance);
   if (disconnectTag){
-    mockAdapter.setFailureMode(true);
+    mockAdapter.setTagRemoved(true);
   }
   await tester.tap(find.widgetWithText(OutlinedButton, "Ok")); 
   await tester.pumpAndSettle();

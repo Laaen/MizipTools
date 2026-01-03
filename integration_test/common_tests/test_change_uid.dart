@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/main.dart';
 import 'package:path_provider/path_provider.dart';
-import '../mock_nfc_adapter.dart';
-import '../mock_nfc_tag.dart';
+import '../mock/mock_nfc_adapter.dart';
+import '../mock/mock_nfc_tag.dart';
 
 Future<void> testChangeUid(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
   final mockAdapter = MockNfcAdapter();
@@ -14,14 +14,14 @@ Future<void> testChangeUid(WidgetTester tester, MockNfcTag mockTag, String newUi
   await commonChangeUidExec(tester, mockAdapter, newUid, "UID changed successfully", expectedResult);
 }
 
-Future<void> testChangeUidFailBlockZero(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
+Future<void> testChangeUidNotCUID(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
   final mockAdapter = MockNfcAdapter();
   mockTag.setFailureBlockZero(true);
   mockAdapter.setTag(mockTag);
   await commonChangeUidExec(tester, mockAdapter, newUid, "Warning : Sector 0 write failed, tag is not a CUID one", expectedResult);
 }
 
-Future<void> testChangeUidBadKey(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
+Future<void> testChangeUidWrongKey(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
   final mockAdapter = MockNfcAdapter();
   mockTag.setDenyAuthList([1]);
   mockAdapter.setTag(mockTag);
@@ -31,7 +31,7 @@ Future<void> testChangeUidBadKey(WidgetTester tester, MockNfcTag mockTag, String
   await commonChangeUidExec(tester, mockAdapter, newUid, "Incorrect keys", expectedResult);
 }
 
-Future<void> testChangeUidTagDisconnected(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
+Future<void> testChangeUidTagRemoved(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
 
@@ -51,7 +51,7 @@ Future<void> commonChangeUidExec(WidgetTester tester, MockNfcAdapter mockAdapter
   await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Ok").first);
   await tester.pumpAndSettle();
   if (disconnectTag){
-    mockAdapter.setFailureMode(true);
+    mockAdapter.setTagRemoved(true);
   }
   await tester.tap(find.widgetWithText(OutlinedButton, "Ok").first);
   await tester.pumpAndSettle();
@@ -88,7 +88,7 @@ FFFFFFFFFFFF78778800FFFFFFFFFFFF
 55010000000000000000000000000000
 FFFFFFFFFFFF78778800FFFFFFFFFFFF""";
 
-const expectedTagContentChangeUidTestMifareClassicFailBlockZero = """ED711B74F3890400C808002000000017
+const expectedTagContentChangeUidTestMifareClassicNotCUID = """ED711B74F3890400C808002000000017
 6200488849884A884B88000000000000
 00000000000000000000000000000000
 FFFFFFFFFFFF78778800FFFFFFFFFFFF
@@ -130,7 +130,7 @@ A2C609E2223178778803A2EB2F878BE6
 55010000000000000000000000000000
 9AAEE4E8EF4478778800E3D48CF37E3A""";
 
-const expectedTagContentChangeUidTestMizipFailBlockZero = """ED711B74F3890400C808002000000017
+const expectedTagContentChangeUidTestMizipNotCUID = """ED711B74F3890400C808002000000017
 6200488849884A884B88000000000000
 00000000000000000000000000000000
 A0A1A2A3A4A5787788C1B4C123439EEF

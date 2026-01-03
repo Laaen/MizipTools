@@ -8,7 +8,7 @@ import 'mock_nfc_tag.dart';
 class MockNfcAdapter extends NfcAdapter{
   
   /// Makes the methods fail (either exception throw of false return)
-  bool failureMode = false;
+  bool tagRemoved = false;
 
   /// The NFC tag to simulate
   MockNfcTag? currentTag;
@@ -28,7 +28,7 @@ class MockNfcAdapter extends NfcAdapter{
     Future.delayed(Duration(milliseconds: 500));
     if (currentTag == null){
       throw NfcAdapterTagRemovedException("Tag was removed");
-    } else if (failureMode){
+    } else if (tagRemoved){
       throw NfcAdapterCommunicationException("Communication error");
     } else {
       return Uint8List(0);
@@ -38,7 +38,7 @@ class MockNfcAdapter extends NfcAdapter{
   @override
   Future<NfcTag> pollTag({Duration timeout = const Duration(milliseconds: 200)}) async{
     await Future.delayed(Duration(milliseconds: 500));
-    if (failureMode){
+    if (tagRemoved){
       throw NfcAdapterCommunicationException("Communication error");
     } else if (currentTag != null) {
       return NfcTag(type: currentTag!.type, id: currentTag!.getUid());
@@ -62,7 +62,7 @@ class MockNfcAdapter extends NfcAdapter{
 
   @override
   Future<bool> writeBlock(int blockNb, Uint8List data) async{
-    if (failureMode){
+    if (tagRemoved){
       throw NfcAdapterCommunicationException("Communication error");
     }
     return currentTag!.writeBlock(blockNb, data);
@@ -70,7 +70,7 @@ class MockNfcAdapter extends NfcAdapter{
 
   @override
   Future<Uint8List> readBlock(int blockNb) async{
-    if (failureMode){
+    if (tagRemoved){
       throw NfcAdapterCommunicationException("Communication error");
     }
     return currentTag!.readBlock(blockNb);
@@ -78,14 +78,14 @@ class MockNfcAdapter extends NfcAdapter{
 
   @override
   Future<Uint8List> readSector(int sectorNb) async{
-    if (failureMode){
+    if (tagRemoved){
       throw NfcAdapterCommunicationException("Communication error");
     }
     return currentTag!.readSector(sectorNb);
   }
 
-  void setFailureMode(bool value){
-    failureMode = value;
+  void setTagRemoved(bool value){
+    tagRemoved = value;
   }
 
 }

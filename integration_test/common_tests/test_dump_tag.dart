@@ -6,8 +6,8 @@ import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/main.dart';
 import 'package:miziptools/widgets/dump/dump_tag.dart' show DumpTag;
 import 'package:path_provider/path_provider.dart';
-import '../mock_nfc_adapter.dart';
-import '../mock_nfc_tag.dart';
+import '../mock/mock_nfc_adapter.dart';
+import '../mock/mock_nfc_tag.dart';
 
 Future<void> testDumpTagRemovedTag(WidgetTester tester, MockNfcTag mockTag) async{
   final mockAdapter = MockNfcAdapter();
@@ -15,14 +15,14 @@ Future<void> testDumpTagRemovedTag(WidgetTester tester, MockNfcTag mockTag) asyn
   await commonDumpTagExec(tester, mockAdapter, "Communication error", disconnectTag: true);
 }
 
-Future<void> testDumpTagKeyError(WidgetTester tester, MockNfcTag mockTag) async{
+Future<void> testDumpTagWrongKey(WidgetTester tester, MockNfcTag mockTag) async{
   final mockAdapter = MockNfcAdapter();
   mockTag.setDenyAuthList([3]);
   mockAdapter.setTag(mockTag);
   await commonDumpTagExec(tester, mockAdapter, "Incorrect keys");
 }
 
-Future<void> testDumpTagSuccesful(WidgetTester tester, MockNfcTag mockTag) async{
+Future<void> testDumpTagSuccess(WidgetTester tester, MockNfcTag mockTag) async{
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
   await commonDumpTagExec(tester, mockAdapter, "Dump done file : ${mockAdapter.currentTag!.getUid().toUpperCase()}.dump");
@@ -34,7 +34,7 @@ Future<void> commonDumpTagExec(WidgetTester tester, MockNfcAdapter mockAdapter, 
   await tester.tap(find.widgetWithText(Tab, "Dumps"));
   await tester.pumpAndSettle();
   if (disconnectTag){
-    mockAdapter.setFailureMode(true);
+    mockAdapter.setTagRemoved(true);
   }
   await tester.tap(find.widgetWithText(DumpTag, "Dump Tag"));
   await tester.pumpAndSettle();

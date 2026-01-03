@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:miziptools/extensions/uint8list_extensions.dart';
 import 'package:miziptools/main.dart';
 import 'package:path_provider/path_provider.dart';
-import '../mock_nfc_adapter.dart';
-import '../mock_nfc_tag.dart';
+import '../mock/mock_nfc_adapter.dart';
+import '../mock/mock_nfc_tag.dart';
 
 Future<void> testAdd10Success(WidgetTester tester, MockNfcTag mockTag) async{
   final mockAdapter = MockNfcAdapter();
@@ -12,7 +12,7 @@ Future<void> testAdd10Success(WidgetTester tester, MockNfcTag mockTag) async{
   await commonAdd10Exec(tester, mockAdapter, "Balance changed successfully", expectedResultTestAdd10Success);
 }
 
-Future<void> testAdd10TagDisconnected(WidgetTester tester, MockNfcTag mockTag) async{
+Future<void> testAdd10TagRemoved(WidgetTester tester, MockNfcTag mockTag) async{
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
 
@@ -28,7 +28,7 @@ Future<void> commonAdd10Exec(WidgetTester tester, MockNfcAdapter mockAdapter, St
   await tester.tap(find.widgetWithText(Tab, "Balance"));
   await tester.pumpAndSettle();
   if (disconnectTag){
-    mockAdapter.setFailureMode(true);
+    mockAdapter.setTagRemoved(true);
   }
   await tester.tap(find.widgetWithText(OutlinedButton, "Add 10\$")); 
   await tester.pumpAndSettle();
