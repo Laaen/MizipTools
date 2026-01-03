@@ -36,8 +36,17 @@ Future<void> testWriteFromDumpBadKey(WidgetTester tester, MockNfcTag mockTag) as
   await commonWriteFromDumpExec(tester, mockAdapter, dumpContentWriteFromDumpTest, "Incorrect keys", expectedResult);
 }
 
+Future<void> testWriteFromDumpTagLost(WidgetTester tester, MockNfcTag mockTag) async{
+  final mockAdapter = MockNfcAdapter();
+  mockAdapter.setTag(mockTag);
 
-Future<void> commonWriteFromDumpExec(WidgetTester tester, MockNfcAdapter mockAdapter, String dumpContent, String expectedSnackBarMessage, String expectedTagContent) async{  
+  // Nothing should be changed
+  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
+  await commonWriteFromDumpExec(tester, mockAdapter, dumpContentWriteFromDumpTest, "Communication error", expectedResult, disconnectTag: true);
+}
+
+
+Future<void> commonWriteFromDumpExec(WidgetTester tester, MockNfcAdapter mockAdapter, String dumpContent, String expectedSnackBarMessage, String expectedTagContent, {bool disconnectTag = false}) async{  
   final dir = await getExternalStorageDirectory();
   final newUid = dumpContent.substring(0, 8);
 
@@ -55,6 +64,9 @@ Future<void> commonWriteFromDumpExec(WidgetTester tester, MockNfcAdapter mockAda
   // The first found text is bugged
   await tester.tap(find.text(dumpContent.substring(0, 8)).at(1));
   await tester.pumpAndSettle();
+  if(disconnectTag){
+    mockAdapter.setFailureMode(true);
+  }
   await tester.tap(find.widgetWithText(OutlinedButton, "Write"));
   await tester.pumpAndSettle();
   expect(find.widgetWithText(SnackBar, expectedSnackBarMessage), findsOneWidget);

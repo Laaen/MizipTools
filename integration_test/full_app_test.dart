@@ -38,6 +38,10 @@ void main(){
       await testDumpTagKeyError(tester, generateMockMifareClassic());
     });
 
+    testWidgets("Test dump tag disconnect", (tester) async{
+      await testDumpTagRemovedTag(tester, generateMockMifareClassic());
+    });
+
     testWidgets("Test write from dump", (tester) async {
       await testWriteFromDumpSuccesful(tester, generateMockMifareClassic());
     });
@@ -49,6 +53,11 @@ void main(){
     testWidgets("Test writing dump to a MifareClassic with unknown keys fails", (tester) async {
       await testWriteFromDumpBadKey(tester, generateMockMifareClassic());
     });
+
+    testWidgets("Test writing dump to a diconnected tag", (tester) async {
+      await testWriteFromDumpTagLost(tester, generateMockMifareClassic());
+    });
+
 
     testWidgets("Test read dump", (tester) async {
       await testReadDumpSuccessful(tester, generateMockMifareClassic(), exampleDumpTestReadDump);
@@ -66,6 +75,10 @@ void main(){
       await testChangeUidBadKey(tester, generateMockMifareClassic(), "ABD453C7", "");
     });
 
+    testWidgets("Test change UID tag disconnected", (tester) async {
+      await testChangeUidTagDisconnected(tester, generateMockMifareClassic(), "ABD453C7", "");
+    });
+
     testWidgets("Test auto-repair success", (tester) async{
       await testAutoRepairSuccess(tester, generateBrokenTag());
     });
@@ -74,7 +87,12 @@ void main(){
       await testAutoRepairKeyFail(tester, generateBrokenTag());
     });
 
+    testWidgets("Test auto-repair tag disconnected", (tester) async{
+      await testAutoRepairTagDisconnected(tester, generateBrokenTag());
+    });
+
   });
+
 
   group("MiZip tests", (){
     testWidgets("Start The app, and check displayed data in all menus", (tester) async {
@@ -85,8 +103,16 @@ void main(){
       await testChangeBalanceSuccess(tester, generateMockMizipTag(), "26.92");
     });
 
+    testWidgets("Change balance tag disconnected", (tester) async{
+      await testChangeBalanceTagRemoved(tester, generateMockMizipTag(), "26.92");
+    });
+
     testWidgets("Add 10\$", (tester) async{
       await testAdd10Success(tester, generateMockMizipTag());
+    });
+
+    testWidgets("Add 10\$ tag disconnected", (tester) async{
+      await testAdd10TagDisconnected(tester, generateMockMizipTag());
     });
 
     testWidgets("Test dump tag success", (tester) async {
@@ -109,6 +135,10 @@ void main(){
       await testWriteFromDumpBadKey(tester, generateMockMizipTag());
     });
 
+    testWidgets("Test writing dump to a diconnected tag", (tester) async {
+      await testWriteFromDumpTagLost(tester, generateMockMizipTag());
+    });
+
     testWidgets("Test read dump", (tester) async {
       await testReadDumpSuccessful(tester, generateMockMizipTag(), exampleDumpTestReadDump);
     });
@@ -123,6 +153,10 @@ void main(){
 
     testWidgets("Test change UID fail with bad keys", (tester) async {
       await testChangeUidBadKey(tester, generateMockMizipTag(), "ABD453C7", "");
+    });
+
+    testWidgets("Test change UID tag disconnected", (tester) async {
+      await testChangeUidTagDisconnected(tester, generateMockMizipTag(), "ABD453C7", "");
     });
 
   });

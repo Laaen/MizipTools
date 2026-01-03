@@ -5,22 +5,22 @@ import 'package:miziptools/nfc/nfc_adapter.dart';
 
 class NfcExceptionHandler {
 
-  static void handleException(Exception e, BuildContext context){
+  static void handleException(Exception e, BuildContext context, {String prefix = ""}){
     switch(e.runtimeType){
       case const (RetriesExcedeedException):
-        NfcExceptionHandler.displaySnackbar(context, "Number of retries excedeed");
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Number of retries excedeed");
       case const (SectorAuthenticationFailed):
-        NfcExceptionHandler.displaySnackbar(context, "Incorrect keys");
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Incorrect keys");
       case const (NfcAdapterCommunicationException):
-        NfcExceptionHandler.displaySnackbar(context, "Communication error");
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Communication error");
       case const (NfcAdapterTagRemovedException):
-        NfcExceptionHandler.displaySnackbar(context, "Tag was removed");
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Tag was removed");
       case const (NfcAdapterException):
-        NfcExceptionHandler.displaySnackbar(context, "Unknown exception");
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Unknown exception");
       case const (ReleaseFailedException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while releasing the tag : Tag was lost");
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Error while releasing the tag : Tag was lost");
       case const(WriteSectorZeroException):
-        NfcExceptionHandler.displaySnackbar(context, "Warning : Sector 0 write failed, tag is not a CUID one");
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Warning : Sector 0 write failed, tag is not a CUID one");
     }
   }
 

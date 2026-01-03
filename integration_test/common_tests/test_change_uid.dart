@@ -31,7 +31,16 @@ Future<void> testChangeUidBadKey(WidgetTester tester, MockNfcTag mockTag, String
   await commonChangeUidExec(tester, mockAdapter, newUid, "Incorrect keys", expectedResult);
 }
 
-Future<void> commonChangeUidExec(WidgetTester tester, MockNfcAdapter mockAdapter, String newUid, String expectedSnackBarMessage, String expectedResult) async{
+Future<void> testChangeUidTagDisconnected(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
+  final mockAdapter = MockNfcAdapter();
+  mockAdapter.setTag(mockTag);
+
+  // Nothing changed
+  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
+  await commonChangeUidExec(tester, mockAdapter, newUid, "Communication error", expectedResult, disconnectTag: true);
+}
+
+Future<void> commonChangeUidExec(WidgetTester tester, MockNfcAdapter mockAdapter, String newUid, String expectedSnackBarMessage, String expectedResult, {bool disconnectTag = false}) async{
   final dir = await getExternalStorageDirectory();
 
   await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir!,));
@@ -41,10 +50,12 @@ Future<void> commonChangeUidExec(WidgetTester tester, MockNfcAdapter mockAdapter
   await tester.pumpAndSettle();
   await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Ok").first);
   await tester.pumpAndSettle();
+  if (disconnectTag){
+    mockAdapter.setFailureMode(true);
+  }
   await tester.tap(find.widgetWithText(OutlinedButton, "Ok").first);
   await tester.pumpAndSettle();
   expect(find.widgetWithText(SnackBar, expectedSnackBarMessage), findsOneWidget);
-  await tester.pumpAndSettle();
 
   // Wait for tag to be rediscovered if change is successful
   await Future.delayed(Duration(seconds: 1));

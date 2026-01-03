@@ -7,4 +7,6 @@
 ### 2.0.1
 - Fixed UI overflow for some widgets
 - Added warning message in case of trying to write a dump or change the uid on a non CUID tag
+- Added error messages if reading and/or writing to a tag with incorrect keys
+- Added error messages if reading and/or writing to a disconnected tag
 - Reorganized tests

@@ -26,10 +26,9 @@ class TagAdd10 extends StatelessWidget{
 
     try{
       await tag.updateInnerBalance();
-    } catch(e){
-      if(context.mounted){
-        showSnackBar(context, "Error: Could not get tag's current balance");
-      }
+    } on Exception catch (e){
+      // ignore: use_build_context_synchronously
+      NfcExceptionHandler.handleException(e, context, prefix: "Error: Could not get tag's current balance : ");
       return;
     }
 
@@ -47,7 +46,7 @@ class TagAdd10 extends StatelessWidget{
       await tag.setBalance(newBalance.toString());
     } on Exception catch (e) {
       // ignore: use_build_context_synchronously
-      NfcExceptionHandler.handleException(e, context);
+      NfcExceptionHandler.handleException(e, context, prefix: "Error while writing new balance : ");
       return;
     }
 

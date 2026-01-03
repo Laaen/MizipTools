@@ -24,7 +24,16 @@ Future<void> testAutoRepairKeyFail(WidgetTester tester, MockNfcTag mockTag) asyn
   await commonAutoRepairExec(tester, mockAdapter, "Incorrect keys", expectedResult);
 }
 
-Future<void> commonAutoRepairExec(WidgetTester tester, MockNfcAdapter mockAdapter, String expectedSnackBarMessage, String expectedResult) async{
+Future<void> testAutoRepairTagDisconnected(WidgetTester tester, MockNfcTag mockTag) async{
+  final mockAdapter = MockNfcAdapter();
+  mockAdapter.setTag(mockTag);
+
+  // Nothing changed
+  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
+  await commonAutoRepairExec(tester, mockAdapter, "Communication error", expectedResult, disconnectTag: true);
+}
+
+Future<void> commonAutoRepairExec(WidgetTester tester, MockNfcAdapter mockAdapter, String expectedSnackBarMessage, String expectedResult, {bool disconnectTag = false}) async{
       final dataDir = await getExternalStorageDirectory();
 
       // The UID which should be in save_uid
@@ -38,6 +47,9 @@ Future<void> commonAutoRepairExec(WidgetTester tester, MockNfcAdapter mockAdapte
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Ok").last);
       await tester.pumpAndSettle();
+      if(disconnectTag){
+        mockAdapter.setFailureMode(true);
+      }
       await tester.tap(find.widgetWithText(OutlinedButton, "Ok").last);
       await tester.pumpAndSettle();
       await Future.delayed(Duration(seconds: 3));

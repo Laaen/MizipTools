@@ -12,12 +12,24 @@ Future<void> testAdd10Success(WidgetTester tester, MockNfcTag mockTag) async{
   await commonAdd10Exec(tester, mockAdapter, "Balance changed successfully", expectedResultTestAdd10Success);
 }
 
-Future<void> commonAdd10Exec(WidgetTester tester, MockNfcAdapter mockAdapter, String expectedSnackBarMessage, String expectedResult) async{
+Future<void> testAdd10TagDisconnected(WidgetTester tester, MockNfcTag mockTag) async{
+  final mockAdapter = MockNfcAdapter();
+  mockAdapter.setTag(mockTag);
+
+  // Nothing should be changed
+  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
+  await commonAdd10Exec(tester, mockAdapter, "Error: Could not get tag's current balance : Communication error", expectedResult, disconnectTag: true);
+}
+
+Future<void> commonAdd10Exec(WidgetTester tester, MockNfcAdapter mockAdapter, String expectedSnackBarMessage, String expectedResult, {bool disconnectTag = false}) async{
   final dataDir = await getExternalStorageDirectory();
 
   await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dataDir!,));
   await tester.tap(find.widgetWithText(Tab, "Balance"));
   await tester.pumpAndSettle();
+  if (disconnectTag){
+    mockAdapter.setFailureMode(true);
+  }
   await tester.tap(find.widgetWithText(OutlinedButton, "Add 10\$")); 
   await tester.pumpAndSettle();
   expect(find.widgetWithText(SnackBar, expectedSnackBarMessage), findsOneWidget);

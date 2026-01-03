@@ -62,16 +62,30 @@ class MockNfcAdapter extends NfcAdapter{
 
   @override
   Future<bool> writeBlock(int blockNb, Uint8List data) async{
+    if (failureMode){
+      throw NfcAdapterCommunicationException("Communication error");
+    }
     return currentTag!.writeBlock(blockNb, data);
   }
 
   @override
   Future<Uint8List> readBlock(int blockNb) async{
+    if (failureMode){
+      throw NfcAdapterCommunicationException("Communication error");
+    }
     return currentTag!.readBlock(blockNb);
   }
 
   @override
   Future<Uint8List> readSector(int sectorNb) async{
+    if (failureMode){
+      throw NfcAdapterCommunicationException("Communication error");
+    }
     return currentTag!.readSector(sectorNb);
   }
+
+  void setFailureMode(bool value){
+    failureMode = value;
+  }
+
 }

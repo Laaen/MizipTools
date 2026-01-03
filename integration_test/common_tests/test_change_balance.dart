@@ -13,16 +13,28 @@ Future<void> testChangeBalanceSuccess(WidgetTester tester, MockNfcTag mockTag, S
   await commonChangeBalanceExec(tester, mockAdapter, newBalance, "Balance changed successfully", expectedTagContentChangeBalanceTest);
 }
 
-Future<void> commonChangeBalanceExec(WidgetTester tester, MockNfcAdapter mockAdapter, String newBalance, String expectedSnackBarMessage, String expectedResult) async{
+Future<void> testChangeBalanceTagRemoved(WidgetTester tester, MockNfcTag mockTag, String newBalance) async{
+  final mockAdapter = MockNfcAdapter();
+  mockAdapter.setTag(mockTag);
+
+  // Nothing should be changed
+  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
+  await commonChangeBalanceExec(tester, mockAdapter, newBalance, "Communication error", expectedResult, disconnectTag: true);
+}
+
+Future<void> commonChangeBalanceExec(WidgetTester tester, MockNfcAdapter mockAdapter, String newBalance, String expectedSnackBarMessage, String expectedResult, {bool disconnectTag = false}) async{
   final dataDir = await getExternalStorageDirectory();
 
   await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dataDir!,));
   await tester.tap(find.widgetWithText(Tab, "Balance"));
   await tester.pumpAndSettle();
   await tester.enterText(find.byType(TextFormField), newBalance);
+  if (disconnectTag){
+    mockAdapter.setFailureMode(true);
+  }
   await tester.tap(find.widgetWithText(OutlinedButton, "Ok")); 
   await tester.pumpAndSettle();
-  expect(find.widgetWithText(SnackBar, "Balance changed successfully"), findsOneWidget);
+  expect(find.widgetWithText(SnackBar, expectedSnackBarMessage), findsOneWidget);
   expect(mockAdapter.currentTag!.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(expectedResult));
 }
 
