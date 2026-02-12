@@ -1,5 +1,8 @@
 # MizipTools
 
+![tests status](https://gitea.floof.ovh/Laen/Miziptools/actions/workflows/integration_tests.yaml/badge.svg?branch=fix_error_messages)
+![code coverage](https://coverage.floof.ovh/get/miziptools)
+
 Android App written in Flutter made to modify MiZip NFC tags.  
 ⚠️ This app only works with MiZip tags ⚠️
 
@@ -9,7 +12,6 @@ Features :
 - ✅ Change tag's balance
 - ✅ Change tag's UID
 - ✅ Read tag's dump
-
 
 ## How to install
 ⚠️ **If you're upgrading from the Kotlin version, backup your dumps, they will be erased when installing this version**  ⚠️  

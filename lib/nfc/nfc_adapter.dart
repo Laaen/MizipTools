@@ -57,11 +57,14 @@ class NfcAdapter {
     return false;
   }
 
-  Future<void> writeBlock(int blockNb, Uint8List data) async{
+  Future<bool> writeBlock(int blockNb, Uint8List data) async{
     try{
-      return await FlutterNfcKit.writeBlock(blockNb, data);
+      await FlutterNfcKit.writeBlock(blockNb, data);
+      // If we reach here, there was no error
+      return true;
     } on Exception catch(e){
       handleException(e);
+      return false;
     }
   }
 
