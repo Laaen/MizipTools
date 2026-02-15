@@ -10,3 +10,4 @@
 - Added error messages if reading and/or writing to a tag with incorrect keys
 - Added error messages if reading and/or writing to a disconnected tag
 - Reorganized tests
+- Added UID display for MifareClassic tag
