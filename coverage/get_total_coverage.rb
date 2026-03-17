@@ -15,6 +15,6 @@ end
 key = ENV["TEST_COV_KEY"]
 coverage_percentage = (100 * covered_lines / total_lines).ceil
 
-data = {name: "miziptools", value: coverage_percentage, token: key}
+data = {name: "miziptools", value: coverage_percentage, key: key}
 headers = {'Content-Type': 'application/json'}
 Net::HTTP.post(URI.parse("https://coverage.floof.ovh/set"), data.to_json, headers)
