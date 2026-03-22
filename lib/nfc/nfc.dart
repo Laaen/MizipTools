@@ -10,6 +10,7 @@ Future<void> watchForTag(CurrentNFCTag currentTag, NfcAdapter nfcAdapter, Lock g
   while (true){
     await waitForTagLost(currentTag, nfcAdapter, globalLock);
     await onTagLost();
+    await nfcAdapter.releaseTag();
     final tag = await waitForNewTag(nfcAdapter);
     await onTagDetected(globalLock, tag, nfcAdapter);
     await Future.delayed(const Duration(milliseconds: 10));
