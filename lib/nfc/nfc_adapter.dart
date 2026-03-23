@@ -43,8 +43,8 @@ class NfcAdapter {
   Future<void> releaseTag() async {
     try{
       return await FlutterNfcKit.finish();
-    } on Exception catch(e){
-      handleException(e);
+    } on Exception catch(_){
+      return;
     }
   }
 
