@@ -17,22 +17,22 @@ import 'consts.dart';
 typedef WidgetsToFind = ({List<Type> balance, List<Type> dumps, List<Type> advanced});
 
 Future<void> testTagDataNoTag(WidgetTester tester, MockNfcTag? mockTag) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
 
   await commonTagDataExec(tester, mockAdapter, (balance: List<Type>.empty(), dumps: [ReadDump], advanced: List<Type>.empty()), ["No tag detected"]);
 }
 
 Future<void> testTagDataMifareClassic(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
 
   await commonTagDataExec(tester, mockAdapter, (balance: List<Type>.empty(), dumps: [DumpTag, WriteFromDump, ReadDump], advanced: [ChangeUid, AutoRepair]), ["Not a MiZip tag (Mifare Classic Tag)"]);
 }
 
 Future<void> testTagDataMizip(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
 
   await commonTagDataExec(tester, mockAdapter, (balance: [TagAdd10, TagBalance], dumps: [DumpTag, WriteFromDump, ReadDump], advanced: [ChangeUid]), ["UID: ${mockTag.getUid().toUpperCase()}" ,"Balance: 36.92\$"]);
 }

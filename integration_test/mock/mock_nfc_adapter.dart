@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:logging/logging.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/nfc/nfc_tag.dart';
 
@@ -8,51 +9,55 @@ import 'mock_nfc_tag.dart';
 class MockNfcAdapter extends NfcAdapter{
   
   /// Makes the methods fail (either exception throw of false return)
-  bool tagRemoved = false;
+  bool communicationError = false;
 
   /// The NFC tag to simulate
-  MockNfcTag? currentTag;
-  
-  MockNfcAdapter();
+  MockNfcTag? tagToSimulate;
 
-  void setTag(MockNfcTag? tag){
-    currentTag = tag;
-  }
+  /// The currently present tag
+  MockNfcTag? currentTag;
+
+  MockNfcAdapter({this.tagToSimulate});
 
   void removeTag(){
     currentTag = null;
+  }
+
+  void putTag(){
+    currentTag = tagToSimulate;
   }
 
   @override
   Future<Uint8List> pingTag({Duration timeout = const Duration(milliseconds: 200)}) async{
     Future.delayed(Duration(milliseconds: 500));
     if (currentTag == null){
+      Logger.root.warning("Ping : Tag is null");
       throw NfcAdapterTagRemovedException("Tag was removed");
-    } else if (tagRemoved){
+    } else if (communicationError){
+      Logger.root.warning("Ping : Mocking communication error");
       throw NfcAdapterCommunicationException("Communication error");
     } else {
+      Logger.root.info("Ping OK");
       return Uint8List(0);
     }
   }
 
   @override
   Future<NfcTag> pollTag({Duration timeout = const Duration(milliseconds: 200)}) async{
+    Logger.root.info("Polling tag ...");
     await Future.delayed(Duration(milliseconds: 500));
-    if (tagRemoved){
+    if (communicationError){
+      Logger.root.warning("Poll : Mocking communication error");
       throw NfcAdapterCommunicationException("Communication error");
-    } else if (currentTag != null) {
-      return NfcTag(type: currentTag!.type, id: currentTag!.getUid());
-    } else{
-      throw NfcAdapterTagRemovedException("Tag was removed");
+    } else {
+      Logger.root.info("Poll : Returning tag");
+      return NfcTag(type: tagToSimulate!.type, id: tagToSimulate!.getUid());
     }
   }
 
   @override
   Future<void> releaseTag() async {
-    final cTag = currentTag;
     removeTag();
-    await Future.delayed(Duration(milliseconds: 700));
-    setTag(cTag!);
   }
 
   @override
@@ -62,7 +67,7 @@ class MockNfcAdapter extends NfcAdapter{
 
   @override
   Future<bool> writeBlock(int blockNb, Uint8List data) async{
-    if (tagRemoved){
+    if (communicationError){
       throw NfcAdapterCommunicationException("Communication error");
     }
     return currentTag!.writeBlock(blockNb, data);
@@ -70,7 +75,7 @@ class MockNfcAdapter extends NfcAdapter{
 
   @override
   Future<Uint8List> readBlock(int blockNb) async{
-    if (tagRemoved){
+    if (communicationError){
       throw NfcAdapterCommunicationException("Communication error");
     }
     return currentTag!.readBlock(blockNb);
@@ -78,14 +83,14 @@ class MockNfcAdapter extends NfcAdapter{
 
   @override
   Future<Uint8List> readSector(int sectorNb) async{
-    if (tagRemoved){
+    if (communicationError){
       throw NfcAdapterCommunicationException("Communication error");
     }
     return currentTag!.readSector(sectorNb);
   }
 
-  void setTagRemoved(bool value){
-    tagRemoved = value;
+  void setCommunicationError(bool value){
+    communicationError = value;
   }
 
 }

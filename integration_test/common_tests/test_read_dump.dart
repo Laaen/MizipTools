@@ -12,8 +12,8 @@ import 'consts.dart';
 // TODO : Add test for error message if no file selected
 
 Future<void> testReadDumpSuccess(WidgetTester tester, MockNfcTag? mockTag, String dumpData) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
 
   // Create the dump
   final dir = await getExternalStorageDirectory();

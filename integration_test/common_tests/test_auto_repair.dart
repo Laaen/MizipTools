@@ -8,16 +8,16 @@ import '../mock/mock_nfc_tag.dart';
 import 'consts.dart';
 
 Future<void> testAutoRepairSuccess(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
 
   await commonAutoRepairExec(tester, mockAdapter, "Repair successful", expectedAutoRepairSuccess);
 }
 
 Future<void> testAutoRepairWrongKey(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter();
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
   mockTag.setDenyAuthList([1]);
-  mockAdapter.setTag(mockTag);
+  mockAdapter.putTag();
 
   // Nothing changed
   final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
@@ -26,8 +26,8 @@ Future<void> testAutoRepairWrongKey(WidgetTester tester, MockNfcTag mockTag) asy
 }
 
 Future<void> testAutoRepairTagRemoved(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
 
   // Nothing changed
   final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
@@ -50,7 +50,7 @@ Future<void> commonAutoRepairExec(WidgetTester tester, MockNfcAdapter mockAdapte
       await Future.delayed(delay);
       await tester.pumpAndSettle(delay);
       if(disconnectTag){
-        mockAdapter.setTagRemoved(true);
+        mockAdapter.setCommunicationError(true);
       }
       await tester.tap(find.widgetWithText(OutlinedButton, "Ok").last);
       await tester.pumpAndSettle(delay);
