@@ -11,21 +11,21 @@ import '../mock/mock_nfc_tag.dart';
 import 'consts.dart';
 
 Future<void> testDumpTagRemovedTag(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
   await commonDumpTagExec(tester, mockAdapter, "Communication error", disconnectTag: true);
 }
 
 Future<void> testDumpTagWrongKey(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter();
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
   mockTag.setDenyAuthList([3]);
-  mockAdapter.setTag(mockTag);
+  mockAdapter.putTag();
   await commonDumpTagExec(tester, mockAdapter, "Incorrect keys");
 }
 
 Future<void> testDumpTagSuccess(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
   await commonDumpTagExec(tester, mockAdapter, "Dump done file : ${mockAdapter.currentTag!.getUid().toUpperCase()}.dump");
 }
 
@@ -35,7 +35,7 @@ Future<void> commonDumpTagExec(WidgetTester tester, MockNfcAdapter mockAdapter, 
   await tester.tap(find.widgetWithText(Tab, "Dumps"));
   await tester.pumpAndSettle(delay);
   if (disconnectTag){
-    mockAdapter.setTagRemoved(true);
+    mockAdapter.setCommunicationError(true);
   }
   await tester.tap(find.widgetWithText(DumpTag, "Dump Tag"));
   await tester.pumpAndSettle(delay);

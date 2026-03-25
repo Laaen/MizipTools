@@ -13,8 +13,8 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   final dataDir = await getExternalStorageDirectory();
   setupLogging();
-  final adapter = MockNfcAdapter();
-  adapter.setTag(generateMockMizipTag());
+  final adapter = MockNfcAdapter(tagToSimulate: generateMockMizipTag());
+  adapter.putTag();
   runApp(App(nfcAdapter: adapter, dataDir: dataDir!,));
 }
 

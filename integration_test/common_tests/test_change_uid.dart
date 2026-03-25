@@ -10,22 +10,22 @@ import '../mock/mock_nfc_tag.dart';
 import 'consts.dart';
 
 Future<void> testChangeUid(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
   await commonChangeUidExec(tester, mockAdapter, newUid, "UID changed successfully", expectedResult);
 }
 
 Future<void> testChangeUidNotCUID(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
-  final mockAdapter = MockNfcAdapter();
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
   mockTag.setFailureBlockZero(true);
-  mockAdapter.setTag(mockTag);
+  mockAdapter.putTag();
   await commonChangeUidExec(tester, mockAdapter, newUid, "Warning : Sector 0 write failed, tag is not a CUID one", expectedResult);
 }
 
 Future<void> testChangeUidWrongKey(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
-  final mockAdapter = MockNfcAdapter();
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
   mockTag.setDenyAuthList([1]);
-  mockAdapter.setTag(mockTag);
+  mockAdapter.putTag();
 
   // Nothing changed
   final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
@@ -33,8 +33,8 @@ Future<void> testChangeUidWrongKey(WidgetTester tester, MockNfcTag mockTag, Stri
 }
 
 Future<void> testChangeUidTagRemoved(WidgetTester tester, MockNfcTag mockTag, String newUid, String expectedResult) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
 
   // Nothing changed
   final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
@@ -52,7 +52,7 @@ Future<void> commonChangeUidExec(WidgetTester tester, MockNfcAdapter mockAdapter
   await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Ok").first);
   await tester.pumpAndSettle(delay);
   if (disconnectTag){
-    mockAdapter.setTagRemoved(true);
+    mockAdapter.setCommunicationError(true);
   }
   await tester.tap(find.widgetWithText(OutlinedButton, "Ok").first);
   await tester.pumpAndSettle(delay);

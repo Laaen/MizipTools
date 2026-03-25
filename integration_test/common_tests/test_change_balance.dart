@@ -9,14 +9,14 @@ import '../mock/mock_nfc_tag.dart';
 import 'consts.dart';
 
 Future<void> testChangeBalanceSuccess(WidgetTester tester, MockNfcTag mockTag, String newBalance) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
   await commonChangeBalanceExec(tester, mockAdapter, newBalance, "Balance changed successfully", expectedTagContentChangeBalanceTest);
 }
 
 Future<void> testChangeBalanceTagRemoved(WidgetTester tester, MockNfcTag mockTag, String newBalance) async{
-  final mockAdapter = MockNfcAdapter();
-  mockAdapter.setTag(mockTag);
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
+  mockAdapter.putTag();
 
   // Nothing should be changed
   final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
@@ -32,7 +32,7 @@ Future<void> commonChangeBalanceExec(WidgetTester tester, MockNfcAdapter mockAda
   await tester.pumpAndSettle(delay);
   await tester.enterText(find.byType(TextFormField), newBalance);
   if (disconnectTag){
-    mockAdapter.setTagRemoved(true);
+    mockAdapter.setCommunicationError(true);
   }
   await tester.tap(find.widgetWithText(OutlinedButton, "Ok")); 
   await tester.pumpAndSettle(delay);
