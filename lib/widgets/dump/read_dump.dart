@@ -35,7 +35,7 @@ class ReadDump extends StatelessWidget{
   }
 
   List<DropdownMenuEntry> getDumpList(List<FileSystemEntity> dataDir){
-    return dataDir.map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).where((name) => name.label != "uid_save").toList();
+    return dataDir.map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).where((name) => !["uid_save", "debug"].contains(name.label)).toList();
   }
 
   Future<void> readDump(BuildContext context) async{
