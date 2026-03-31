@@ -19,6 +19,7 @@ dependencies:
   provider: ^6.1.5+1
   google_fonts: ^6.3.2
   flutter_launcher_icons: ^0.14.4
+  logging_appenders: ^2.0.0+1
 
 dev_dependencies:
   integration_test:
