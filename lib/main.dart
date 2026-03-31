@@ -28,7 +28,7 @@ void setupLogging(Directory dataDir){
       print('${record.level.name}: ${record.time}: ${record.message}');
     });
   } else {
-    RotatingFileAppender(baseFilePath: "${dataDir.path}/debug.log", keepRotateCount: 1, rotateAtSizeBytes: 1024 * 1024).attachToLogger(Logger.root);
+    RotatingFileAppender(baseFilePath: "${dataDir.path}/debug.log", keepRotateCount: 1, rotateAtSizeBytes: 1024 * 1024 * 10).attachToLogger(Logger.root);
     Logger.root.level = Level.INFO;
   }
 }
