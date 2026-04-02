@@ -60,6 +60,7 @@ Future<void> commonAutoRepairExec(WidgetTester tester, MockNfcAdapter mockAdapte
       await tester.pumpAndSettle(delay);
 
       // Wait for tag poll after release
+      mockAdapter.putTag();
       Future.delayed(Duration(seconds: 1));
 
       expect(mockAdapter.currentTag!.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(expectedResult));

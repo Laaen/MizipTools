@@ -61,6 +61,7 @@ Future<void> commonChangeUidExec(WidgetTester tester, MockNfcAdapter mockAdapter
   expect(find.widgetWithText(SnackBar, expectedSnackBarMessage), findsOneWidget);
 
   // Wait for tag to be rediscovered if change is successful
+  mockAdapter.putTag();
   await Future.delayed(Duration(seconds: 1));
 
   expect(mockAdapter.currentTag!.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(expectedResult));

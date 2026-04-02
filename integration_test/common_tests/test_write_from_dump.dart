@@ -31,7 +31,6 @@ Future<void> testWriteFromDumpWrongKey(WidgetTester tester, MockNfcTag mockTag) 
   mockTag.setDenyAuthList([1]);
   mockAdapter.putTag();
 
-
   // Nothing should be changed
   final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
   await commonWriteFromDumpExec(tester, mockAdapter, dumpContentWriteFromDumpTest, "Incorrect keys", expectedResult);
@@ -73,7 +72,9 @@ Future<void> commonWriteFromDumpExec(WidgetTester tester, MockNfcAdapter mockAda
   expect(find.widgetWithText(SnackBar, expectedSnackBarMessage), findsOneWidget);
 
   // Wait for tag to be rediscovered if write was successful
+  mockAdapter.putTag();
   await Future.delayed(Duration(seconds: 1));
+
 
   // Content is OK
   expect(mockAdapter.currentTag!.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(expectedTagContent));
