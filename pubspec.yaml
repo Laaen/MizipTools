@@ -17,7 +17,7 @@ dependencies:
   collection: ^1.19.0
   path_provider: ^2.1.5
   provider: ^6.1.5+1
-  google_fonts: ^6.3.2
+  google_fonts: ^8.0.2
   flutter_launcher_icons: ^0.14.4
   logging_appenders: ^2.0.0+1
 
