@@ -27,7 +27,7 @@ Future<void> testTagDataMifareClassic(WidgetTester tester, MockNfcTag mockTag) a
   final mockAdapter = MockNfcAdapter();
   mockAdapter.setTag(mockTag);
 
-  await commonTagDataExec(tester, mockAdapter, (balance: List<Type>.empty(), dumps: [DumpTag, WriteFromDump, ReadDump], advanced: [ChangeUid, AutoRepair]), ["Not a MiZip tag (Mifare Classic Tag)"]);
+  await commonTagDataExec(tester, mockAdapter, (balance: List<Type>.empty(), dumps: [DumpTag, WriteFromDump, ReadDump], advanced: [ChangeUid, AutoRepair]), ["UID: ${mockTag.getUid().toUpperCase()}" ,"Not a MiZip tag (Mifare Classic Tag)"]);
 }
 
 Future<void> testTagDataMizip(WidgetTester tester, MockNfcTag mockTag) async{
