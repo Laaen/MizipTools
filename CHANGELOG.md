@@ -10,3 +10,6 @@
 - Added error messages if reading and/or writing to a tag with incorrect keys
 - Added error messages if reading and/or writing to a disconnected tag
 - Reorganized tests
+- Added logging
+- Fixed issue with tag ping on some phone models
+- Updated dependencies
