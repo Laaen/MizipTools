@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:miziptools/nfc/nfc_tag.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'mifare_classic_test.dart';
 import 'mock/mock_nfc_adapter.dart';
 import 'mock/mock_nfc_tag.dart';
 

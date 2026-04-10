@@ -13,3 +13,6 @@
 - Added logging
 - Fixed issue with tag ping on some phone models
 - Updated dependencies
+- Added UID display for MifareClassic tag
+- Updated flutter version
+- Updated dependencies versions

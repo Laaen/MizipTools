@@ -125,10 +125,6 @@ class CurrentNFCTag with ChangeNotifier {
     return isPresent() && innerTag! is MizipTag;
   }
 
-  bool isMifareClassic(){
-    return isPresent();
-  }
-
   Future<bool> saveUID(String uid) async {
     final dataDir = await getExternalStorageDirectory();
     if (dataDir == null){
