@@ -1,6 +1,6 @@
 name: Gitea Actions Demo
 run-name: MizipTools tests
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   test:
@@ -55,7 +55,7 @@ jobs:
   
   build:
     runs-on: ubuntu-latest
-    if: success() && github.ref == 'refs/heads/master'
+    if: success() && github.base_ref == 'master'
 
     steps:
       - name: checkout
