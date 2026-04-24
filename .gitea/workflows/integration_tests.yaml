@@ -85,7 +85,7 @@ jobs:
       - name: Rename build
         run: mv ./build/app/outputs/flutter-apk/app-release.apk ./miziptools.apk
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v3
         with:
           path: ./miziptools.apk
           overwrite: true
