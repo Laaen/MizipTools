@@ -54,8 +54,8 @@ jobs:
   #       run: ruby ./coverage/get_total_coverage.rb
   
   build:
-    if: success() #&& github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
+    if: success() #&& github.ref == 'refs/heads/master'
 
     steps:
 
