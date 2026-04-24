@@ -52,4 +52,20 @@ jobs:
         env:
           TEST_COV_KEY: ${{ secrets.TEST_COV_KEY }}
         run: ruby ./coverage/get_total_coverage.rb
+  
+  build:
+    if: success() #&& github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Build release package
+        script: flutter build apk --release
+
+      - name: Rename build
+        script: mv ./build/app/outputs/flutter-apk/app-release.apk ./miziptools.apk
+
+      - uses: actions/upload-artifact@v7
+        with:
+          path: ./miziptools.apk
+          overwrite: true
+          archive: false
