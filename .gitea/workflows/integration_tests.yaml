@@ -95,6 +95,7 @@ jobs:
           path: ./miziptools.apk
           overwrite: true
           archive: false
+          retention-days: 7
 
       # Only use this action to get the next tag version, the tag creation is done by the following actions
       - name: Get bumped version
