@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:miziptools/extensions/string_extensions.dart';
 import 'package:miziptools/nfc/nfc_tag.dart';
+import 'package:logging/logging.dart';
 
 class NfcAdapterException implements Exception{
   String cause;
@@ -43,8 +44,8 @@ class NfcAdapter {
   Future<void> releaseTag() async {
     try{
       return await FlutterNfcKit.finish();
-    } on Exception catch(e){
-      handleException(e);
+    } on Exception catch(_){
+      return;
     }
   }
 
@@ -57,11 +58,14 @@ class NfcAdapter {
     return false;
   }
 
-  Future<void> writeBlock(int blockNb, Uint8List data) async{
+  Future<bool> writeBlock(int blockNb, Uint8List data) async{
     try{
-      return await FlutterNfcKit.writeBlock(blockNb, data);
+      await FlutterNfcKit.writeBlock(blockNb, data);
+      // If we reach here, there was no error
+      return true;
     } on Exception catch(e){
       handleException(e);
+      return false;
     }
   }
 
@@ -85,6 +89,7 @@ class NfcAdapter {
 
   void handleException(Exception exception){
     if (exception is PlatformException){
+      logFiltered(exception);
       if(exception.code == "503"){
         throw NfcAdapterTagRemovedException("Tag was removed");
       } else{
@@ -92,6 +97,13 @@ class NfcAdapter {
       }
     } else {
       throw NfcAdapterException("Unknown exception occured : $exception");
+    }
+  }
+
+  /// Doesn't log errors 404 (NFC not available), 408 (Polling tag timeout)
+  void logFiltered(PlatformException exception){
+    if (![404, 408].contains(int.parse(exception.code))){
+      Logger.root.warning("Got exception : $exception");
     }
   }
 

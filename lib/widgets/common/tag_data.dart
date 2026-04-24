@@ -13,10 +13,8 @@ class TagData extends StatelessWidget{
 
     final tag = Provider.of<CurrentNFCTag>(context);
     // Order of evaluation is important as MizipTag inherits MifareClassicTag
-    if (tag.isMizipTag()){
+    if (tag.isPresent()){
       return ContainerWithBorder(child: getTagDataDisplay(tag));
-    } else if (tag.isMifareClassic()){
-      return ContainerWithBorder(child: Text("Not a MiZip tag (Mifare Classic Tag)"));
     } else {
       return ContainerWithBorder(child: Text("No tag detected", style: TextStyle(fontSize: 16)));
     }
@@ -27,10 +25,10 @@ class TagData extends StatelessWidget{
       children : [
         Text("Tag data", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),),
         Container(height: 10,),
+        if (!tag.isMizipTag()) Row(children: [Text("Not a MiZip tag (Mifare Classic Tag)", style: TextStyle(fontSize: 16))]),  
         Row(children: [Text("UID: ${tag.getUid().toHexString().toUpperCase()}", style: TextStyle(fontSize: 16))]),
-        Row(children: [Text("Balance: ${tag.getBalance().getStringBalance()}\$", style: TextStyle(fontSize: 16))])
+        if (tag.isMizipTag()) Row(children: [Text("Balance: ${tag.getBalance().getStringBalance()}\$", style: TextStyle(fontSize: 16))])
       ]
     );
   }
-
 }

@@ -3,7 +3,7 @@ description: "Android App written in Flutter made to modify MiZip NFC tags."
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.0.0
+version: 2.0.1
 
 environment:
   sdk: ^3.6.0
@@ -17,8 +17,9 @@ dependencies:
   collection: ^1.19.0
   path_provider: ^2.1.5
   provider: ^6.1.5+1
-  google_fonts: ^6.3.2
+  google_fonts: ^8.0.2
   flutter_launcher_icons: ^0.14.4
+  logging_appenders: ^2.0.0+1
 
 dev_dependencies:
   integration_test:

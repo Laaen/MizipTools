@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:miziptools/exceptions/nfc_exceptions.dart';
 import 'package:miziptools/misc/snackbar.dart';
+import 'package:miziptools/nfc/nfc_adapter.dart';
 
 class NfcExceptionHandler {
 
-  static void handleException(Exception e, BuildContext context){
+  static void handleException(Exception e, BuildContext context, {String prefix = ""}){
     switch(e.runtimeType){
-      case const (ReadTagRemovedException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while reading : Tag was removed");
-      case const (ReadSectorAuthenticationFailed):
-        NfcExceptionHandler.displaySnackbar(context, "Error while reading : Incorrect key");
-      case const (ReadRetriesExcedeedException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while reading : Maximum number of retries reached");
-      case const (ReadUnknownException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while reading : Unknow error");
-      case const (WriteTagRemovedException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while writing : Tag was removed");
-      case const (WriteSectorAuthenticationFailed):
-        NfcExceptionHandler.displaySnackbar(context, "Error while writing : Incorrect key");
-      case const (WriteRetriesExcedeedException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while writing : Maximum number of retries reached");
-      case const (WriteUnknownException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while writing : Unknow error");
+      case const (RetriesExcedeedException):
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Number of retries excedeed");
+      case const (SectorAuthenticationFailed):
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Incorrect keys");
+      case const (NfcAdapterCommunicationException):
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Communication error");
+      case const (NfcAdapterTagRemovedException):
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Tag was removed");
+      case const (NfcAdapterException):
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Unknown exception");
       case const (ReleaseFailedException):
-        NfcExceptionHandler.displaySnackbar(context, "Error while releasing the tag : Tag was lost");
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Error while releasing the tag : Tag was lost");
+      case const(WriteSectorZeroException):
+        NfcExceptionHandler.displaySnackbar(context, "${prefix}Warning : Sector 0 write failed, tag is not a CUID one");
     }
   }
 

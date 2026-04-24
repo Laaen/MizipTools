@@ -38,10 +38,10 @@ class AutoRepair extends StatelessWidget {
         spacing: 10,
         children: [
           Text("Auto-Repair", style: TextStyle(fontSize: 18),),
-          Row(
-            spacing: 20,
+          Column(
+            spacing: 15,
             children: [
-              Expanded(child: Form(key: _uidFormKey, child: textField)),
+              Form(key: _uidFormKey, child: textField),
               OutlinedButton(onPressed: ()async => autoRepair(context), child: Text("Ok"))
             ],
           )

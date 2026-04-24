@@ -7,6 +7,10 @@ class MockNfcTag {
 
   List<Uint8List> data;
   final NfcTagType type;
+  // If the tag should fail when writing to block 0
+  bool failureBlockZero = false;
+  // List of sectors the tag should deny the authentication for 
+  List<int> denyAuthList = [];
 
   MockNfcTag({required this.data, required this.type});
 
@@ -19,6 +23,11 @@ class MockNfcTag {
   }
 
   bool authenticateSector(int sectorNb, Uint8List? keyA, Uint8List? keyB){
+
+    if(denyAuthList.contains(sectorNb)){
+      return false;
+    }
+
     var result = false;
     if(keyA != null){
       final tagKeyA = data[sectorNb * 4 + 3].sublist(0, 6);
@@ -39,9 +48,21 @@ class MockNfcTag {
     return Uint8List.fromList(data.sublist(sectorNb * 4, sectorNb * 4 + 4).flattened.toList());
   }
 
-  void writeBlock(int blockNb, Uint8List newData){
+  bool writeBlock(int blockNb, Uint8List newData){
+    // Fail write on block zero
+    if(failureBlockZero && (blockNb == 0)){
+      return false;
+    }
     data[blockNb] = newData;
+    return true;
   }
 
+  void setFailureBlockZero(bool value){
+    failureBlockZero = value;
+  }
+
+  void setDenyAuthList(List<int> value){
+    denyAuthList = value;
+  }
 
 }

@@ -23,7 +23,7 @@ class ReadDump extends StatelessWidget{
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text("Read dump", style: TextStyle(fontSize: 18),),
-          Row(spacing: 15,
+          Column(spacing: 15,
             children: [
               DropdownMenu(dropdownMenuEntries: getDumpList(dataDir.getFilesList()), controller: currentDumpChoice, width: 160,),
               OutlinedButton(onPressed: () => readDump(context), child: Text("Read"),)
@@ -35,7 +35,7 @@ class ReadDump extends StatelessWidget{
   }
 
   List<DropdownMenuEntry> getDumpList(List<FileSystemEntity> dataDir){
-    return dataDir.map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).where((name) => name.label != "uid_save").toList();
+    return dataDir.map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).where((name) => !["uid_save", "debug"].contains(name.label)).toList();
   }
 
   Future<void> readDump(BuildContext context) async{

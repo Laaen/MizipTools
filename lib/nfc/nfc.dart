@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:miziptools/exceptions/nfc_exceptions.dart';
 import 'package:miziptools/nfc/currentnfctag.dart';
 import 'package:miziptools/nfc/nfc_adapter.dart';
 import 'package:miziptools/nfc/nfc_tag.dart';
@@ -26,7 +29,7 @@ Future<bool> checkTagPresent(Lock globalLock, NfcAdapter nfcAdapter, {int retrie
   try{
     await globalLock.synchronized(()async {
       Logger.root.info("Tag Ping");
-      await nfcAdapter.pingTag();
+      await nfcAdapter.authenticateSector(0, keyA: Uint8List.fromList([0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5]));
     });
     return true;
   } catch(error){
@@ -36,6 +39,7 @@ Future<bool> checkTagPresent(Lock globalLock, NfcAdapter nfcAdapter, {int retrie
       return await checkTagPresent(globalLock, nfcAdapter, retries: retries - 1);
     }
     else{
+      Logger.root.warning("Exceeded retries on ping with error : $error");
       Logger.root.warning("Tag Lost");
       return false;
     }

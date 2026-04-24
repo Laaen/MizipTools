@@ -106,9 +106,6 @@ class CurrentNFCTag with ChangeNotifier {
         }
       }
     }
-
-    print(validKeys.a.map((k) => k.toHexString().toUpperCase()));
-    print(validKeys.b.map((k) => k.toHexString().toUpperCase()));
     await innerTag!.rewriteKeys(validKeys, candidateCurrentUid);
   }
 
@@ -126,10 +123,6 @@ class CurrentNFCTag with ChangeNotifier {
 
   bool isMizipTag(){
     return isPresent() && innerTag! is MizipTag;
-  }
-
-  bool isMifareClassic(){
-    return isPresent();
   }
 
   Future<bool> saveUID(String uid) async {

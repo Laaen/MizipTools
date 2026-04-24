@@ -26,7 +26,7 @@ class WriteFromDump extends StatelessWidget{
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text("Write dump to tag", style: TextStyle(fontSize: 18),),
-          Row(spacing: 20,
+          Column(spacing: 15,
             children: [
               DropdownMenu(dropdownMenuEntries: getDumpList(dataDir.getFilesList()), controller: currentDumpChoice, width: 158.6,),
               OutlinedButton(onPressed: () => writeDump(context), child: Text("Write"),)
@@ -38,7 +38,7 @@ class WriteFromDump extends StatelessWidget{
   }
 
   List<DropdownMenuEntry> getDumpList(List<FileSystemEntity> dataDir){
-    return dataDir.map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).where((name) => name.label != "uid_save").toList();
+    return dataDir.map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).where((name) => !["uid_save", "debug"].contains(name.label)).toList();
   }
 
   Future<void> writeDump(BuildContext context) async{

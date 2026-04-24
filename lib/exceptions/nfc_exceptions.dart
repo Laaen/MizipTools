@@ -1,43 +1,11 @@
-class ReadFailedException implements Exception{
+class RetriesExcedeedException implements Exception{
   String cause;
-  ReadFailedException(this.cause);
+  RetriesExcedeedException(this.cause);
 }
 
-class ReadRetriesExcedeedException extends ReadFailedException{
-  ReadRetriesExcedeedException(super.cause);
-}
-
-class ReadSectorAuthenticationFailed extends ReadFailedException{
-  ReadSectorAuthenticationFailed(super.cause);
-}
-
-class ReadTagRemovedException extends ReadFailedException{
-  ReadTagRemovedException(super.cause);
-}
-
-class ReadUnknownException extends ReadFailedException{
-  ReadUnknownException(super.cause);
-}
-
-class WriteFailedException implements Exception{
+class SectorAuthenticationFailed implements Exception{
   String cause;
-  WriteFailedException(this.cause);
-}
-
-class WriteRetriesExcedeedException extends WriteFailedException{
-  WriteRetriesExcedeedException(super.cause);
-}
-
-class WriteTagRemovedException extends ReadFailedException{
-  WriteTagRemovedException(super.cause);
-}
-
-class WriteSectorAuthenticationFailed extends WriteFailedException{
-  WriteSectorAuthenticationFailed(super.cause);
-}
-
-class WriteUnknownException extends ReadFailedException{
-  WriteUnknownException(super.cause);
+  SectorAuthenticationFailed(this.cause);
 }
 
 class ReleaseFailedException implements Exception{
@@ -45,3 +13,7 @@ class ReleaseFailedException implements Exception{
   ReleaseFailedException(this.cause);
 }
 
+class WriteSectorZeroException implements Exception{
+  String cause;
+  WriteSectorZeroException(this.cause);
+}

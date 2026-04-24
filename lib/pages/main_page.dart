@@ -73,6 +73,7 @@ class MainPageState extends State<MainPage>{
 
   /// Callback executed when a new tag is detected, gets the tag's handle + its keys
   Future<void> onTagDetected (Lock globalLock, NfcTag tag, NfcAdapter nfcAdapter) async{
+    Logger.root.info("Tag detected");
     if(tag.type != NfcTagType.mifareClassic){
       await handleNotMifareClassicTag();
       return;
