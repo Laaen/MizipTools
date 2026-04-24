@@ -55,7 +55,7 @@ jobs:
   
   build:
     runs-on: ubuntu-latest
-    if: success()
+    if: success() && github.ref == 'refs/heads/master'
 
     steps:
       - name: checkout
@@ -96,7 +96,8 @@ jobs:
           overwrite: true
           archive: false
 
-      - name: Bump version and push tag
+      # Only use this action to get the next tag version, the tag creation is done by the following actions
+      - name: Get bumped version
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
