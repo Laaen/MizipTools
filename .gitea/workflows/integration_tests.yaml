@@ -55,10 +55,9 @@ jobs:
   
   build:
     runs-on: ubuntu-latest
-    if: success() && github.ref_type == 'tag'
+    if: success()
 
     steps:
-
       - name: checkout
         uses: actions/checkout@v4
 
@@ -101,6 +100,7 @@ jobs:
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
+          release_branches: .*
           github_token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Generate release text
