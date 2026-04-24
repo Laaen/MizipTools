@@ -76,6 +76,11 @@ jobs:
         with:
           channel: 'stable'
 
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0.1'
+          bundler-cache: true
+
       - name: Get Flutter dependencies
         run: flutter pub get
 
@@ -87,6 +92,15 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
+          name: miziptools-release-build
           path: ./miziptools.apk
           overwrite: true
           archive: false
+      
+      - name: Generate release text
+        run: ruby scripts/get_changelog.rb 
+
+      - uses: akkuman/gitea-release-action@v1
+        with:
+          files: ./miziptools.apk
+          body_path: ./release_text
