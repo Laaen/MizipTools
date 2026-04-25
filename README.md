@@ -1,6 +1,5 @@
 # MizipTools
 
-![tests status](https://gitea.floof.ovh/Laen/Miziptools/actions/workflows/integration_tests.yaml/badge.svg?branch=master)
 ![code coverage](https://coverage.floof.ovh/get/miziptools)
 
 Android App written in Flutter made to modify MiZip NFC tags.  
