@@ -11,7 +11,6 @@ import 'package:miziptools/widgets/basic/container_with_border.dart';
 import 'package:provider/provider.dart';
 
 class AutoRepair extends StatelessWidget {
-
   AutoRepair({super.key});
 
   final _uidFormKey = GlobalKey<FormState>();
@@ -27,7 +26,7 @@ class AutoRepair extends StatelessWidget {
       validator: uidFieldValidator,
       decoration: InputDecoration(
         labelText: "Old UID",
-        border: UnderlineInputBorder()
+        border: UnderlineInputBorder(),
       ),
     );
 
@@ -37,67 +36,69 @@ class AutoRepair extends StatelessWidget {
       child: Column(
         spacing: 10,
         children: [
-          Text("Auto-Repair", style: TextStyle(fontSize: 18),),
+          Text("Auto-Repair", style: TextStyle(fontSize: 18)),
           Column(
             spacing: 15,
             children: [
               Form(key: _uidFormKey, child: textField),
-              OutlinedButton(onPressed: ()async => autoRepair(context), child: Text("Ok"))
+              OutlinedButton(
+                onPressed: () async => autoRepair(context),
+                child: Text("Ok"),
+              ),
             ],
-          )
+          ),
         ],
-      )
+      ),
     );
   }
 
-  String? uidFieldValidator(String? data){
+  String? uidFieldValidator(String? data) {
     data = data?.toUpperCase();
 
-    if(data == null || data.length < 8){
+    if (data == null || data.length < 8) {
       return "UID must be 8 chars";
-    } if (data.characters.any((char) => !validChars.contains(char))){
+    }
+    if (data.characters.any((char) => !validChars.contains(char))) {
       return "Must be valid hexa";
     }
     return null;
   }
 
-  Future<void> autoRepair(BuildContext context) async{
+  Future<void> autoRepair(BuildContext context) async {
     final tag = context.read<CurrentNFCTag>();
-    if(_uidFormKey.currentState!.validate()){
-      
+    if (_uidFormKey.currentState!.validate()) {
       showSnackBar(context, "Trying to auto-repair");
 
-      try{
+      try {
         await tag.autoRepair(_uidFormController.text.toUint8List());
-        if(context.mounted){
+        if (context.mounted) {
           showSnackBar(context, "Repair successful");
-        }      
-      } on Exception catch(e) {
+        }
+      } on Exception catch (e) {
         // ignore: use_build_context_synchronously
         NfcExceptionHandler.handleException(e, context);
         return;
       }
 
-      try{
+      try {
         // Release to poll new tag
         await tag.releaseTag();
-      } on Exception catch(e){
+      } on Exception catch (e) {
         // ignore: use_build_context_synchronously
         NfcExceptionHandler.handleException(e, context);
         return;
       }
-  
     }
   }
 
-  String getSavedUid(BuildContext context){
-    try{
+  String getSavedUid(BuildContext context) {
+    try {
       final dataDir = context.read<DataDir>();
       return dataDir.readFile("uid_save");
-    } on FileSystemException catch(e){
+    } on FileSystemException catch (e) {
       Logger.root.severe("Error while reading save uid file : $e");
       return "00000000";
     }
   }
-
 }
+
