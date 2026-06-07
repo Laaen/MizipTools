@@ -12,23 +12,28 @@ import 'package:logging_appenders/logging_appenders.dart';
 import "pages/main_page.dart";
 import 'package:logging/logging.dart';
 
-
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final externalDir = await getExternalStorageDirectory();
   setupLogging(externalDir!);
-  // TODO: Check if null value can cause issues
-  runApp(App(nfcAdapter: NfcAdapter(), dataDir: externalDir!,));
+  final adapter = NfcAdapter();
+  // Sets the isValid property
+  await adapter.checkValidity();
+  runApp(App(nfcAdapter: adapter, dataDir: externalDir));
 }
 
-void setupLogging(Directory dataDir){
-  if(kDebugMode){
+void setupLogging(Directory dataDir) {
+  if (kDebugMode) {
     Logger.root.level = Level.INFO;
     Logger.root.onRecord.listen((record) {
       print('${record.level.name}: ${record.time}: ${record.message}');
     });
   } else {
-    RotatingFileAppender(baseFilePath: "${dataDir.path}/debug.log", keepRotateCount: 1, rotateAtSizeBytes: 1024 * 1024 * 10).attachToLogger(Logger.root);
+    RotatingFileAppender(
+      baseFilePath: "${dataDir.path}/debug.log",
+      keepRotateCount: 1,
+      rotateAtSizeBytes: 1024 * 1024 * 10,
+    ).attachToLogger(Logger.root);
     Logger.root.level = Level.INFO;
   }
 }
