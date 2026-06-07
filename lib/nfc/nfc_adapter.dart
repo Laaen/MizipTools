@@ -18,7 +18,18 @@ class NfcAdapterTagRemovedException extends NfcAdapterException {
 }
 
 class NfcAdapter {
+  bool valid = false;
+
   NfcAdapter();
+
+  /// Gets the device's nfc availability
+  Future<void> checkValidity() async {
+    valid = await FlutterNfcKit.nfcAvailability == NFCAvailability.available;
+  }
+
+  bool get isValid {
+    return valid;
+  }
 
   Future<Uint8List> pingTag(
       {Duration timeout = const Duration(milliseconds: 200)}) async {
@@ -115,4 +126,3 @@ class NfcAdapter {
     }
   }
 }
-
