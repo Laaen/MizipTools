@@ -5,7 +5,6 @@ import 'package:logging/logging.dart';
 import 'package:miziptools/nfc/nfc_tag.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'mifare_classic_test.dart';
 import 'mock/mock_nfc_adapter.dart';
 import 'mock/mock_nfc_tag.dart';
 
@@ -54,4 +53,3 @@ MockNfcTag generateMockMizipTag() {
     "DC0BAC5BA9E178778800AB67CA563689".toUint8List(),
   ]);
 }
-
