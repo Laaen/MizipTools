@@ -4,96 +4,115 @@ import 'package:miziptools/extensions/string_extensions.dart';
 import 'package:miziptools/nfc/nfc_tag.dart';
 import 'package:logging/logging.dart';
 
-class NfcAdapterException implements Exception{
+class NfcAdapterException implements Exception {
   String cause;
   NfcAdapterException(this.cause);
 }
 
-class NfcAdapterCommunicationException extends NfcAdapterException{
+class NfcAdapterCommunicationException extends NfcAdapterException {
   NfcAdapterCommunicationException(super.cause);
 }
 
-class NfcAdapterTagRemovedException extends NfcAdapterException{
+class NfcAdapterTagRemovedException extends NfcAdapterException {
   NfcAdapterTagRemovedException(super.cause);
 }
 
 class NfcAdapter {
+  bool valid = false;
 
   NfcAdapter();
 
-  Future<Uint8List> pingTag({Duration timeout = const Duration(milliseconds: 200)}) async{
-    try{
-      return await FlutterNfcKit.transceive("FFCA000000".toUint8List(), timeout: timeout);
-    } on Exception catch (e){
+  /// Gets the device's nfc availability
+  Future<void> checkValidity() async {
+    valid = await FlutterNfcKit.nfcAvailability == NFCAvailability.available;
+  }
+
+  bool get isValid {
+    return valid;
+  }
+
+  Future<Uint8List> pingTag(
+      {Duration timeout = const Duration(milliseconds: 200)}) async {
+    try {
+      return await FlutterNfcKit.transceive("FFCA000000".toUint8List(),
+          timeout: timeout);
+    } on Exception catch (e) {
       handleException(e);
     }
     return Uint8List(0);
   }
 
-  Future<NfcTag> pollTag({Duration timeout = const Duration(milliseconds: 200)}) async{
-    try{
-      final tag = await FlutterNfcKit.poll(timeout: timeout, androidCheckNDEF: false);
-      final type = tag.type == NFCTagType.mifare_classic ? NfcTagType.mifareClassic : NfcTagType.other;
+  Future<NfcTag> pollTag(
+      {Duration timeout = const Duration(milliseconds: 200)}) async {
+    try {
+      final tag =
+          await FlutterNfcKit.poll(timeout: timeout, androidCheckNDEF: false);
+      final type = tag.type == NFCTagType.mifare_classic
+          ? NfcTagType.mifareClassic
+          : NfcTagType.other;
       return NfcTag(type: type, id: tag.id);
-    } on Exception catch(e){
+    } on Exception catch (e) {
       handleException(e);
     }
     return NfcTag(type: NfcTagType.other, id: "FFFFFFFF");
   }
 
   Future<void> releaseTag() async {
-    try{
+    try {
       return await FlutterNfcKit.finish();
-    } on Exception catch(_){
+    } on Exception catch (_) {
       return;
     }
   }
 
-  Future<bool> authenticateSector(int sectorNb, {Uint8List? keyA, Uint8List? keyB}) async{
-    try{
-      return await FlutterNfcKit.authenticateSector(sectorNb, keyA: keyA, keyB: keyB);
-    } on Exception catch(e){
+  Future<bool> authenticateSector(int sectorNb,
+      {Uint8List? keyA, Uint8List? keyB}) async {
+    try {
+      return await FlutterNfcKit.authenticateSector(sectorNb,
+          keyA: keyA, keyB: keyB);
+    } on Exception catch (e) {
       handleException(e);
     }
     return false;
   }
 
-  Future<bool> writeBlock(int blockNb, Uint8List data) async{
-    try{
+  Future<bool> writeBlock(int blockNb, Uint8List data) async {
+    try {
       await FlutterNfcKit.writeBlock(blockNb, data);
       // If we reach here, there was no error
       return true;
-    } on Exception catch(e){
+    } on Exception catch (e) {
       handleException(e);
       return false;
     }
   }
 
-  Future<Uint8List> readBlock(int blockNb) async{
-    try{
+  Future<Uint8List> readBlock(int blockNb) async {
+    try {
       return await FlutterNfcKit.readBlock(blockNb);
-    } on Exception catch(e){
+    } on Exception catch (e) {
       handleException(e);
     }
     return Uint8List(0);
   }
 
-  Future<Uint8List> readSector(int sectorNb) async{
-    try{
+  Future<Uint8List> readSector(int sectorNb) async {
+    try {
       return await FlutterNfcKit.readSector(sectorNb);
-    } on Exception catch(e){
+    } on Exception catch (e) {
       handleException(e);
     }
     return Uint8List(0);
   }
 
-  void handleException(Exception exception){
-    if (exception is PlatformException){
+  void handleException(Exception exception) {
+    if (exception is PlatformException) {
       logFiltered(exception);
-      if(exception.code == "503"){
+      if (exception.code == "503") {
         throw NfcAdapterTagRemovedException("Tag was removed");
-      } else{
-        throw NfcAdapterCommunicationException("Communication exception occured");
+      } else {
+        throw NfcAdapterCommunicationException(
+            "Communication exception occured");
       }
     } else {
       throw NfcAdapterException("Unknown exception occured : $exception");
@@ -101,10 +120,9 @@ class NfcAdapter {
   }
 
   /// Doesn't log errors 404 (NFC not available), 408 (Polling tag timeout)
-  void logFiltered(PlatformException exception){
-    if (![404, 408].contains(int.parse(exception.code))){
+  void logFiltered(PlatformException exception) {
+    if (![404, 408].contains(int.parse(exception.code))) {
       Logger.root.warning("Got exception : $exception");
     }
   }
-
 }

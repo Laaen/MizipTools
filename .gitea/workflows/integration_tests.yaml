@@ -52,3 +52,18 @@ jobs:
         env:
           TEST_COV_KEY: ${{ secrets.TEST_COV_KEY }}
         run: ruby ./coverage/get_total_coverage.rb
+
+      - name: Build debug package
+        run: flutter build apk --debug
+
+      - name: Rename build
+        run: mv ./build/app/outputs/flutter-apk/app-debug.apk ./miziptools-debug.apk
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: miziptools-debug-build
+          path: ./miziptools-debug.apk
+          overwrite: true
+          archive: false
+          retention-days: 7
+
