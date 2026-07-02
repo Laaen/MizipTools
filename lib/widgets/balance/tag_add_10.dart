@@ -4,37 +4,39 @@ import 'package:flutter/material.dart';
 import "package:miziptools/exceptions/nfc_exception_handler.dart";
 import "package:miziptools/nfc/currentnfctag.dart";
 import "package:miziptools/misc/snackbar.dart";
+import "package:miziptools/tags/balance.dart";
 import "package:miziptools/widgets/basic/container_with_border.dart";
 import "package:provider/provider.dart";
 
-
-class TagAdd10 extends StatelessWidget{
-
+class TagAdd10 extends StatelessWidget {
   const TagAdd10({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ContainerWithBorder(
-      child: OutlinedButton(onPressed: () => add10(context), child: Text("Add 10\$"),),
+      child: OutlinedButton(
+        onPressed: () => add10(context),
+        child: Text("Add 10\$"),
+      ),
     );
   }
 
   void add10(BuildContext context) async {
-    
     showSnackBar(context, "Adding 10\$");
     final tag = context.read<CurrentNFCTag>();
 
-    try{
+    try {
       await tag.updateInnerBalance();
-    } on Exception catch (e){
+    } on Exception catch (e) {
       // ignore: use_build_context_synchronously
-      NfcExceptionHandler.handleException(e, context, prefix: "Error: Could not get tag's current balance : ");
+      NfcExceptionHandler.handleException(e, context,
+          prefix: "Error: Could not get tag's current balance : ");
       return;
     }
 
     final currentBalance = tag.getBalance();
-    if(!currentBalance.isValid()){
-      if(context.mounted){
+    if (currentBalance.valid == BalanceValidity.invalid) {
+      if (context.mounted) {
         showSnackBar(context, "Error: The retreived balance is incorrect");
       }
       return;
@@ -46,13 +48,13 @@ class TagAdd10 extends StatelessWidget{
       await tag.setBalance(newBalance.toString());
     } on Exception catch (e) {
       // ignore: use_build_context_synchronously
-      NfcExceptionHandler.handleException(e, context, prefix: "Error while writing new balance : ");
+      NfcExceptionHandler.handleException(e, context,
+          prefix: "Error while writing new balance : ");
       return;
     }
 
-    if(context.mounted){
-      showSnackBar(context, "Balance changed successfully");  
+    if (context.mounted) {
+      showSnackBar(context, "Balance changed successfully");
     }
   }
 }
-

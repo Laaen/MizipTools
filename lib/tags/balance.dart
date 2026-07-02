@@ -1,5 +1,8 @@
 import 'dart:typed_data';
 
+///Enum for validity of Balance
+enum BalanceValidity { badChecksum, invalid, valid }
+
 /// Represents the balance of a tag
 /// Is used to convert between raw bytes format to double or String
 class Balance {
@@ -11,7 +14,7 @@ class Balance {
   late Uint8List counterByte;
 
   /// On balance reading fail, it is marked as not valid
-  bool valid = false;
+  BalanceValidity valid = BalanceValidity.invalid;
 
   Balance(
       {required this.rawBalance,
@@ -30,10 +33,14 @@ class Balance {
     if (rawBalance.length != 2 ||
         rawChecksum.length != 1 ||
         counterByte.length != 1) {
-      valid = false;
+      valid = BalanceValidity.invalid;
     }
 
-    valid = checkChecksum();
+    if (checkChecksum()) {
+      valid = BalanceValidity.valid;
+    } else {
+      valid = BalanceValidity.badChecksum;
+    }
   }
 
   bool checkChecksum() {
@@ -65,11 +72,11 @@ class Balance {
         .toList();
   }
 
-  void setValid(bool state) {
+  void setValid(BalanceValidity state) {
     valid = state;
   }
 
-  bool isValid() {
+  BalanceValidity isValid() {
     return valid;
   }
 }
