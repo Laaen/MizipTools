@@ -13,7 +13,7 @@ void main() async {
   final dataDir = await getExternalStorageDirectory();
   setupLogging();
   final adapter =
-      MockNfcAdapter(tagToSimulate: generateMockMizipTag(), available: false);
+      MockNfcAdapter(tagToSimulate: generateMockMizipTag(), available: true);
   adapter.putTag();
   runApp(App(
     nfcAdapter: adapter,
@@ -40,7 +40,7 @@ MockNfcTag generateMockMizipTag() {
     "AA020000000000000000000000000000".toUint8List(),
     "E4634151649478778803EA586922C355".toUint8List(),
     "00A90AA3000000000000000000000006".toUint8List(),
-    "006C0E62000000000000000000000007".toUint8List(),
+    "006C0EFF000000000000000000000007".toUint8List(),
     "55070000000000000000000000000000".toUint8List(),
     "4604D2437F5E787788126893748F2935".toUint8List(),
     "00000000000000000000000000000000".toUint8List(),
