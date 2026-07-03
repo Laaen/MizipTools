@@ -1,3 +1,11 @@
+### 2.0.2
+- Check if NFC is enabled on launch
+- Displays a message if NFC is disabled or not supported
+- Bumped Kotlin + Gradle version
+- Migrated Kotlin plugin
+- Fixed checksum check
+- Added message in case of invalid checksum of the balance
+
 ### 2.0.1
 - Fixed UI overflow for some widgets
 - Added warning message in case of trying to write a dump or change the uid on a non CUID tag
