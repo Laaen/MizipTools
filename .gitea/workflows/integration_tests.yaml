@@ -52,10 +52,7 @@ jobs:
         env:
           TEST_COV_KEY: ${{ secrets.TEST_COV_KEY }}
         run: ruby ./coverage/get_total_coverage.rb
-
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          fetch-depth: 0  
+  
       - uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
