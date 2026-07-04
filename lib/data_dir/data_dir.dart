@@ -15,8 +15,7 @@ class DataDir with ChangeNotifier {
   /// Writes the provided content to the file
   /// Triggers a listener notification in order to reload the UI
   Future<void> writeFile(String fileName, String content) async {
-    final IOSink file = File("${dataDir.path}/$fileName").openWrite()
-      ..write(content);
+    final file = File("${dataDir.path}/$fileName").openWrite()..write(content);
     await file.close();
     notifyListeners();
   }
@@ -36,7 +35,7 @@ class DataDir with ChangeNotifier {
     return dataDir
         .listSync()
         .where(
-          (FileSystemEntity file) => file.path.split("/").last != "uid_save",
+          (file) => file.path.split("/").last != "uid_save",
         )
         .toList();
   }
