@@ -85,7 +85,7 @@ class MainPageState extends State<MainPage> {
         await t.updateInnerTag(currentTag);
       } on Exception catch (e) {
         // ignore: use_build_context_synchronously
-        NfcExceptionHandler.handleException(e, context);
+         handleException(e, context);
       }
     }
   }

@@ -29,7 +29,7 @@ class TagAdd10 extends StatelessWidget {
       await tag.updateInnerBalance();
     } on Exception catch (e) {
       // ignore: use_build_context_synchronously
-      NfcExceptionHandler.handleException(e, context,
+       handleException(e, context,
           prefix: "Error: Could not get tag's current balance : ");
       return;
     }
@@ -48,7 +48,7 @@ class TagAdd10 extends StatelessWidget {
       await tag.setBalance(newBalance.toString());
     } on Exception catch (e) {
       // ignore: use_build_context_synchronously
-      NfcExceptionHandler.handleException(e, context,
+       handleException(e, context,
           prefix: "Error while writing new balance : ");
       return;
     }
