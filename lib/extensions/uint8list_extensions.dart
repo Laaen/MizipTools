@@ -8,4 +8,3 @@ extension Converter on Uint8List {
     return map((x) => x.toRadixString(16).padLeft(2, "0")).toList().join();
   }
 }
-

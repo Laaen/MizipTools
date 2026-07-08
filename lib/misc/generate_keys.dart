@@ -63,4 +63,3 @@ Uint8List xor(Uint8List x, Uint8List y, int leftPad) {
       .padLeft(leftPad, "0")
       .toUint8List();
 }
-
