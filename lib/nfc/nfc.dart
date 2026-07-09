@@ -51,7 +51,7 @@ Future<NfcTag?> getNewTag(NfcAdapter nfcAdapter) async {
   try {
     final tag = await nfcAdapter.pollTag();
     return tag;
-  } on Exception {
+  } catch (_) {
     Logger.root.fine("No tag found");
     return Future.value();
   }
