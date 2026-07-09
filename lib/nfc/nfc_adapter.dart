@@ -1,7 +1,6 @@
 import "package:flutter/services.dart";
 import "package:flutter_nfc_kit/flutter_nfc_kit.dart";
 import "package:logging/logging.dart";
-import "package:miziptools/extensions/string_extensions.dart";
 import "package:miziptools/nfc/nfc_tag.dart";
 
 /// All NFC interaction goes through this class

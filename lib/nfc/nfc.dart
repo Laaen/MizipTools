@@ -100,4 +100,3 @@ Future<void> watchForTag(
     await Future.delayed(const Duration(milliseconds: 10));
   }
 }
-
