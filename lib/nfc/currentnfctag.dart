@@ -19,8 +19,8 @@ class CurrentNFCTag with ChangeNotifier {
   /// Can be a [MifareClassicTag], a [MizipTag] or null
   MifareClassicTag? innerTag;
 
-  /// Sets innerTag to newTag and triggers a balance update with [MifareClassicTag.updateInnerBalance()]
-  /// Triggers an UI reload
+  /// Sets innerTag to newTag and triggers a balance update with
+  /// [MifareClassicTag.updateInnerBalance()], and then triggers an UI reload
   Future<void> updateInnerTag(MifareClassicTag? newTag) async {
     innerTag = newTag;
     await innerTag?.updateInnerBalance();
@@ -95,33 +95,46 @@ class CurrentNFCTag with ChangeNotifier {
     await innerTag!.setUid(newUid);
   }
 
-  /// Authenticato to the given sector with the given keys
-  Future<bool> authenticateSector(int sectorNb, Uint8List? keyA, keyB) async {
-    return await innerTag!.authenticateSector(sectorNb, keyA: keyA, keyB: keyB);
+  /// Authenticate to the given sector with the given keys
+  Future<bool> authenticateSector(
+    int sectorNb,
+    Uint8List? keyA,
+    Uint8List? keyB,
+  ) async {
+    return innerTag!.authenticateSector(sectorNb, keyA: keyA, keyB: keyB);
   }
 
+  /// Asks the NFC adapter to release the tag, and sets innerTag to null
   Future<void> releaseTag() async {
     await innerTag!.releaseTag();
     setTagAbsent();
   }
 
+  /// Gets the keys of the current UID, the old UID
+  /// and the default MifareClassic keys, tries to authenticate with each to get
+  /// a list of correct keys. Once the correct keys are found,
+  /// it will rewrite the keys on the tag to match the current UID
   Future<void> autoRepair(Uint8List oldUid) async {
-    MifareKeys validKeys = (a: [], b: []);
+    final MifareKeys validKeys = (a: [], b: []);
 
-    MifareKeys candidateCurrentUid = generateKeys(innerTag!.uid);
-    MifareKeys candidateOldUid = generateKeys(oldUid);
-    MifareKeys candidateMifareClassic = (
+    final MifareKeys candidateCurrentUid = generateKeys(innerTag!.uid);
+    final MifareKeys candidateOldUid = generateKeys(oldUid);
+    final MifareKeys candidateMifareClassic = (
       a: List.filled(
-          5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])),
+        5,
+        Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
+      ),
       b: List.filled(
-          5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]))
+        5,
+        Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
+      )
     );
 
     // Test keys A
     for (final (index, keys) in IterableZip([
       candidateMifareClassic.a,
       candidateCurrentUid.a,
-      candidateOldUid.a
+      candidateOldUid.a,
     ]).indexed) {
       for (final key in keys) {
         if (await tryAuthenticate(index, keyA: key)) {
@@ -135,7 +148,7 @@ class CurrentNFCTag with ChangeNotifier {
     for (final (index, keys) in IterableZip([
       candidateMifareClassic.b,
       candidateCurrentUid.b,
-      candidateOldUid.b
+      candidateOldUid.b,
     ]).indexed) {
       for (final key in keys) {
         if (await tryAuthenticate(index, keyB: key)) {
@@ -147,12 +160,22 @@ class CurrentNFCTag with ChangeNotifier {
     await innerTag!.rewriteKeys(validKeys, candidateCurrentUid);
   }
 
-  Future<bool> tryAuthenticate(int sectorNb,
-      {Uint8List? keyA, Uint8List? keyB, int nbRetries = 2}) async {
+  /// Tries to authenticate to the sector with the given keys A and B,
+  /// and returns if it was succesful or not
+  Future<bool> tryAuthenticate(
+    int sectorNb, {
+    Uint8List? keyA,
+    Uint8List? keyB,
+    int nbRetries = 2,
+  }) async {
     if (!await innerTag!.authenticateSector(sectorNb, keyA: keyA, keyB: keyB)) {
       if (nbRetries > 0) {
-        return tryAuthenticate(sectorNb,
-            keyA: keyA, keyB: keyB, nbRetries: nbRetries - 1);
+        return tryAuthenticate(
+          sectorNb,
+          keyA: keyA,
+          keyB: keyB,
+          nbRetries: nbRetries - 1,
+        );
       } else {
         return false;
       }
@@ -161,10 +184,12 @@ class CurrentNFCTag with ChangeNotifier {
     }
   }
 
+  /// Returns if innerTag is an instance of [MizipTag]
   bool isMizipTag() {
     return isPresent() && innerTag! is MizipTag;
   }
 
+  /// Saves the given UID to the 'uid_save' file
   Future<bool> saveUID(String uid) async {
     final dataDir = await getExternalStorageDirectory();
     if (dataDir == null) {
