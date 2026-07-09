@@ -74,17 +74,6 @@ class NfcAdapter {
     }
   }
 
-  Future<Uint8List> pingTag(
-      {Duration timeout = const Duration(milliseconds: 200)}) async {
-    try {
-      return await FlutterNfcKit.transceive("FFCA000000".toUint8List(),
-          timeout: timeout);
-    } on Exception catch (e) {
-      handleException(e);
-    }
-    return Uint8List(0);
-  }
-
   Future<NfcTag> pollTag(
       {Duration timeout = const Duration(milliseconds: 200)}) async {
     try {
