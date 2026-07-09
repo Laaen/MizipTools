@@ -1,34 +1,77 @@
-import 'package:flutter/services.dart';
-import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
-import 'package:miziptools/extensions/string_extensions.dart';
-import 'package:miziptools/nfc/nfc_tag.dart';
-import 'package:logging/logging.dart';
+import "package:flutter/services.dart";
+import "package:flutter_nfc_kit/flutter_nfc_kit.dart";
+import "package:logging/logging.dart";
+import "package:miziptools/extensions/string_extensions.dart";
+import "package:miziptools/nfc/nfc_tag.dart";
 
-class NfcAdapterException implements Exception {
-  String cause;
-  NfcAdapterException(this.cause);
-}
-
-class NfcAdapterCommunicationException extends NfcAdapterException {
-  NfcAdapterCommunicationException(super.cause);
-}
-
-class NfcAdapterTagRemovedException extends NfcAdapterException {
-  NfcAdapterTagRemovedException(super.cause);
-}
-
+/// All NFC interaction goes through this class
+///
+/// Is is meant to be an abstraction over NFC communication
+/// Currently, it uses the "flutter_nfc_kit" module to perform
+/// nfc stuff
 class NfcAdapter {
-  bool valid = false;
-
+  /// Returns a new NfcAdapter
   NfcAdapter();
+
+  /// Wether if NFC is available and enabled on the device or not
+  bool nfcEnabled = false;
+
+  /// Getter for nfcEnabled
+  bool get isValid {
+    return nfcEnabled;
+  }
+
+  /// Calls [FlutterNfcKit.authenticateSector()] with the provided keys
+  ///
+  /// Returns wether the authentication is succesful or not
+  /// A succesful authentication means the key was correct
+  ///
+  /// Throws an [NfcAdapterException] if something went wrong
+  Future<bool> authenticateSector(
+    int sectorNb, {
+    Uint8List? keyA,
+    Uint8List? keyB,
+  }) async {
+    try {
+      return await FlutterNfcKit.authenticateSector(
+        sectorNb,
+        keyA: keyA,
+        keyB: keyB,
+      );
+    } on Exception catch (e) {
+      handleException(e);
+    }
+    return false;
+  }
 
   /// Gets the device's nfc availability
   Future<void> checkValidity() async {
-    valid = await FlutterNfcKit.nfcAvailability == NFCAvailability.available;
+    nfcEnabled =
+        await FlutterNfcKit.nfcAvailability == NFCAvailability.available;
   }
 
-  bool get isValid {
-    return valid;
+  /// Gets an exception throwed by a [FlutterNfcKit] method invocation
+  /// and rethrows a [NfcAdapterException] based on the original exception
+  void handleException(Exception exception) {
+    if (exception is PlatformException) {
+      logFiltered(exception);
+      if (exception.code == "503") {
+        throw NfcAdapterTagRemovedException("Tag was removed");
+      } else {
+        throw NfcAdapterCommunicationException(
+          "Communication exception occured",
+        );
+      }
+    } else {
+      throw NfcAdapterException("Unknown exception occured : $exception");
+    }
+  }
+
+  /// Doesn't log errors 404 (NFC not available), 408 (Polling tag timeout)
+  void logFiltered(PlatformException exception) {
+    if (![404, 408].contains(int.parse(exception.code))) {
+      Logger.root.warning("Got exception : $exception");
+    }
   }
 
   Future<Uint8List> pingTag(
@@ -57,36 +100,6 @@ class NfcAdapter {
     return NfcTag(type: NfcTagType.other, id: "FFFFFFFF");
   }
 
-  Future<void> releaseTag() async {
-    try {
-      return await FlutterNfcKit.finish();
-    } on Exception catch (_) {
-      return;
-    }
-  }
-
-  Future<bool> authenticateSector(int sectorNb,
-      {Uint8List? keyA, Uint8List? keyB}) async {
-    try {
-      return await FlutterNfcKit.authenticateSector(sectorNb,
-          keyA: keyA, keyB: keyB);
-    } on Exception catch (e) {
-      handleException(e);
-    }
-    return false;
-  }
-
-  Future<bool> writeBlock(int blockNb, Uint8List data) async {
-    try {
-      await FlutterNfcKit.writeBlock(blockNb, data);
-      // If we reach here, there was no error
-      return true;
-    } on Exception catch (e) {
-      handleException(e);
-      return false;
-    }
-  }
-
   Future<Uint8List> readBlock(int blockNb) async {
     try {
       return await FlutterNfcKit.readBlock(blockNb);
@@ -105,24 +118,35 @@ class NfcAdapter {
     return Uint8List(0);
   }
 
-  void handleException(Exception exception) {
-    if (exception is PlatformException) {
-      logFiltered(exception);
-      if (exception.code == "503") {
-        throw NfcAdapterTagRemovedException("Tag was removed");
-      } else {
-        throw NfcAdapterCommunicationException(
-            "Communication exception occured");
-      }
-    } else {
-      throw NfcAdapterException("Unknown exception occured : $exception");
+  Future<void> releaseTag() async {
+    try {
+      return await FlutterNfcKit.finish();
+    } on Exception catch (_) {
+      return;
     }
   }
 
-  /// Doesn't log errors 404 (NFC not available), 408 (Polling tag timeout)
-  void logFiltered(PlatformException exception) {
-    if (![404, 408].contains(int.parse(exception.code))) {
-      Logger.root.warning("Got exception : $exception");
+  Future<bool> writeBlock(int blockNb, Uint8List data) async {
+    try {
+      await FlutterNfcKit.writeBlock(blockNb, data);
+      // If we reach here, there was no error
+      return true;
+    } on Exception catch (e) {
+      handleException(e);
+      return false;
     }
   }
+}
+
+class NfcAdapterCommunicationException extends NfcAdapterException {
+  NfcAdapterCommunicationException(super.cause);
+}
+
+class NfcAdapterException implements Exception {
+  NfcAdapterException(this.cause);
+  String cause;
+}
+
+class NfcAdapterTagRemovedException extends NfcAdapterException {
+  NfcAdapterTagRemovedException(super.cause);
 }
