@@ -28,7 +28,7 @@ Future<bool> checkTagPresent(
       );
     });
     return true;
-  } on Exception catch (error) {
+  } catch (error) {
     if (retries > 0) {
       Logger.root.warning("Ping failed, retrying");
       await Future.delayed(delay);
