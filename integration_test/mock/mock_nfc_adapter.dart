@@ -39,7 +39,6 @@ class MockNfcAdapter extends NfcAdapter {
     return;
   }
 
-  @override
   Future<Uint8List> pingTag(
       {Duration timeout = const Duration(milliseconds: 200)}) async {
     Future.delayed(Duration(milliseconds: 500));
