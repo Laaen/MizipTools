@@ -148,7 +148,7 @@ class MainPageState extends State<MainPage> {
     }
 
     if (mounted) {
-      final t = context.read<CurrentNFCTag>();
+      var t = context.read<CurrentNFCTag>();
       try {
         await t.updateInnerTag(currentTag);
       } on Exception catch (e) {
