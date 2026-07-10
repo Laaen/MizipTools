@@ -73,8 +73,10 @@ class NfcAdapter {
     }
   }
 
-  Future<NfcTag> pollTag(
-      {Duration timeout = const Duration(milliseconds: 200)}) async {
+  /// Tries to connect with a tag
+  Future<NfcTag> pollTag({
+    Duration timeout = const Duration(milliseconds: 200),
+  }) async {
     try {
       final tag =
           await FlutterNfcKit.poll(timeout: timeout, androidCheckNDEF: false);
@@ -88,6 +90,7 @@ class NfcAdapter {
     return NfcTag(type: NfcTagType.other, id: "FFFFFFFF");
   }
 
+  /// Returns the data of the nth block
   Future<Uint8List> readBlock(int blockNb) async {
     try {
       return await FlutterNfcKit.readBlock(blockNb);
@@ -97,6 +100,7 @@ class NfcAdapter {
     return Uint8List(0);
   }
 
+  /// Returns the data of the nth sector
   Future<Uint8List> readSector(int sectorNb) async {
     try {
       return await FlutterNfcKit.readSector(sectorNb);
@@ -106,6 +110,7 @@ class NfcAdapter {
     return Uint8List(0);
   }
 
+  /// Release the tag
   Future<void> releaseTag() async {
     try {
       return await FlutterNfcKit.finish();
@@ -114,6 +119,7 @@ class NfcAdapter {
     }
   }
 
+  /// Writes the given data to the nth block
   Future<bool> writeBlock(int blockNb, Uint8List data) async {
     try {
       await FlutterNfcKit.writeBlock(blockNb, data);
@@ -126,15 +132,23 @@ class NfcAdapter {
   }
 }
 
-class NfcAdapterCommunicationException extends NfcAdapterException {
-  NfcAdapterCommunicationException(super.cause);
-}
-
+/// Represents an exception raised during operation with the nfc tag
 class NfcAdapterException implements Exception {
+  /// Creates a [NfcAdapterException] with the given cause
   NfcAdapterException(this.cause);
+
+  /// Why the exception is raised
   String cause;
 }
 
+/// Represents a communication exception (disconnection due to external cause)
+class NfcAdapterCommunicationException extends NfcAdapterException {
+  /// Creates a [NfcAdapterCommunicationException] with the given cause
+  NfcAdapterCommunicationException(super.cause);
+}
+
+/// Represents the tag being removed
 class NfcAdapterTagRemovedException extends NfcAdapterException {
+  /// Creates a [NfcAdapterTagRemovedException] with the given cause
   NfcAdapterTagRemovedException(super.cause);
 }
