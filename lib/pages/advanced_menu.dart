@@ -25,4 +25,3 @@ class AdvancedMenu extends StatelessWidget {
     );
   }
 }
-
