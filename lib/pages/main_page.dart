@@ -161,7 +161,7 @@ class MainPageState extends State<MainPage> {
 
   /// Called when the tag is lost,
   /// il sets [CurrentNFCTag]'s innerTag to null
-  Future<void> onTagLost() async {
+  void onTagLost() async {
     if (mounted) {
       context.read<CurrentNFCTag>().setTagAbsent();
     }
