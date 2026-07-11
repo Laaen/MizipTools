@@ -53,7 +53,7 @@ class MainPageState extends State<MainPage> {
           builder: (context, tag, child) {
             return Container(
               padding: const EdgeInsets.fromLTRB(0, 30, 0, 30),
-              child: const TabBarView(
+              child: TabBarView(
                 children: [
                   BalanceMenu(),
                   DumpMenu(),
@@ -112,8 +112,8 @@ class MainPageState extends State<MainPage> {
       return false;
     }
     final Balance balance = cTag.getBalance();
-    return (balance.valid == BalanceValidity.valid) ||
-        (balance.valid == BalanceValidity.badChecksum);
+    return balance.valid == BalanceValidity.valid ||
+        balance.valid == BalanceValidity.badChecksum;
   }
 
   /// Callback executed when a new tag is detected
@@ -170,6 +170,6 @@ class MainPageState extends State<MainPage> {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<Lock>('globalLock', globalLock));
+    properties.add(DiagnosticsProperty<Lock>("globalLock", globalLock));
   }
 }
