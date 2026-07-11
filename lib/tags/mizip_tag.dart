@@ -63,6 +63,10 @@ class MizipTag extends MifareClassicTag {
     });
   }
 
+  /// Sets the new balance to the tag
+  ///
+  /// The String value is converted to a Balance object before being used to
+  /// write the new balance block
   Future<void> setBalance(String value) async {
     // Convert given value to a list of 2 hex + get the checksum
     final newValue = (double.parse(value) * 100)
@@ -78,10 +82,11 @@ class MizipTag extends MifareClassicTag {
         .toList();
     final checksum = newValue.reduce((acc, curr) => acc ^ curr);
 
-    var newBalance = Balance(
-        rawBalance: Uint8List.fromList(newValue),
-        rawChecksum: Uint8List.fromList([checksum]),
-        counterByte: Uint8List.fromList(balance.counterByte));
+    final newBalance = Balance(
+      rawBalance: Uint8List.fromList(newValue),
+      rawChecksum: Uint8List.fromList([checksum]),
+      counterByte: Uint8List.fromList(balance.counterByte),
+    );
     Logger.root.info("New balance : $newBalance");
     final blockNbToWrite = await getCurrentBalanceBlockNumber();
     await writeBalance(newBalance, blockNbToWrite);
@@ -94,15 +99,21 @@ class MizipTag extends MifareClassicTag {
     final balanceBlockNb = await getCurrentBalanceBlockNumber();
     final data = await getRawBalanceData(balanceBlockNb);
     balance = Balance(
-        rawBalance: data.rawBalance,
-        rawChecksum: data.rawChecksum,
-        counterByte: data.counterByte);
+      rawBalance: data.rawBalance,
+      rawChecksum: data.rawChecksum,
+      counterByte: data.counterByte,
+    );
   }
 
+  /// Performn NCF communication with the tag to write the new
+  /// balance block to the give index
   Future<void> writeBalance(Balance balance, int blockNb) async {
     await lock.synchronized(() async {
-      await writeBlock(blockNb, Uint8List.fromList(balance.getRawBlockValue()),
-          retries: 5);
+      await writeBlock(
+        blockNb,
+        Uint8List.fromList(balance.getRawBlockValue()),
+        retries: 5,
+      );
     });
   }
 }
