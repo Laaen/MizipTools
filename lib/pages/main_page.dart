@@ -46,6 +46,7 @@ class MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     Logger.root.info("Starting app");
     return DefaultTabController(
+      initialIndex: 0,
       length: 3,
       child: Scaffold(
         appBar: const MizipToolsAppBar(),
