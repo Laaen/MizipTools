@@ -46,7 +46,6 @@ class MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     Logger.root.info("Starting app");
     return DefaultTabController(
-      initialIndex: 0,
       length: 3,
       child: Scaffold(
         appBar: const MizipToolsAppBar(),
@@ -113,8 +112,8 @@ class MainPageState extends State<MainPage> {
       return false;
     }
     final Balance balance = cTag.getBalance();
-    return balance.valid == BalanceValidity.valid ||
-        balance.valid == BalanceValidity.badChecksum;
+    return (balance.valid == BalanceValidity.valid) ||
+        (balance.valid == BalanceValidity.badChecksum);
   }
 
   /// Callback executed when a new tag is detected
@@ -149,7 +148,7 @@ class MainPageState extends State<MainPage> {
     }
 
     if (mounted) {
-      var t = context.read<CurrentNFCTag>();
+      final t = context.read<CurrentNFCTag>();
       try {
         await t.updateInnerTag(currentTag);
       } on Exception catch (e) {
