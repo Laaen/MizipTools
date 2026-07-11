@@ -152,7 +152,7 @@ class MainPageState extends State<MainPage> {
       try {
         await t.updateInnerTag(currentTag);
       } on Exception catch (e) {
-        // TODO: Check why this works
+        // TODO(Laen): Check why this works
         // ignore: use_build_context_synchronously
         handleException(e, context);
       }
