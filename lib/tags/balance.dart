@@ -69,7 +69,8 @@ class Balance {
   /// Generates the balance block full data
   Uint8List getRawBlockValue() {
     return Uint8List.fromList(
-        [0] + rawBalance + rawChecksum + List.filled(11, 0) + counterByte);
+      [0] + rawBalance + rawChecksum + List.filled(11, 0) + counterByte,
+    );
   }
 
   /// Gets the balance value as a string
