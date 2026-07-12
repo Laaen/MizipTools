@@ -13,28 +13,43 @@ import "package:synchronized/synchronized.dart";
 typedef MifareKeys = ({List<Uint8List> a, List<Uint8List> b});
 
 /// Represents a Mifare classic tag
-///
 class MifareClassicTag {
-  MifareClassicTag(
-      {required this.uid, required this.lock, required this.nfcAdapter});
+  /// Returns a new [MifareClassicTag] with the given properties
+  MifareClassicTag({
+    required this.uid,
+    required this.lock,
+    required this.nfcAdapter,
+  });
 
   /// Lock used to prevent concurrent access to the NFC reader
+  ///
+  /// It corresponds to the `globalLock` present in the main_page.dart
   Lock lock;
 
+  /// The NFC adapter used to perform communicatins with the tag
   NfcAdapter nfcAdapter;
+
+  /// The tag's UID
   Uint8List uid;
 
+  /// The tag's current balance
   Balance balance = Balance.empty();
 
   /// Returns wether the authentication is successful of not.
   ///
-  /// Some retries are needed because it can fail even if the provided key is the good one.
-  ///
-  /// Throws [NfcAdapterTagRemovedException] | [NfcAdapterCommunicationException] | [NfcAdapterException]
-  Future<bool> authenticateSector(int sectorNb,
-      {int retries = 2, Uint8List? keyA, Uint8List? keyB}) async {
+  /// Some retries are needed because it can fail even if the provided key is
+  /// the good one.
+  Future<bool> authenticateSector(
+    int sectorNb, {
+    int retries = 2,
+    Uint8List? keyA,
+    Uint8List? keyB,
+  }) async {
+    final keyAStr = keyA?.toHexString();
+    final keyBStr = keyB?.toHexString();
     Logger.root.info(
-        "Authenticating to sector $sectorNb with keys A: ${keyA?.toHexString()} B: ${keyB?.toHexString()}");
+      "Authenticating to sector $sectorNb with keys A: $keyAStr B: $keyBStr",
+    );
     bool result = false;
     for (final _ in Iterable.generate(retries)) {
       result =
@@ -46,8 +61,11 @@ class MifareClassicTag {
     return result;
   }
 
+  /// Returns the tag's data
+  ///
+  /// The dump is a list of 5 Uint8List (one for each sector)
   Future<List<Uint8List>> dumpTagData() async {
-    List<Uint8List> dump = [];
+    final List<Uint8List> dump = [];
     await lock.synchronized(() async {
       for (int sectorNb = 0; sectorNb < 5; sectorNb++) {
         final sectorData = await readSector(sectorNb, retries: 5);
@@ -59,30 +77,39 @@ class MifareClassicTag {
     return dump;
   }
 
+  /// Returns the balance of the tag
   Balance getBalance() {
     return balance;
   }
 
+  /// Returns the [MifareKeys] of the tag
+  ///
+  /// For a [MifareClassicTag] we suppose the keys are all FFFFFFFFFFFF
   MifareKeys getKeys() {
     return (
       a: List.filled(
-          5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])),
+        5,
+        Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
+      ),
       b: List.filled(
-          5, Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]))
+        5,
+        Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
+      )
     );
   }
 
   /// Returns the block's data
-  ///
-  /// Throws [RetriesExcedeedException] | [SectorAuthenticationFailed] | [NfcAdapterCommunicationException] | [NfcAdapterTagRemovedException] | [NfcAdapterException]
-  Future<Uint8List> readBlock(int number,
-      {int retries = 0,
-      Duration delay = const Duration(milliseconds: 10)}) async {
+  Future<Uint8List> readBlock(
+    int number, {
+    int retries = 0,
+    Duration delay = const Duration(milliseconds: 10),
+  }) async {
     Uint8List result = Uint8List(0);
     Logger.root.info(
-        "Reading block $number with key ${getKeys().a[number ~/ 4].toHexString()}");
+      "Reading block $number with key ${getKeys().a[number ~/ 4].toHexString()}",
+    );
 
-    return await lock.synchronized(() async {
+    return lock.synchronized(() async {
       for (final _ in Iterable.generate(retries)) {
         Future.delayed(delay);
         if (await authenticateSector(number ~/ 4,
