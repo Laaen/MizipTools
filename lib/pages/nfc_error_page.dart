@@ -25,7 +25,9 @@ class NfcErrorPage extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
                 ),
                 Text(
-                  "NFC is either not enabled or not supported on this device\nGo to your device settings to enable it and restart the application",
+                  """
+NFC is either not enabled or not supported on this device.
+Go to your device settings to enable it and restart the application.""",
                 ),
               ],
             ),
