@@ -66,13 +66,13 @@ class CurrentNFCTag with ChangeNotifier {
     int retries = 0,
     Duration delay = const Duration(milliseconds: 10),
   }) async {
-    return await innerTag!.readSector(number);
+    return innerTag!.readSector(number);
   }
 
   /// Returns the whole tag data as a list of 5 [Uint8List]
   /// A tag has 5 sectors
   Future<List<Uint8List>> dumpTagData() async {
-    return await innerTag!.dumpTagData();
+    return innerTag!.dumpTagData();
   }
 
   /// Writes the given data to the tag
@@ -101,7 +101,7 @@ class CurrentNFCTag with ChangeNotifier {
     Uint8List? keyA,
     Uint8List? keyB,
   ) async {
-    return await innerTag!.authenticateSector(sectorNb, keyA: keyA, keyB: keyB);
+    return innerTag!.authenticateSector(sectorNb, keyA: keyA, keyB: keyB);
   }
 
   /// Asks the NFC adapter to release the tag, and sets innerTag to null
