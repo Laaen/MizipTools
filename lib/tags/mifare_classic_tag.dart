@@ -105,21 +105,28 @@ class MifareClassicTag {
     Duration delay = const Duration(milliseconds: 10),
   }) async {
     Uint8List result = Uint8List(0);
+
+    final keyA = getKeys().a[number ~/ 4];
+
     Logger.root.info(
-      "Reading block $number with key ${getKeys().a[number ~/ 4].toHexString()}",
+      "Reading block $number with key ${keyA.toHexString()}",
     );
 
     return lock.synchronized(() async {
       for (final _ in Iterable.generate(retries)) {
-        Future.delayed(delay);
-        if (await authenticateSector(number ~/ 4,
-            keyA: getKeys().a[number ~/ 4])) {
+        await Future.delayed(delay);
+        if (await authenticateSector(
+          number ~/ 4,
+          keyA: keyA,
+        )) {
           result = await nfcAdapter.readBlock(number);
         } else {
           Logger.root.severe(
-              "Read failed : Authentication failure with keyA : ${getKeys().a[number ~/ 4].toHexString()}");
+            "Read failed : Authentication failure key : ${keyA.toHexString()}",
+          );
           throw SectorAuthenticationFailed(
-              "Read failed : Authentication failure with keyA : ${getKeys().a[number ~/ 4].toHexString()}");
+            "Read failed : Authentication failure key : ${keyA.toHexString()}",
+          );
         }
 
         if (result.isNotEmpty) {
@@ -128,32 +135,35 @@ class MifareClassicTag {
       }
       Logger.root.severe("Failed to read block $number");
       throw RetriesExcedeedException(
-          "Failed to read block $number : number of retries excedeed");
+        "Failed to read block $number : number of retries excedeed",
+      );
     });
   }
 
   /// Returns the sector's data
-  ///
-  /// Throws [RetriesExcedeedException] | [SectorAuthenticationFailed] | [NfcAdapterCommunicationException] | [NfcAdapterTagRemovedException] | [NfcAdapterException]
-  Future<Uint8List> readSector(int number,
-      {int retries = 0,
-      Duration delay = const Duration(milliseconds: 10),
-      Uint8List? keyA}) async {
+  Future<Uint8List> readSector(
+    int number, {
+    int retries = 0,
+    Duration delay = const Duration(milliseconds: 10),
+    Uint8List? keyA,
+  }) async {
     Uint8List result = Uint8List(0);
     final key = keyA ?? getKeys().a[number];
 
     Logger.root.info("Reading sector $number with key ${key.toHexString()}");
 
-    return await lock.synchronized(() async {
+    return lock.synchronized(() async {
       for (final _ in Iterable.generate(retries)) {
-        Future.delayed(delay);
+        await Future.delayed(delay);
         if (await authenticateSector(number, keyA: key)) {
           result = await nfcAdapter.readSector(number);
         } else {
           Logger.root.severe(
-              "Read failed : Authentication failure with keyA : ${key.toHexString()}");
+            "Read failed : Authentication failure key : ${key.toHexString()}",
+          );
           throw SectorAuthenticationFailed(
-              "Read failed : Authentication failure with keyA : ${key.toHexString()}");
+            "Read failed : Authentication failure key : ${key.toHexString()}",
+          );
         }
 
         if (result.isNotEmpty) {
@@ -162,10 +172,12 @@ class MifareClassicTag {
       }
       Logger.root.severe("Failed to read block $number");
       throw RetriesExcedeedException(
-          "Failed to read block $number : number of retries excedeed");
+        "Failed to read block $number : number of retries excedeed",
+      );
     });
   }
 
+  /// Tell the tag we don't want to talk with it anymore
   Future<void> releaseTag() async {
     try {
       await nfcAdapter.releaseTag();
