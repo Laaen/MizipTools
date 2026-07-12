@@ -20,4 +20,3 @@ class NfcTag {
   /// Its UID
   final String id;
 }
-
