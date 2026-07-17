@@ -190,12 +190,23 @@ class MifareClassicTag {
     }
   }
 
-  Future<void> rewriteKeys(MifareKeys currentKeys, correctKeys) async {
-    return await lock.synchronized(() async {
+  /// Replaces the tag keys with the provided correctKeys
+  ///
+  /// Uses currentKeys to authenticate with the tag for the rewrite
+  /// opereation
+  Future<void> rewriteKeys(
+    MifareKeys currentKeys,
+    MifareKeys correctKeys,
+  ) async {
+    return lock.synchronized(() async {
       for (final (index, _) in currentKeys.a.indexed) {
-        await setsectorKey(index, correctKeys.a[index], correctKeys.b[index],
-            currentKeyA: currentKeys.a[index],
-            currentKeyB: currentKeys.b[index]);
+        await setsectorKey(
+          index,
+          correctKeys.a[index],
+          correctKeys.b[index],
+          currentKeyA: currentKeys.a[index],
+          currentKeyB: currentKeys.b[index],
+        );
       }
     });
   }
