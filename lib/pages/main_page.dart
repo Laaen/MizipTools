@@ -107,6 +107,8 @@ class MainPageState extends State<MainPage> {
     );
     try {
       await cTag.updateInnerBalance();
+      // We need to catch all excetpions to convert them to a custom one
+      // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       Logger.root.warning("Error while getting balance : $e");
       return false;

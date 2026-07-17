@@ -28,6 +28,8 @@ Future<bool> checkTagPresent(
       );
     });
     return true;
+    // We need to catch all excetpions to convert them to a custom one
+    // ignore: avoid_catches_without_on_clauses
   } catch (error) {
     if (retries > 0) {
       Logger.root.warning("Ping failed, retrying");
@@ -51,6 +53,8 @@ Future<NfcTag?> getNewTag(NfcAdapter nfcAdapter) async {
   try {
     final tag = await nfcAdapter.pollTag();
     return tag;
+    // We need to catch all excetpions to convert them to a custom one
+    // ignore: avoid_catches_without_on_clauses
   } catch (_) {
     Logger.root.fine("No tag found");
     return Future.value();
