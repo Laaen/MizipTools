@@ -318,12 +318,13 @@ class MifareClassicTag {
     });
   }
 
+  /// Writes the given data to the tag
   Future<void> writeDumpToTag(List<Uint8List> data) async {
-    await lock.synchronized(() async {
+    return lock.synchronized(() async {
       try {
         // Write the data in every sector except sector 0 (issues, if UID changes, breaks everything, we have to do it at the end)
-        var currentBlockNb = 4;
-        for (var (idx, line) in data.skip(4).indexed) {
+        const currentBlockNb = 4;
+        for (final (idx, line) in data.skip(4).indexed) {
           await writeBlock(currentBlockNb + idx, line, retries: 5);
         }
       } catch (error) {
