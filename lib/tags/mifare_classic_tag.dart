@@ -211,18 +211,29 @@ class MifareClassicTag {
     });
   }
 
-  Future<void> setsectorKey(int sectorNb, Uint8List newKeyA, Uint8List newKeyB,
-      {Uint8List? currentKeyA, Uint8List? currentKeyB}) async {
-    await lock.synchronized(() async {
+  /// Changes the keys of a sector
+  Future<void> setsectorKey(
+    int sectorNb,
+    Uint8List newKeyA,
+    Uint8List newKeyB, {
+    Uint8List? currentKeyA,
+    Uint8List? currentKeyB,
+  }) async {
+    return lock.synchronized(() async {
       final sectorData =
           await readSector(sectorNb, retries: 5, keyA: currentKeyA);
       final currentTrailerBlock =
           Uint8List.fromList(sectorData.slices(16).last);
 
       final newTrailerBlock = Uint8List.fromList(
-          newKeyA + currentTrailerBlock.sublist(6, 10) + newKeyB);
-      await writeBlock(sectorNb * 4 + 3, newTrailerBlock,
-          retries: 5, keyB: currentKeyB);
+        newKeyA + currentTrailerBlock.sublist(6, 10) + newKeyB,
+      );
+      await writeBlock(
+        sectorNb * 4 + 3,
+        newTrailerBlock,
+        retries: 5,
+        keyB: currentKeyB,
+      );
     });
   }
 
