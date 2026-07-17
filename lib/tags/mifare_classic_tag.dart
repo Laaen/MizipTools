@@ -112,7 +112,9 @@ class MifareClassicTag {
       "Reading block $number with key ${keyA.toHexString()}",
     );
 
-    return lock.synchronized(() async {
+    // The await here is necessary (I guess because of the use of a lock)
+    // ignore: unnecessary_await_in_return
+    return await lock.synchronized(() async {
       for (final _ in Iterable.generate(retries)) {
         await Future.delayed(delay);
         if (await authenticateSector(
@@ -152,7 +154,9 @@ class MifareClassicTag {
 
     Logger.root.info("Reading sector $number with key ${key.toHexString()}");
 
-    return lock.synchronized(() async {
+    // The await here is necessary (I guess because of the use of a lock)
+    // ignore: unnecessary_await_in_return
+    return await lock.synchronized(() async {
       for (final _ in Iterable.generate(retries)) {
         await Future.delayed(delay);
         if (await authenticateSector(number, keyA: key)) {
