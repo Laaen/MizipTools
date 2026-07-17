@@ -336,7 +336,7 @@ class MifareClassicTag {
     });
   }
 
-  // Special case block 0 must be written last (tag disconnection on UID rewrite)
+  /// Special case block 0 must be written last (tag disconnection on UID rewrite)
   Future<void> writeSectorZero(List<Uint8List> data) async {
     // Blocks 1, 2 and sector trailer
     await writeBlock(1, data[1], retries: 5);
@@ -344,16 +344,20 @@ class MifareClassicTag {
     await writeBlock(3, data[3], retries: 5);
 
     // Block 0, we need to use the new B key of the sector
-
     // If a fail here, the tag is not a CUID one
     try {
       final newKey = data[3].sublist(10, 16);
       await writeBlock(0, data[0], keyB: newKey, retries: 5);
+      // We need to catch all excetpions to convert them to a custom one
+      // ignore: avoid_catches_without_on_clauses
     } catch (_) {
       throw WriteSectorZeroException("Error while writing block 0");
     }
   }
 
+  /// Returns the BCC of the given UID
+  ///
+  /// It is computed from the UID
   static Uint8List generateBcc(Uint8List uid) {
     return Uint8List.fromList([uid.reduce((a, b) => a ^ b)]);
   }
