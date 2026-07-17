@@ -237,12 +237,14 @@ class MifareClassicTag {
     });
   }
 
+  /// Changes the UID of the tag
   Future<void> setUid(Uint8List newUid) async {
-    await lock.synchronized(() async {
+    return lock.synchronized(() async {
       // We must get block 0's content before changing the keys !
       final currentBlockZero = await readBlock(0, retries: 5);
       final newBlockZero = Uint8List.fromList(
-          newUid + generateBcc(newUid) + currentBlockZero.sublist(5, 16));
+        newUid + generateBcc(newUid) + currentBlockZero.sublist(5, 16),
+      );
 
       // Generate keys only if we are MizipTag, else use defaults
       MifareKeys newKeys;
@@ -252,14 +254,19 @@ class MifareClassicTag {
         newKeys = defaultKeys;
       }
 
-      for (final sectorIdx in Iterable.generate(4)) {
+      for (final int sectorIdx in Iterable.generate(4)) {
         await setsectorKey(
-            sectorIdx + 1, newKeys.a[sectorIdx + 1], newKeys.b[sectorIdx + 1]);
+          sectorIdx + 1,
+          newKeys.a[sectorIdx + 1],
+          newKeys.b[sectorIdx + 1],
+        );
       }
 
       await setsectorKey(0, newKeys.a[0], newKeys.b[0]);
       try {
         await writeBlock(0, newBlockZero, keyB: newKeys.b[0], retries: 5);
+        // We need to catch all excetpions to convert them to a custom one
+        // ignore: avoid_catches_without_on_clauses
       } catch (_) {
         throw WriteSectorZeroException("Error while writing block 0");
       }
