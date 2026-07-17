@@ -273,33 +273,38 @@ class MifareClassicTag {
     });
   }
 
+  /// Noop here, a [MifareClassicTag] doesn't have a balance
   Future<void> updateInnerBalance() async {
     return;
   }
 
   /// Writes the given data to the block
-  ///
-  /// Throws [RetriesExcedeedException] | [SectorAuthenticationFailed] | [NfcAdapterCommunicationException] | [NfcAdapterTagRemovedException] | [NfcAdapterException]
-  Future<void> writeBlock(int number, Uint8List data,
-      {int retries = 0,
-      Duration delay = const Duration(milliseconds: 10),
-      Uint8List? keyB}) async {
+  Future<void> writeBlock(
+    int number,
+    Uint8List data, {
+    int retries = 0,
+    Duration delay = const Duration(milliseconds: 10),
+    Uint8List? keyB,
+  }) async {
     bool result = false;
     final key = keyB ?? getKeys().b[number ~/ 4];
 
     Logger.root.info(
-        "Writing data : (${data.toHexString()}) to block $number with key ${key.toHexString()}");
+      "Writing data : (${data.toHexString()}) to block $number with key ${key.toHexString()}",
+    );
 
-    return await lock.synchronized(() async {
+    await lock.synchronized(() async {
       for (final _ in Iterable.generate(retries)) {
-        Future.delayed(delay);
+        await Future.delayed(delay);
         if (await authenticateSector(number ~/ 4, keyB: key)) {
           result = await nfcAdapter.writeBlock(number, data);
         } else {
           Logger.root.severe(
-              "Write failed : Authentication failure with keyB : ${key.toHexString()}");
+            "Write failed : Authentication failure with keyB : ${key.toHexString()}",
+          );
           throw SectorAuthenticationFailed(
-              "Write failed : Authentication failure with keyB : ${key.toHexString()}");
+            "Write failed : Authentication failure with keyB : ${key.toHexString()}",
+          );
         }
 
         if (result) {
@@ -308,7 +313,8 @@ class MifareClassicTag {
       }
       Logger.root.severe("Failed to write block $number");
       throw RetriesExcedeedException(
-          "Failed to write block $number : number of retries excedeed");
+        "Failed to write block $number : number of retries excedeed",
+      );
     });
   }
 
