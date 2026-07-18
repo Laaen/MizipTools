@@ -1,30 +1,33 @@
-import 'package:flutter/material.dart';
-import 'package:miziptools/exceptions/nfc_exception_handler.dart';
-import 'package:miziptools/extensions/string_extensions.dart';
-import 'package:miziptools/misc/snackbar.dart';
-import 'package:miziptools/nfc/currentnfctag.dart';
-import 'package:miziptools/widgets/basic/container_with_border.dart';
-import 'package:provider/provider.dart';
+import "package:flutter/material.dart";
+import "package:miziptools/exceptions/nfc_exception_handler.dart";
+import "package:miziptools/extensions/string_extensions.dart";
+import "package:miziptools/misc/snackbar.dart";
+import "package:miziptools/nfc/currentnfctag.dart";
+import "package:miziptools/widgets/basic/container_with_border.dart";
+import "package:provider/provider.dart";
 
-class ChangeUid extends StatelessWidget{
-
+/// Widget for changing the UID of the tag
+///
+/// The user fills the field with the new UID to write
+class ChangeUid extends StatelessWidget {
+  /// Returns a new [ChangeUid]
   ChangeUid({super.key});
 
-  final _uidFormKey = GlobalKey<FormState>();
-  final _uidFormController = TextEditingController();
-
+  /// Valid hexadecimal characters
   static const validChars = "0123456789ABCDEF";
+  final _uidFormKey = GlobalKey<FormState>();
+
+  final _uidFormController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-
     final textField = TextFormField(
       controller: _uidFormController,
       maxLength: 8,
       validator: uidFieldValidator,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         labelText: "New UID",
-        border: UnderlineInputBorder()
+        border: UnderlineInputBorder(),
       ),
     );
 
@@ -33,47 +36,51 @@ class ChangeUid extends StatelessWidget{
         spacing: 15,
         children: [
           Form(key: _uidFormKey, child: textField),
-          OutlinedButton(onPressed: ()async => changeUid(context), child: Text("Ok"))
+          OutlinedButton(
+            onPressed: () async => changeUid(context),
+            child: const Text("Ok"),
+          ),
         ],
-      )
+      ),
     );
   }
 
+  Future<void> changeUid(BuildContext context) async {
+    final tag = context.read<CurrentNFCTag>();
+    if (_uidFormKey.currentState!.validate()) {
+      showSnackBar(context, "Changing UID");
+      try {
+        await tag.setUid(_uidFormController.text.toUint8List());
+      } on Exception catch (e) {
+        // ignore: use_build_context_synchronously
+        handleException(e, context);
+        return;
+      }
 
-  String? uidFieldValidator(String? data){
+      if (context.mounted) {
+        showSnackBar(context, "UID changed successfully");
+      }
+
+      try {
+        await tag.releaseTag();
+      } on Exception catch (e) {
+        // ignore: use_build_context_synchronously
+        handleException(e, context);
+        return;
+      }
+    }
+  }
+
+  String? uidFieldValidator(String? data) {
     data = data?.toUpperCase();
 
-    if(data == null || data.length < 8){
+    if (data == null || data.length < 8) {
       return "UID must be 8 chars";
-    } if (data.characters.any((char) => !validChars.contains(char))){
+    }
+    if (data.characters.any((char) => !validChars.contains(char))) {
       return "Must be valid hexa";
     }
     return null;
   }
-
-  Future<void> changeUid(BuildContext context) async{
-    final tag = context.read<CurrentNFCTag>();
-    if(_uidFormKey.currentState!.validate()){
-      showSnackBar(context, "Changing UID");
-      try{
-        await tag.setUid(_uidFormController.text.toUint8List());
-      } on Exception catch(e){
-        // ignore: use_build_context_synchronously
-         handleException(e, context);
-        return;
-      }
-        
-      if(context.mounted){
-        showSnackBar(context, "UID changed successfully");
-      }
-
-      try{
-        await tag.releaseTag();
-      } on Exception catch(e){
-        // ignore: use_build_context_synchronously
-         handleException(e, context);
-        return;
-      }
-    }
-  }
 }
+
