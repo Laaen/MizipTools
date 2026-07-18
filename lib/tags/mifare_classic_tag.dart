@@ -295,7 +295,7 @@ class MifareClassicTag {
 
     await lock.synchronized(() async {
       for (final _ in Iterable.generate(retries)) {
-        Future.delayed(delay);
+        await Future.delayed(delay);
         if (await authenticateSector(number ~/ 4, keyB: key)) {
           result = await nfcAdapter.writeBlock(number, data);
         } else {
