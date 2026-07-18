@@ -49,7 +49,6 @@ class MizipTag extends MifareClassicTag {
     return generateKeys(uid);
   }
 
-  // TODO(Laen): Check if can be deleted
   /// Communicates with the tag to get the raw balance data
   Future<({Uint8List rawBalance, Uint8List rawChecksum, Uint8List counterByte})>
       getRawBalanceData(int blockNb) async {
