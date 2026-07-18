@@ -114,8 +114,8 @@ class MainPageState extends State<MainPage> {
       return false;
     }
     final Balance balance = cTag.getBalance();
-    return balance.valid == BalanceValidity.valid ||
-        balance.valid == BalanceValidity.badChecksum;
+    return balance.balanceValidity == BalanceValidity.valid ||
+        balance.balanceValidity == BalanceValidity.badChecksum;
   }
 
   /// Callback executed when a new tag is detected
