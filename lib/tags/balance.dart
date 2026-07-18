@@ -74,8 +74,6 @@ class Balance {
   }
 
   /// Gets the balance value as a string
-  // TODO(Laen): An exception may occur here : FormatException (FormatException:
-  // Invalid radix-16 number (at character 1)
   String getStringBalance() {
     final hexaStringArrBalance = _getHexaStringArrBalance();
     return (int.parse(hexaStringArrBalance.join(), radix: 16) / 100.0)
@@ -83,12 +81,12 @@ class Balance {
   }
 
   /// Getter for valid
-  BalanceValidity isValid() {
+  BalanceValidity get balanceValidity {
     return valid;
   }
 
   /// Changes the validity of the Balance
-  void setValid(BalanceValidity state) {
+  set balanceValidity(BalanceValidity state) {
     valid = state;
   }
 
