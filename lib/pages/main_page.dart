@@ -154,7 +154,7 @@ class MainPageState extends State<MainPage> {
       try {
         await t.updateInnerTag(currentTag);
       } on Exception catch (e) {
-        // TODO(Laen): Check why this works
+        // It's not important if the message is not displayed
         // ignore: use_build_context_synchronously
         handleException(e, context);
       }
@@ -163,7 +163,7 @@ class MainPageState extends State<MainPage> {
 
   /// Called when the tag is lost,
   /// il sets [CurrentNFCTag]'s innerTag to null
-  void onTagLost() async {
+  Future<void> onTagLost() async {
     if (mounted) {
       context.read<CurrentNFCTag>().setTagAbsent();
     }
