@@ -45,6 +45,7 @@ class ChangeUid extends StatelessWidget {
     );
   }
 
+  /// Changes the UID of the tag (and all keys)
   Future<void> changeUid(BuildContext context) async {
     final tag = context.read<CurrentNFCTag>();
     if (_uidFormKey.currentState!.validate()) {
@@ -52,6 +53,7 @@ class ChangeUid extends StatelessWidget {
       try {
         await tag.setUid(_uidFormController.text.toUint8List());
       } on Exception catch (e) {
+        // We can survive if the message is not displayed
         // ignore: use_build_context_synchronously
         handleException(e, context);
         return;
@@ -64,6 +66,7 @@ class ChangeUid extends StatelessWidget {
       try {
         await tag.releaseTag();
       } on Exception catch (e) {
+        // We can survive if the message is not displayed
         // ignore: use_build_context_synchronously
         handleException(e, context);
         return;
@@ -71,16 +74,18 @@ class ChangeUid extends StatelessWidget {
     }
   }
 
+  /// Validator for UID
+  ///
+  /// The UID must have only hexadecimal chars and be 8 chars long
   String? uidFieldValidator(String? data) {
-    data = data?.toUpperCase();
+    final uid = data?.toUpperCase();
 
-    if (data == null || data.length < 8) {
+    if (uid == null || uid.length < 8) {
       return "UID must be 8 chars";
     }
-    if (data.characters.any((char) => !validChars.contains(char))) {
+    if (uid.characters.any((char) => !validChars.contains(char))) {
       return "Must be valid hexa";
     }
     return null;
   }
 }
-
