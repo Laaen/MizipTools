@@ -30,9 +30,14 @@ class TagAdd10 extends StatelessWidget {
     try {
       await tag.updateInnerBalance();
     } on Exception catch (e) {
-      // ignore: use_build_context_synchronously
-      handleException(e, context,
-          prefix: "Error: Could not get tag's current balance : ");
+      handleException(
+        e,
+        // We don't really care if the message is displayed
+        // + Never encountered such case
+        // ignore: use_build_context_synchronously
+        context,
+        prefix: "Error: Could not get tag's current balance : ",
+      );
       return;
     }
 
@@ -44,13 +49,19 @@ class TagAdd10 extends StatelessWidget {
       return;
     }
 
-    final newBalance = min(currentBalance.getDoubleBalance() + 10, 100.0);
+    final newBalance = min(currentBalance.getDoubleBalance() + 10, 100);
 
     try {
       await tag.setBalance(newBalance.toString());
     } on Exception catch (e) {
-      // ignore: use_build_context_synchronously
-      handleException(e, context, prefix: "Error while writing new balance : ");
+      handleException(
+        e,
+        // We don't really care if the message is displayed
+        // + Never encountered such case
+        // ignore: use_build_context_synchronously
+        context,
+        prefix: "Error while writing new balance : ",
+      );
       return;
     }
 
