@@ -23,14 +23,9 @@ class ReadDumpDialog extends StatelessWidget {
         spacing: 20,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            _title,
-            style: const TextStyle(fontSize: 18),
-          ),
+          Text(_title, style: const TextStyle(fontSize: 18)),
           const Divider(),
-          Expanded(
-            child: prettyViewer(_dataToDisplay),
-          ),
+          Expanded(child: prettyViewer(_dataToDisplay)),
           OutlinedButton(
             onPressed: () => Navigator.pop(context),
             child: const Text("Close"),
@@ -53,11 +48,8 @@ class ReadDumpDialog extends StatelessWidget {
           ),
         );
       },
-      separatorBuilder: (context, idx) => const Divider(
-        thickness: 0,
-      ),
+      separatorBuilder: (context, idx) => const Divider(thickness: 0),
       itemCount: items.length,
     );
   }
 }
-
