@@ -1,29 +1,22 @@
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
 
-class MizipToolsAppBar extends StatelessWidget implements PreferredSize{
-
+/// Appbar with title + tabs
+class MizipToolsAppBar extends StatelessWidget implements PreferredSizeWidget {
+  /// Return a new [MizipToolsAppBar]
   const MizipToolsAppBar({super.key});
 
   @override
-  // TODO: Properly implement this
-  Widget get child => throw UnimplementedError();
-
-  @override
-  Size get preferredSize => Size.fromHeight(100);
+  Size get preferredSize => const Size.fromHeight(100);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      title: Text("MizipTools"),
+      title: const Text("MizipTools"),
       bottom: const TabBar(
-        tabs: [
-          Tab(text: "Balance"),
-          Tab(text: "Dumps"),
-          Tab(text: "Advanced")
-        ] 
+        tabs: [Tab(text: "Balance"), Tab(text: "Dumps"), Tab(text: "Advanced")],
       ),
     );
   }
-
 }
+
