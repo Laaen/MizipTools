@@ -1,47 +1,64 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:miziptools/data_dir/data_dir.dart';
-import 'package:miziptools/misc/snackbar.dart';
-import 'package:miziptools/widgets/basic/container_with_border.dart';
-import 'package:miziptools/widgets/dump/dialog_read_dump.dart';
-import 'package:provider/provider.dart';
+import "dart:io";
+import "package:flutter/material.dart";
+import "package:miziptools/data_dir/data_dir.dart";
+import "package:miziptools/misc/snackbar.dart";
+import "package:miziptools/widgets/basic/container_with_border.dart";
+import "package:miziptools/widgets/dump/dialog_read_dump.dart";
+import "package:provider/provider.dart";
 
-class ReadDump extends StatelessWidget{
-
+/// Widget used to select a dump to read
+class ReadDump extends StatelessWidget {
+  /// Returns a new [ReadDump]
   ReadDump({super.key});
 
-  final currentDumpChoice = TextEditingController();
+  final _currentDumpChoice = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-
     final dataDir = context.read<DataDir>();
 
-    return ContainerWithBorder(child: 
-      Column( spacing: 15,
+    return ContainerWithBorder(
+      child: Column(
+        spacing: 15,
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Read dump", style: TextStyle(fontSize: 18),),
-          Column(spacing: 15,
+          const Text("Read dump", style: TextStyle(fontSize: 18)),
+          Column(
+            spacing: 15,
             children: [
-              DropdownMenu(dropdownMenuEntries: getDumpList(dataDir.getFilesList()), controller: currentDumpChoice, width: 160,),
-              OutlinedButton(onPressed: () => readDump(context), child: Text("Read"),)
+              DropdownMenu(
+                dropdownMenuEntries: getDumpList(dataDir.getFilesList()),
+                controller: _currentDumpChoice,
+                width: 160,
+              ),
+              OutlinedButton(
+                onPressed: () => readDump(context),
+                child: const Text("Read"),
+              ),
             ],
-          )
+          ),
         ],
-      )
+      ),
     );
   }
 
-  List<DropdownMenuEntry> getDumpList(List<FileSystemEntity> dataDir){
-    return dataDir.map((entry) => DropdownMenuEntry(value: entry.path, label: entry.path.split("/").last.split(".").first)).where((name) => !["uid_save", "debug"].contains(name.label)).toList();
+  /// Retreives the list of dump files
+  List<DropdownMenuEntry> getDumpList(List<FileSystemEntity> dataDir) {
+    return dataDir
+        .map(
+          (entry) => DropdownMenuEntry(
+            value: entry.path,
+            label: entry.path.split("/").last.split(".").first,
+          ),
+        )
+        .where((name) => !["uid_save", "debug"].contains(name.label))
+        .toList();
   }
 
-  Future<void> readDump(BuildContext context) async{
-
-    if(currentDumpChoice.text.isEmpty){
-      if(context.mounted){
+  /// Reads the selected dump and creates a [ReadDumpDialog] to display it
+  Future<void> readDump(BuildContext context) async {
+    if (_currentDumpChoice.text.isEmpty) {
+      if (context.mounted) {
         showSnackBar(context, "You must select a file");
       }
       return;
@@ -49,16 +66,22 @@ class ReadDump extends StatelessWidget{
 
     final dataDir = context.read<DataDir>();
 
-    try{
-      final fileContent = dataDir.readFile("${currentDumpChoice.text}.dump");
-      showDialog<String>(context: context, builder: (context) {
-        return ReadDumpDialog(title: currentDumpChoice.text, dataToDisplay: fileContent,);
-      });
-    } catch(e){
-      if(context.mounted){
+    try {
+      final fileContent = dataDir.readFile("${_currentDumpChoice.text}.dump");
+      await showDialog<String>(
+        context: context,
+        builder: (context) {
+          return ReadDumpDialog(
+            title: _currentDumpChoice.text,
+            dataToDisplay: fileContent,
+          );
+        },
+      );
+    } on Exception catch (e) {
+      if (context.mounted) {
         showSnackBar(context, "Error while reading dump : $e");
       }
     }
-
   }
 }
+
