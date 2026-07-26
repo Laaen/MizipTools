@@ -58,7 +58,7 @@ class DumpTag extends StatelessWidget {
       if (context.mounted) {
         await writeDumpToFile(context, fileName, stringDump);
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (context.mounted) {
         showSnackBar(context, "Error while writing dump to file : $e");
       }
@@ -84,7 +84,7 @@ class DumpTag extends StatelessWidget {
   /// When the tag's data is read from the tag, the keys are not included
   /// in the trailer blocks, so we have to add them manually
   List<String> addKeysToDump(List<String> dump, MifareKeys keys) {
-    var modifiedDump = dump.toList();
+    final modifiedDump = dump.toList();
     for (final (sectorNb, blockNb) in [3, 7, 11, 15, 19].indexed) {
       final keyA = keys.a[sectorNb].toHexString().toUpperCase();
       final keyB = keys.b[sectorNb].toHexString().toUpperCase();
