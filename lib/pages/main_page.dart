@@ -53,8 +53,10 @@ class MainPageState extends State<MainPage> {
           builder: (context, tag, child) {
             return Container(
               padding: const EdgeInsets.fromLTRB(0, 30, 0, 30),
+              // ignore: prefer_const_constructors
               child: TabBarView(
-                children: [BalanceMenu(), DumpMenu(), AdvancedMenu()],
+                // ignore: prefer_const_constructors
+                children: const [BalanceMenu(), DumpMenu(), AdvancedMenu()],
               ),
             );
           },
