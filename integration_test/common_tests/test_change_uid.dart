@@ -32,7 +32,7 @@ Future<void> testChangeUidNotCUID(
   String expectedResult,
 ) async {
   final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
-  mockTag.setFailureBlockZero(true);
+  mockTag.setFailureBlockZero(value: true);
   mockAdapter.putTag();
   await commonChangeUidExec(
     tester,
@@ -106,7 +106,7 @@ Future<void> commonChangeUidExec(
   await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Ok").first);
   await tester.pumpAndSettle(delay);
   if (disconnectTag) {
-    mockAdapter.setCommunicationError(true);
+    mockAdapter.setCommunicationError(value: true);
   }
   await tester.tap(find.widgetWithText(OutlinedButton, "Ok").first);
   await tester.pumpAndSettle(delay);

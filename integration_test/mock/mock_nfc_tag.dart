@@ -56,7 +56,7 @@ class MockNfcTag {
 
   // This object is only used in tests
   // ignore: use_setters_to_change_properties
-  void setFailureBlockZero(bool value) {
+  void setFailureBlockZero({required bool value}) {
     failureBlockZero = value;
   }
 

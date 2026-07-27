@@ -59,7 +59,7 @@ Future<void> commonChangeBalanceExec(
   await tester.pumpAndSettle(delay);
   await tester.enterText(find.byType(TextFormField), newBalance);
   if (disconnectTag) {
-    mockAdapter.setCommunicationError(true);
+    mockAdapter.setCommunicationError(value: true);
   }
   await tester.tap(find.widgetWithText(OutlinedButton, "Ok"));
   await tester.pumpAndSettle(delay);

@@ -29,7 +29,7 @@ Future<void> testWriteFromDumpBlockZeroFail(
   MockNfcTag mockTag,
 ) async {
   final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
-  mockTag.setFailureBlockZero(true);
+  mockTag.setFailureBlockZero(value: true);
   mockAdapter.putTag();
 
   // Same as dumpContent, but block 0 unchanged
@@ -113,7 +113,7 @@ Future<void> commonWriteFromDumpExec(
   await tester.tap(find.text(dumpContent.substring(0, 8)).at(1));
   await tester.pumpAndSettle(delay);
   if (disconnectTag) {
-    mockAdapter.setCommunicationError(true);
+    mockAdapter.setCommunicationError(value: true);
   }
   await tester.tap(find.widgetWithText(OutlinedButton, "Write"));
   await tester.pumpAndSettle(delay);

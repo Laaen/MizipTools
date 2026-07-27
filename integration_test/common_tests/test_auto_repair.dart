@@ -83,7 +83,7 @@ Future<void> commonAutoRepairExec(
   await Future.delayed(delay);
   await tester.pumpAndSettle(delay);
   if (disconnectTag) {
-    mockAdapter.setCommunicationError(true);
+    mockAdapter.setCommunicationError(value: true);
   }
   await tester.tap(find.widgetWithText(OutlinedButton, "Ok").last);
   await tester.pumpAndSettle(delay);

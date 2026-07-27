@@ -53,7 +53,7 @@ Future<void> commonDumpTagExec(
   await tester.tap(find.widgetWithText(Tab, "Dumps"));
   await tester.pumpAndSettle(delay);
   if (disconnectTag) {
-    mockAdapter.setCommunicationError(true);
+    mockAdapter.setCommunicationError(value: true);
   }
   await tester.tap(find.widgetWithText(DumpTag, "Dump Tag"));
   await tester.pumpAndSettle(delay);

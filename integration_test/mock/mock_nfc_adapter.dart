@@ -43,7 +43,7 @@ class MockNfcAdapter extends NfcAdapter {
   Future<Uint8List> pingTag({
     Duration timeout = const Duration(milliseconds: 200),
   }) async {
-    Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     if (currentTag == null) {
       Logger.root.warning("Ping : Tag is null");
       throw NfcAdapterTagRemovedException("Tag was removed");
@@ -102,7 +102,7 @@ class MockNfcAdapter extends NfcAdapter {
 
   // This object is only used for tests
   // ignore: use_setters_to_change_properties
-  void setCommunicationError(bool value) {
+  void setCommunicationError({required bool value}) {
     communicationError = value;
   }
 
