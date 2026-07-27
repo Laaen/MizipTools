@@ -165,4 +165,3 @@ A2C609E2223178778803A2EB2F878BE6
 9AAEE4E8EF4478778800E3D48CF37E3A""";
 
 const expectedContentWriteDumpSuccess = dumpContentWriteFromDumpTest;
-
