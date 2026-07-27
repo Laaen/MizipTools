@@ -9,7 +9,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
-      - name: Retreive commit message
+      - name: Retrieve commit message
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
 
       - name: Set up JDK 17
@@ -52,15 +52,15 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           
       - name: Build debug package
-        if: $COMMIT_MESSAGE == 'build_debug'
+        if: env.COMMIT_MESSAGE == 'build_debug'
         run: flutter build apk --debug
 
       - name: Rename build    
-        if: $COMMIT_MESSAGE == 'build_debug'
+        if: env.COMMIT_MESSAGE == 'build_debug'
         run: mv ./build/app/outputs/flutter-apk/app-debug.apk ./miziptools-debug.apk
 
       - uses: actions/upload-artifact@v3    
-        if: $COMMIT_MESSAGE == 'build_debug'
+        if: env.COMMIT_MESSAGE == 'build_debug'
         with:
           name: miziptools-debug-build
           path: ./miziptools-debug.apk
