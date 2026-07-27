@@ -53,7 +53,7 @@ Future<void> commonAdd10Exec(
   );
   await tester.pumpAndSettle(const Duration(seconds: 1));
   if (disconnectTag) {
-    mockAdapter.setCommunicationError(true);
+    mockAdapter.setCommunicationError(value: true);
   }
   await tester.tap(find.widgetWithText(OutlinedButton, r"Add 10$"));
   await tester.pumpAndSettle(delay);
