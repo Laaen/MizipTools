@@ -49,15 +49,15 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           
       - name: Build debug package
-        if: github.event.workflow_run.head_commit.message == "build_debug"
+        if: github.event.workflow_run.head_commit.message == 'build_debug'
         run: flutter build apk --debug
 
       - name: Rename build    
-        if: github.event.workflow_run.head_commit.message == "build_debug"
+        if: github.event.workflow_run.head_commit.message == 'build_debug'
         run: mv ./build/app/outputs/flutter-apk/app-debug.apk ./miziptools-debug.apk
 
       - uses: actions/upload-artifact@v3    
-        if: github.event.workflow_run.head_commit.message == "build_debug"
+        if: github.event.workflow_run.head_commit.message == 'build_debug'
         with:
           name: miziptools-debug-build
           path: ./miziptools-debug.apk
