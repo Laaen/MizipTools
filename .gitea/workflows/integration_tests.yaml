@@ -9,6 +9,9 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
+      - name: Debug 
+        run: echo "${{ github.event.head_commit.message }}"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
