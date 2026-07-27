@@ -1,6 +1,9 @@
 # MizipTools
 
-![code coverage](https://coverage.floof.ovh/get/miziptools)
+[![Coverage](https://sonarqube.floof.ovh/api/project_badges/measure?project=Miziptools&metric=coverage&token=sqb_9c56a5a78e860c0c8156291c20e9aaec59c81fbe)](https://sonarqube.floof.ovh/dashboard?id=Miziptools)
+[![Quality Gate Status](https://sonarqube.floof.ovh/api/project_badges/measure?project=Miziptools&metric=alert_status&token=sqb_9c56a5a78e860c0c8156291c20e9aaec59c81fbe)](https://sonarqube.floof.ovh/dashboard?id=Miziptools)
+[![Maintainability Rating](https://sonarqube.floof.ovh/api/project_badges/measure?project=Miziptools&metric=sqale_rating&token=sqb_9c56a5a78e860c0c8156291c20e9aaec59c81fbe)](https://sonarqube.floof.ovh/dashboard?id=Miziptools)
+
 
 Android App written in Flutter made to modify MiZip NFC tags.  
 ⚠️ This app only works with MiZip tags ⚠️
