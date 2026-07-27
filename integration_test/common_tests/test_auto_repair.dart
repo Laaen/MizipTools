@@ -1,72 +1,114 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:miziptools/extensions/uint8list_extensions.dart';
-import 'package:miziptools/main.dart';
-import 'package:path_provider/path_provider.dart';
-import '../mock/mock_nfc_adapter.dart';
-import '../mock/mock_nfc_tag.dart';
-import 'consts.dart';
+import "package:flutter/material.dart";
+import "package:flutter_test/flutter_test.dart";
+import "package:miziptools/extensions/uint8list_extensions.dart";
+import "package:miziptools/main.dart";
+import "package:path_provider/path_provider.dart";
+import "../mock/mock_nfc_adapter.dart";
+import "../mock/mock_nfc_tag.dart";
+import "consts.dart";
 
-Future<void> testAutoRepairSuccess(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
-  mockAdapter.putTag();
+Future<void> testAutoRepairSuccess(
+  WidgetTester tester,
+  MockNfcTag mockTag,
+) async {
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag)..putTag();
 
-  await commonAutoRepairExec(tester, mockAdapter, "Repair successful", expectedAutoRepairSuccess);
+  await commonAutoRepairExec(
+    tester,
+    mockAdapter,
+    "Repair successful",
+    expectedAutoRepairSuccess,
+  );
 }
 
-Future<void> testAutoRepairWrongKey(WidgetTester tester, MockNfcTag mockTag) async{
+Future<void> testAutoRepairWrongKey(
+  WidgetTester tester,
+  MockNfcTag mockTag,
+) async {
   final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
   mockTag.setDenyAuthList([1]);
   mockAdapter.putTag();
 
   // Nothing changed
-  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
+  final expectedResult = mockTag.data
+      .map((block) => block.toHexString().toUpperCase())
+      .join("\n");
 
-  await commonAutoRepairExec(tester, mockAdapter, "Incorrect keys", expectedResult);
+  await commonAutoRepairExec(
+    tester,
+    mockAdapter,
+    "Incorrect keys",
+    expectedResult,
+  );
 }
 
-Future<void> testAutoRepairTagRemoved(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
-  mockAdapter.putTag();
+Future<void> testAutoRepairTagRemoved(
+  WidgetTester tester,
+  MockNfcTag mockTag,
+) async {
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag)..putTag();
 
   // Nothing changed
-  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
-  await commonAutoRepairExec(tester, mockAdapter, "Communication error", expectedResult, disconnectTag: true);
+  final expectedResult = mockTag.data
+      .map((block) => block.toHexString().toUpperCase())
+      .join("\n");
+  await commonAutoRepairExec(
+    tester,
+    mockAdapter,
+    "Communication error",
+    expectedResult,
+    disconnectTag: true,
+  );
 }
 
-Future<void> commonAutoRepairExec(WidgetTester tester, MockNfcAdapter mockAdapter, String expectedSnackBarMessage, String expectedResult, {bool disconnectTag = false}) async{
-      final dataDir = await getExternalStorageDirectory();
+Future<void> commonAutoRepairExec(
+  WidgetTester tester,
+  MockNfcAdapter mockAdapter,
+  String expectedSnackBarMessage,
+  String expectedResult, {
+  bool disconnectTag = false,
+}) async {
+  final dataDir = await getExternalStorageDirectory();
 
-      // The UID which should be in save_uid
-      final oldUid = "ABD453C7";
+  // The UID which should be in save_uid
+  const oldUid = "ABD453C7";
 
-      await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dataDir!,));
+  await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dataDir!));
 
-      await tester.tap(find.widgetWithText(Tab, "Advanced"));
-      await tester.pumpAndSettle(delay);
-      await tester.enterText(find.byType(TextFormField).last, oldUid);
-      await tester.pumpAndSettle(delay);
-      await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Ok").last);
-      await Future.delayed(delay);
-      await tester.pumpAndSettle(delay);
-      if(disconnectTag){
-        mockAdapter.setCommunicationError(true);
-      }
-      await tester.tap(find.widgetWithText(OutlinedButton, "Ok").last);
-      await tester.pumpAndSettle(delay);
-      // Second delay for second SnackBar
-      await tester.pumpAndSettle(delay);
-      expect(find.widgetWithText(SnackBar, expectedSnackBarMessage), findsOneWidget);
-      await tester.pumpAndSettle(delay);
+  await tester.tap(find.widgetWithText(Tab, "Advanced"));
+  await tester.pumpAndSettle(delay);
+  await tester.enterText(find.byType(TextFormField).last, oldUid);
+  await tester.pumpAndSettle(delay);
+  await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Ok").last);
+  await Future.delayed(delay);
+  await tester.pumpAndSettle(delay);
+  if (disconnectTag) {
+    mockAdapter.setCommunicationError(true);
+  }
+  await tester.tap(find.widgetWithText(OutlinedButton, "Ok").last);
+  await tester.pumpAndSettle(delay);
+  // Second delay for second SnackBar
+  await tester.pumpAndSettle(delay);
+  expect(
+    find.widgetWithText(SnackBar, expectedSnackBarMessage),
+    findsOneWidget,
+  );
+  await tester.pumpAndSettle(delay);
 
-      // Wait for tag poll after release
-      mockAdapter.putTag();
-      Future.delayed(Duration(seconds: 1));
+  // Wait for tag poll after release
+  mockAdapter.putTag();
+  await Future.delayed(const Duration(seconds: 1));
 
-      expect(mockAdapter.currentTag!.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(expectedResult));
+  expect(
+    mockAdapter.currentTag!.data
+        .map((block) => block.toHexString().toUpperCase())
+        .join("\n"),
+    equals(expectedResult),
+  );
 }
 
-const expectedAutoRepairSuccess = """ED711B74F3890400C808002000000017
+const expectedAutoRepairSuccess = """
+ED711B74F3890400C808002000000017
 6200488849884A884B88000000000000
 00000000000000000000000000000000
 A0A1A2A3A4A5787788C1B4C123439EEF
@@ -86,3 +128,4 @@ E4634151649478778803EA586922C355
 00000000000000000000000000000001
 55010000000000000000000000000000
 DC0BAC5BA9E178778800AB67CA563689""";
+
