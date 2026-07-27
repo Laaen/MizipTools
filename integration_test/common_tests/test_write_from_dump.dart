@@ -1,61 +1,109 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:miziptools/extensions/uint8list_extensions.dart';
-import 'package:miziptools/main.dart';
-import 'package:path_provider/path_provider.dart';
-import '../mock/mock_nfc_adapter.dart';
-import '../mock/mock_nfc_tag.dart';
-import 'consts.dart';
+import "package:flutter/material.dart";
+import "package:flutter_test/flutter_test.dart";
+import "package:miziptools/extensions/uint8list_extensions.dart";
+import "package:miziptools/main.dart";
+import "package:path_provider/path_provider.dart";
+import "../mock/mock_nfc_adapter.dart";
+import "../mock/mock_nfc_tag.dart";
+import "consts.dart";
 
-Future<void> testWriteFromDumpSuccess(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
-  mockAdapter.putTag();
+Future<void> testWriteFromDumpSuccess(
+  WidgetTester tester,
+  MockNfcTag mockTag,
+) async {
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag)..putTag();
 
-  await commonWriteFromDumpExec(tester, mockAdapter, dumpContentWriteFromDumpTest, "Dump successfully written !", expectedContentWriteDumpSuccess);
+  await commonWriteFromDumpExec(
+    tester,
+    mockAdapter,
+    dumpContentWriteFromDumpTest,
+    "Dump successfully written !",
+    expectedContentWriteDumpSuccess,
+  );
 }
 
-Future<void> testWriteFromDumpBlockZeroFail(WidgetTester tester, MockNfcTag mockTag) async{
+Future<void> testWriteFromDumpBlockZeroFail(
+  WidgetTester tester,
+  MockNfcTag mockTag,
+) async {
   final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
   mockTag.setFailureBlockZero(true);
   mockAdapter.putTag();
 
   // Same as dumpContent, but block 0 unchanged
-  final expectedResult = "${mockTag.data.first.toHexString()}\n${dumpContentWriteFromDumpTest.split("\n").sublist(1).join("\n")}"; 
-  await commonWriteFromDumpExec(tester, mockAdapter, dumpContentWriteFromDumpTest, "Warning : Sector 0 write failed, tag is not a CUID one", expectedResult.toUpperCase());
+  final expectedResult =
+      "${mockTag.data.first.toHexString()}\n${dumpContentWriteFromDumpTest.split("\n").sublist(1).join("\n")}";
+  await commonWriteFromDumpExec(
+    tester,
+    mockAdapter,
+    dumpContentWriteFromDumpTest,
+    "Warning : Sector 0 write failed, tag is not a CUID one",
+    expectedResult.toUpperCase(),
+  );
 }
 
-Future<void> testWriteFromDumpWrongKey(WidgetTester tester, MockNfcTag mockTag) async{
+Future<void> testWriteFromDumpWrongKey(
+  WidgetTester tester,
+  MockNfcTag mockTag,
+) async {
   final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
   mockTag.setDenyAuthList([1]);
   mockAdapter.putTag();
 
   // Nothing should be changed
-  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
-  await commonWriteFromDumpExec(tester, mockAdapter, dumpContentWriteFromDumpTest, "Incorrect keys", expectedResult);
+  final expectedResult = mockTag.data
+      .map((block) => block.toHexString().toUpperCase())
+      .join("\n");
+  await commonWriteFromDumpExec(
+    tester,
+    mockAdapter,
+    dumpContentWriteFromDumpTest,
+    "Incorrect keys",
+    expectedResult,
+  );
 }
 
-Future<void> testWriteFromDumpTagLost(WidgetTester tester, MockNfcTag mockTag) async{
-  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
-  mockAdapter.putTag();
+Future<void> testWriteFromDumpTagLost(
+  WidgetTester tester,
+  MockNfcTag mockTag,
+) async {
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag)..putTag();
 
   // Nothing should be changed
-  final expectedResult = mockTag.data.map((block) => block.toHexString().toUpperCase()).join("\n");
-  await commonWriteFromDumpExec(tester, mockAdapter, dumpContentWriteFromDumpTest, "Communication error", expectedResult, disconnectTag: true);
+  final expectedResult = mockTag.data
+      .map((block) => block.toHexString().toUpperCase())
+      .join("\n");
+  await commonWriteFromDumpExec(
+    tester,
+    mockAdapter,
+    dumpContentWriteFromDumpTest,
+    "Communication error",
+    expectedResult,
+    disconnectTag: true,
+  );
 }
 
-
-Future<void> commonWriteFromDumpExec(WidgetTester tester, MockNfcAdapter mockAdapter, String dumpContent, String expectedSnackBarMessage, String expectedTagContent, {bool disconnectTag = false}) async{  
+Future<void> commonWriteFromDumpExec(
+  WidgetTester tester,
+  MockNfcAdapter mockAdapter,
+  String dumpContent,
+  String expectedSnackBarMessage,
+  String expectedTagContent, {
+  bool disconnectTag = false,
+}) async {
   final dir = await getExternalStorageDirectory();
   final newUid = dumpContent.substring(0, 8);
 
-  File("${dir!.path}/${dumpContent.substring(0, 8)}.dump").writeAsStringSync(dumpContent);
+  File(
+    "${dir!.path}/${dumpContent.substring(0, 8)}.dump",
+  ).writeAsStringSync(dumpContent);
 
-  await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir,));
+  await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir));
   await tester.tap(find.widgetWithText(Tab, "Dumps"));
   await tester.pumpAndSettle(delay);
-  await Future.delayed(Duration(seconds: 1));
+  await Future.delayed(const Duration(seconds: 1));
   await tester.pumpAndSettle(delay);
   await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Write"));
   await tester.pumpAndSettle(delay);
@@ -64,30 +112,38 @@ Future<void> commonWriteFromDumpExec(WidgetTester tester, MockNfcAdapter mockAda
   // The first found text is bugged
   await tester.tap(find.text(dumpContent.substring(0, 8)).at(1));
   await tester.pumpAndSettle(delay);
-  if(disconnectTag){
+  if (disconnectTag) {
     mockAdapter.setCommunicationError(true);
   }
   await tester.tap(find.widgetWithText(OutlinedButton, "Write"));
   await tester.pumpAndSettle(delay);
-  expect(find.widgetWithText(SnackBar, expectedSnackBarMessage), findsOneWidget);
+  expect(
+    find.widgetWithText(SnackBar, expectedSnackBarMessage),
+    findsOneWidget,
+  );
 
   // Wait for tag to be rediscovered if write was successful
   mockAdapter.putTag();
-  await Future.delayed(Duration(seconds: 1));
-
+  await Future.delayed(const Duration(seconds: 1));
 
   // Content is OK
-  expect(mockAdapter.currentTag!.data.map((block) => block.toHexString().toUpperCase()).join("\n"), equals(expectedTagContent));
+  expect(
+    mockAdapter.currentTag!.data
+        .map((block) => block.toHexString().toUpperCase())
+        .join("\n"),
+    equals(expectedTagContent),
+  );
 
   // Backup of previous UID is here
-  expect(await File("${dir.path}/uid_save").exists(), equals(true));
+  expect(File("${dir.path}/uid_save").existsSync(), equals(true));
   expect(File("${dir.path}/uid_save").readAsLinesSync().first, equals(newUid));
 
   // Cleanup
   File("${dir.path}/${dumpContent.substring(0, 8)}.dump").deleteSync();
 }
 
-const dumpContentWriteFromDumpTest = """ABD453C7EB890400C808002000000017
+const dumpContentWriteFromDumpTest = """
+ABD453C7EB890400C808002000000017
 6200488849884A884B88000000000000
 00000000000000000000000000000000
 A0A1A2A3A4A5787788C1B4C123439EEF
@@ -109,3 +165,4 @@ A2C609E2223178778803A2EB2F878BE6
 9AAEE4E8EF4478778800E3D48CF37E3A""";
 
 const expectedContentWriteDumpSuccess = dumpContentWriteFromDumpTest;
+
