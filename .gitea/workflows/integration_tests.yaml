@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Debug 
-        run: export COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
+        run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
 
       - name: Debug bis 
         run: echo $COMMIT_MESSAGE
