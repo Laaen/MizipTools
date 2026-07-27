@@ -13,7 +13,7 @@ jobs:
         run: export COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
 
       - name: Debug bis 
-        run: echo "$COMMIT_MESSAGE"
+        run: echo $COMMIT_MESSAGE
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
