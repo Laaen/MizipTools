@@ -1,21 +1,22 @@
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
 
-class ContainerWithBorder extends StatelessWidget{
+/// Basic widget : Container with a rounded rectangle shape
+/// It will have a widget in the center of it
+class ContainerWithBorder extends StatelessWidget {
+  /// Returns a new [ContainerWithBorder] with the given widget
+  const ContainerWithBorder({required this.child, super.key});
 
+  /// The widget which will be displayed in the center
   final Widget child;
-
-  const ContainerWithBorder({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
-
-    final padding = EdgeInsets.all(20);
-    final margin = EdgeInsets.fromLTRB(30, 10, 30, 10);
-    final alignment =  Alignment.center;
+    const padding = EdgeInsets.all(20);
+    const margin = EdgeInsets.fromLTRB(30, 10, 30, 10);
+    const alignment = Alignment.center;
     final decoration = BoxDecoration(
-        color: Theme.of(context).colorScheme.onSecondary, 
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.all(Radius.circular(20))
+      color: Theme.of(context).colorScheme.onSecondary,
+      borderRadius: const BorderRadius.all(Radius.circular(20)),
     );
 
     return Container(
@@ -23,8 +24,7 @@ class ContainerWithBorder extends StatelessWidget{
       padding: padding,
       margin: margin,
       decoration: decoration,
-      child: child
+      child: child,
     );
   }
-
 }

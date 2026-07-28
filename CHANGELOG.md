@@ -1,10 +1,12 @@
-### 2.0.2
+### 2.1.0
 - Check if NFC is enabled on launch
 - Displays a message if NFC is disabled or not supported
 - Bumped Kotlin + Gradle version
 - Migrated Kotlin plugin
 - Fixed checksum check
 - Added message in case of invalid checksum of the balance
+- Applied flutter lint rules 
+- Set up sonarqube scan + added badges to the readme
 
 ### 2.0.1
 - Fixed UI overflow for some widgets

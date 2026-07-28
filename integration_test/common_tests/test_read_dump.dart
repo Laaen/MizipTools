@@ -1,28 +1,33 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:miziptools/main.dart';
-import 'package:miziptools/widgets/dump/dialog_read_dump.dart';
-import 'package:path_provider/path_provider.dart';
-import '../mock/mock_nfc_adapter.dart';
-import '../mock/mock_nfc_tag.dart';
-import 'consts.dart';
+import "package:flutter/material.dart";
+import "package:flutter_test/flutter_test.dart";
+import "package:miziptools/main.dart";
+import "package:miziptools/widgets/dump/dialog_read_dump.dart";
+import "package:path_provider/path_provider.dart";
+import "../mock/mock_nfc_adapter.dart";
+import "../mock/mock_nfc_tag.dart";
+import "consts.dart";
 
-// TODO : Add test for error message if no file selected
+// TODO(laen): Add test for error message if no file selected
 
-Future<void> testReadDumpSuccess(WidgetTester tester, MockNfcTag? mockTag, String dumpData) async{
-  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag);
-  mockAdapter.putTag();
+Future<void> testReadDumpSuccess(
+  WidgetTester tester,
+  MockNfcTag? mockTag,
+  String dumpData,
+) async {
+  final mockAdapter = MockNfcAdapter(tagToSimulate: mockTag)..putTag();
 
   // Create the dump
   final dir = await getExternalStorageDirectory();
-  File("${dir!.path}/${dumpData.substring(0, 8)}.dump").writeAsStringSync(dumpData);
+  File(
+    "${dir!.path}/${dumpData.substring(0, 8)}.dump",
+  ).writeAsStringSync(dumpData);
 
-  await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir,));
+  await tester.pumpWidget(App(nfcAdapter: mockAdapter, dataDir: dir));
   await tester.tap(find.widgetWithText(Tab, "Dumps"));
   await tester.pumpAndSettle(delay);
-  await Future.delayed(Duration(seconds: 1));
+  await Future.delayed(const Duration(seconds: 1));
   await tester.pumpAndSettle(delay);
   await tester.ensureVisible(find.widgetWithText(OutlinedButton, "Read"));
   await tester.pumpAndSettle(delay);
@@ -32,19 +37,19 @@ Future<void> testReadDumpSuccess(WidgetTester tester, MockNfcTag? mockTag, Strin
   await tester.pumpAndSettle(delay);
   await tester.tap(find.widgetWithText(OutlinedButton, "Read"));
   await tester.pumpAndSettle(delay);
-  await Future.delayed(Duration(milliseconds: 100));
+  await Future.delayed(const Duration(milliseconds: 100));
   expect(find.byType(ReadDumpDialog), findsOne);
   await tester.tap(find.widgetWithText(OutlinedButton, "Close"));
   await tester.pumpAndSettle(delay);
-  await Future.delayed(Duration(milliseconds: 100));
+  await Future.delayed(const Duration(milliseconds: 100));
   expect(find.byType(ReadDumpDialog), findsNothing);
 
   // Cleanup
   File("${dir.path}/${dumpData.substring(0, 8)}.dump").deleteSync();
-
 }
 
-const exampleDumpTestReadDump = """ABD453C7EB890400C808002000000017
+const exampleDumpTestReadDump = """
+ABD453C7EB890400C808002000000017
 6200488849884A884B88000000000000
 00000000000000000000000000000000
 A0A1A2A3A4A5787788C1B4C123439EEF

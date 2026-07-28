@@ -1,12 +1,26 @@
-import 'dart:typed_data';
+import "dart:typed_data";
+import "package:miziptools/extensions/string_extensions.dart";
+import "package:miziptools/extensions/uint8list_extensions.dart";
+import "package:miziptools/tags/mifare_classic_tag.dart";
 
-import 'package:miziptools/extensions/string_extensions.dart';
-import 'package:miziptools/extensions/uint8list_extensions.dart';
-import 'package:miziptools/tags/mifare_classic_tag.dart';
+/// The default keys a and b of a MifareClassic tag (FFFFFFFFFFFF)
+MifareKeys defaultKeys = (
+  a: List.generate(
+    5,
+    (_) => Uint8List.fromList(
+      [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF],
+    ),
+  ),
+  b: List.generate(
+    5,
+    (_) => Uint8List.fromList(
+      [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF],
+    ),
+  )
+);
 
-MifareKeys defaultKeys = (a: List.generate(5, (_) => Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])), b: List.generate(5, (_) => Uint8List.fromList([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])));
-
-MifareKeys generateKeys(Uint8List uid){
+/// Generates the a and b keys for the given UID
+MifareKeys generateKeys(Uint8List uid) {
   final baseKeysA = [
     Uint8List.fromList([0x64, 0x21, 0xE1, 0xE7, 0xE4, 0xD6]),
     Uint8List.fromList([0xC6, 0x46, 0x72, 0xF5, 0xFF, 0x1C]),
@@ -23,16 +37,29 @@ MifareKeys generateKeys(Uint8List uid){
 
   final transformedUID = xor(uid, baseUID, 8);
 
-  final intermediateKeyA = Uint8List.fromList(transformedUID + transformedUID.sublist(0,2));
-  final intermediateKeyB = Uint8List.fromList(transformedUID.sublist(2,4) + transformedUID);
+  final intermediateKeyA =
+      Uint8List.fromList(transformedUID + transformedUID.sublist(0, 2));
+  final intermediateKeyB =
+      Uint8List.fromList(transformedUID.sublist(2, 4) + transformedUID);
 
-  final keysA = [Uint8List.fromList([0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5])] + baseKeysA.map((key) => xor(key, intermediateKeyA, 12)).toList(); 
+  final keysA = [
+        Uint8List.fromList([0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5]),
+      ] +
+      baseKeysA.map((key) => xor(key, intermediateKeyA, 12)).toList();
 
-  final keysB = [Uint8List.fromList([0xB4, 0xC1, 0x23, 0X43, 0x9e, 0xEF])] + baseKeysB.map((key) => xor(key, intermediateKeyB, 12)).toList();
+  final keysB = [
+        Uint8List.fromList([0xB4, 0xC1, 0x23, 0X43, 0x9e, 0xEF]),
+      ] +
+      baseKeysB.map((key) => xor(key, intermediateKeyB, 12)).toList();
 
   return (a: keysA, b: keysB);
 }
 
-Uint8List xor(Uint8List x, Uint8List y, int leftPad){
-  return (int.parse(x.toHexString(), radix: 16) ^ int.parse(y.toHexString(), radix: 16)).toRadixString(16).padLeft(leftPad, '0').toUint8List();
+/// Returns a Uint8List which is the result of xoring two others
+Uint8List xor(Uint8List x, Uint8List y, int leftPad) {
+  return (int.parse(x.toHexString(), radix: 16) ^
+          int.parse(y.toHexString(), radix: 16))
+      .toRadixString(16)
+      .padLeft(leftPad, "0")
+      .toUint8List();
 }
